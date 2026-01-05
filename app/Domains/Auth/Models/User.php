@@ -15,7 +15,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-
+use App\Domains\Endereco\Models\Endereco;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property string $id
  * @property string $name
@@ -162,4 +163,14 @@ class User extends Authenticatable implements JWTSubject
         $this->notify(new VerifyEmail);
     }
     //endregion
+
+    /**
+     * Get the Endereco that owns this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function endereco(): BelongsTo
+    {
+        return $this->belongsTo(Endereco::class);
+    }
 }

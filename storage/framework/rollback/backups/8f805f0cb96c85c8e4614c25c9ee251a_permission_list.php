@@ -41,13 +41,4 @@ return [
         'endereco block',
         'endereco manage',
     ],
-    'loja' => [
-        'loja read',
-        'loja create',
-        'loja delete',
-        'loja list',
-        'loja edit',
-        'loja block',
-        'loja manage',
-    ],
 ];
