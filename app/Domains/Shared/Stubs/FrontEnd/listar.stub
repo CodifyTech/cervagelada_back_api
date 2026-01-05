@@ -1,0 +1,102 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import type { ComputedRef } from 'vue'
+import type { ITerm } from '@codifytech/types/globalTypes'
+import type { IHeader, ITableAction } from '@codifytech/types/layoutTable'
+
+import { {{store_name}} } from './stores/{{store_name}}'
+import type { {{interface_name}} } from './types'
+
+withDefaults(defineProps<{
+  isHeader: boolean
+}>(), {
+  isHeader: true,
+})
+
+definePage({
+  meta: {
+    action: 'list',
+    subject: '{{entity_singular_var}}',
+  },
+})
+
+const store = {{store_name}}()
+
+const {
+  items,
+  isSearching,
+  perPage,
+  currentPage,
+  total,
+  crudLoading,
+  stateHandler,
+  stateHandlerKey,
+} = storeToRefs(store)
+
+const {
+  loadMore,
+  setSearchParams,
+  reset,
+  destroy,
+  onOrderBy,
+} = store
+
+const headers: ComputedRef<IHeader[]> = computed(() => {
+  return {{header}} as IHeader[]
+})
+
+const terms: ComputedRef<ITerm[]> = computed(() => {
+  return {{terms}} as ITerm[]
+})
+
+const actions: ITableAction[] = [
+  {
+    icon: 'tabler-edit',
+    color: 'primary',
+    can: {
+      action: 'edit',
+      subject: '{{entity_singular_var}}',
+    },
+    to: (item: {{interface_name}}) => `/{{entity_singular_var}}/editar/${item.id}`,
+  },
+  {
+    icon: 'tabler-trash',
+    color: 'error',
+    can: {
+      action: 'delete',
+      subject: '{{entity_singular_var}}',
+    },
+    onClick: (item: {{interface_name}}) => destroy(item.id),
+  },
+]
+
+onBeforeRouteLeave(() => {
+  store.$reset()
+})
+</script>
+
+<template>
+  <LayoutTable
+    v-model:loading="crudLoading.items"
+    v-model:loading-destroy="crudLoading.delete"
+    v-model:is-searching="isSearching"
+    v-model:state-handler="stateHandler"
+    v-model:state-handler-key="stateHandlerKey"
+    :items="items || []"
+    :is-header="isHeader"
+    :destroy="destroy"
+    title="{{list_title}}"
+    new-item="/{{entity_singular_var}}/cadastrar"
+    :headers="headers"
+    :actions="actions"
+    :items-per-page="perPage"
+    :items-length="total || 0"
+    :page="currentPage"
+    :load-more="loadMore"
+    :terms-search="terms"
+    :set-search-params="setSearchParams"
+    :on-reset="reset"
+    :on-order-by="onOrderBy"
+    @update:searching="setSearchParams"
+  />
+</template>
