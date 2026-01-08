@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('bairro', 100);
             $table->string('cidade', 100);
             $table->string('estado', 2);
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
+            $table->string('latitude');
+            $table->string('longitude');
             $table->boolean('principal');
             $table->foreignUlid('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();

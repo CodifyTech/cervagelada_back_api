@@ -682,6 +682,202 @@
             },
             "status": "completed",
             "completed_at": "2026-01-05T20:03:37.694578Z"
+        },
+        {
+            "id": "695d2b5773108",
+            "timestamp": "2026-01-06T15:33:43.471331Z",
+            "action": "generate_domain",
+            "domain": "Produto",
+            "user": "night",
+            "created": [
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Models/Produto.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Migrations/2026_01_06_153348_create_produtos_table.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Services/ProdutoService.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Controllers/ProdutoController.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Requests/ProdutoRequest.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\routes/domains/produto.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Seeders/ProdutoSeeder.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/types.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/stores/useprodutoStore.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/services/produtoService.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/components/ProdutoForm.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/index.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/cadastrar/index.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/editar/[id].vue"
+            ],
+            "modified": [
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\routes/api.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/a68bc6c5b3e5dd6689a274364ce1c049_api.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\database\\seeders/DatabaseSeeder.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/cd4ddb88070494d6f18ced4e948f666f_DatabaseSeeder.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\config\\permission_list.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/8f805f0cb96c85c8e4614c25c9ee251a_permission_list.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/navigation/vertical/index.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/151631f9fc2e0a2da29607e31dab1ab1_index.ts"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/configs/abilityConfig.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/d22db7a981f91fa4fbe9d5314d1f6fc7_abilityConfig.ts"
+                }
+            ],
+            "directories": [
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Controllers",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Enums",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Migrations",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Models",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Requests",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Seeders",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Produto/Services",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/cadastrar",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/editar",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/components",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/services",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/produto/stores"
+            ],
+            "metadata": {
+                "php_version": "8.3.23",
+                "laravel_version": "12.38.1",
+                "is_domain_generator": true,
+                "skip_frontend": false,
+                "skip_backend": false,
+                "with_tests": false,
+                "with_docs": false
+            },
+            "status": "completed",
+            "completed_at": "2026-01-06T15:33:49.442085Z"
+        },
+        {
+            "id": "695ec9564abc4",
+            "timestamp": "2026-01-07T21:00:06.306140Z",
+            "action": "generate_crud",
+            "domain": "Loja",
+            "user": "night",
+            "created": [
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Models/HorarioLoja.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Migrations/2026_01_07_210009_create_horario_lojas_table.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Services/HorarioLojaService.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Controllers/HorarioLojaController.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Requests/HorarioLojaRequest.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\routes/domains/loja.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Loja/Seeders/HorarioLojaSeeder.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/loja/stores/usehorarioLojaStore.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/loja/services/horarioLojaService.ts"
+            ],
+            "modified": [
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\routes/api.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/a68bc6c5b3e5dd6689a274364ce1c049_api.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\database\\seeders/DatabaseSeeder.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/cd4ddb88070494d6f18ced4e948f666f_DatabaseSeeder.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\config\\permission_list.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/8f805f0cb96c85c8e4614c25c9ee251a_permission_list.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/navigation/vertical/index.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/151631f9fc2e0a2da29607e31dab1ab1_index.ts"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/configs/abilityConfig.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/d22db7a981f91fa4fbe9d5314d1f6fc7_abilityConfig.ts"
+                }
+            ],
+            "directories": [],
+            "metadata": {
+                "php_version": "8.3.23",
+                "laravel_version": "12.38.1",
+                "is_domain_generator": false,
+                "skip_frontend": false,
+                "skip_backend": false,
+                "with_tests": false,
+                "with_docs": false
+            },
+            "status": "completed",
+            "completed_at": "2026-01-07T21:00:10.242798Z"
+        },
+        {
+            "id": "695f1c6c7b48b",
+            "timestamp": "2026-01-08T02:54:36.504997Z",
+            "action": "generate_domain",
+            "domain": "Noticias",
+            "user": "night",
+            "created": [
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Models/Noticias.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Migrations/2026_01_08_025439_create_noticias_table.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Services/NoticiasService.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Controllers/NoticiasController.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Requests/NoticiasRequest.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\routes/domains/noticias.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Seeders/NoticiasSeeder.php",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/types.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/stores/usenoticiasStore.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/services/noticiasService.ts",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/components/NoticiasForm.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/index.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/cadastrar/index.vue",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/editar/[id].vue"
+            ],
+            "modified": [
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\routes/api.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/a68bc6c5b3e5dd6689a274364ce1c049_api.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\database\\seeders/DatabaseSeeder.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/cd4ddb88070494d6f18ced4e948f666f_DatabaseSeeder.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\config\\permission_list.php",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/8f805f0cb96c85c8e4614c25c9ee251a_permission_list.php"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/navigation/vertical/index.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/151631f9fc2e0a2da29607e31dab1ab1_index.ts"
+                },
+                {
+                    "file": "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/configs/abilityConfig.ts",
+                    "backup": "C:\\repos\\backs\\cerva-gelada-back\\storage\\framework/rollback/backups/d22db7a981f91fa4fbe9d5314d1f6fc7_abilityConfig.ts"
+                }
+            ],
+            "directories": [
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Controllers",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Enums",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Migrations",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Models",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Requests",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Seeders",
+                "C:\\repos\\backs\\cerva-gelada-back\\app\\Domains/Noticias/Services",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/cadastrar",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/editar",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/components",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/services",
+                "C:\\repos\\backs\\cerva-gelada-back\\\\..\\..\\fronts\\cerva-gelada-front\\src/pages/noticias/stores"
+            ],
+            "metadata": {
+                "php_version": "8.3.23",
+                "laravel_version": "12.38.1",
+                "is_domain_generator": true,
+                "skip_frontend": false,
+                "skip_backend": false,
+                "with_tests": false,
+                "with_docs": false
+            },
+            "status": "completed",
+            "completed_at": "2026-01-08T02:54:43.493382Z"
         }
     ]
 }

@@ -12,6 +12,68 @@ class LojaService extends BaseService
         $this->setModel($this->loja);
     }
 
-    // 👉 methods
-    
+    /**
+     * Create a store with horarios.
+     */
+    public function createWithHorarios(array $data)
+    {
+        \DB::beginTransaction();
+        try {
+            // Extract horarios from data
+            $horarios = $data['horarios'] ?? [];
+            unset($data['horarios']);
+
+            // Create the store
+            $loja = $this->model::create($data);
+
+            // Create horarios if provided
+            if (!empty($horarios)) {
+                foreach ($horarios as $horario) {
+                    $loja->horarios()->create($horario);
+                }
+            }
+
+            \DB::commit();
+            return $loja->load('horarios');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Update a store with horarios.
+     */
+    public function updateWithHorarios($id, array $data)
+    {
+        \DB::beginTransaction();
+        try {
+            $loja = $this->model::findOrFail($id);
+
+            // Extract horarios from data
+            $horarios = $data['horarios'] ?? null;
+            unset($data['horarios']);
+
+            // Update the store
+            $loja->update($data);
+
+            // Update horarios if provided
+            if ($horarios !== null) {
+                // Delete existing horarios and create new ones
+                $loja->horarios()->delete();
+
+                foreach ($horarios as $horario) {
+                    $loja->horarios()->create($horario);
+                }
+            }
+
+            \DB::commit();
+            return $loja->load('horarios');
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
 }

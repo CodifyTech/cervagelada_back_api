@@ -13,3 +13,9 @@ require __DIR__.'/domains/endereco.php';
 
 // Loja Domain Routes
 require __DIR__.'/domains/loja.php';
+
+// Produto Domain Routes
+require __DIR__.'/domains/produto.php';
+
+// Noticias Domain Routes
+require __DIR__.'/domains/noticias.php';

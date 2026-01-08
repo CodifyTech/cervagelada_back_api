@@ -50,4 +50,22 @@ return [
         'loja block',
         'loja manage',
     ],
+    'produto' => [
+        'produto read',
+        'produto create',
+        'produto delete',
+        'produto list',
+        'produto edit',
+        'produto block',
+        'produto manage',
+    ],
+    'noticias' => [
+        'noticias read',
+        'noticias create',
+        'noticias delete',
+        'noticias list',
+        'noticias edit',
+        'noticias block',
+        'noticias manage',
+    ],
 ];

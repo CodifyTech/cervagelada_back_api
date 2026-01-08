@@ -23,6 +23,29 @@ class LojaController extends BaseController
         $this->setRequest('request', LojaRequest::class);
     }
 
-    // 👉 methods
-    
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        try {
+            $loja = $this->service->createWithHorarios($request->all());
+            return response()->json($loja, 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao criar loja.', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        try {
+            $loja = $this->service->updateWithHorarios($id, $request->all());
+            return response()->json($loja);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao atualizar loja.', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

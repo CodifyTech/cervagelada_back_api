@@ -15,8 +15,10 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->string('nome_fantasia', 150);
             $table->enum('tipo_loja', ['distribuidor', 'cervejaria']);
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 10, 8);
+            $table->string('latitude');
+            $table->string('longitude');
+
+
             $table->integer('raio_entrega_km');
             $table->integer('tempo_entrega_min');
             $table->integer('tempo_entrega_max');
@@ -25,12 +27,13 @@ return new class extends Migration
             $table->decimal('taxa_comissao', 5, 2);
             $table->boolean('ativo');
             $table->string('cep', 10);
-            $table->string('rua', 150);
+            $table->string('logradouro', 150);
             $table->string('numero', 20);
             $table->string('complemento', 100)->nullable();
             $table->string('bairro', 100);
             $table->string('cidade', 100);
             $table->string('estado', 2);
+
             $table->timestamps();
         });
     }

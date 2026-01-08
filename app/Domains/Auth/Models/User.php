@@ -68,6 +68,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'tenant_id',
+        'loja_id',
         'foto',
         'termos',
         'ativo',
@@ -172,5 +173,13 @@ class User extends Authenticatable implements JWTSubject
     public function endereco(): BelongsTo
     {
         return $this->belongsTo(Endereco::class);
+    }
+
+    /**
+     * Get the Loja that owns this record.
+     */
+    public function loja(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Loja\Models\Loja::class);
     }
 }

@@ -41,4 +41,22 @@ return [
         'endereco block',
         'endereco manage',
     ],
+    'loja' => [
+        'loja read',
+        'loja create',
+        'loja delete',
+        'loja list',
+        'loja edit',
+        'loja block',
+        'loja manage',
+    ],
+    'produto' => [
+        'produto read',
+        'produto create',
+        'produto delete',
+        'produto list',
+        'produto edit',
+        'produto block',
+        'produto manage',
+    ],
 ];

@@ -21,12 +21,16 @@ class LojaRequest extends BaseFormRequest
             'taxa_comissao' => ['required', 'numeric'],
             'ativo' => ['required', 'boolean'],
             'cep' => ['required', 'string', 'max:10'],
-            'rua' => ['required', 'string', 'max:150'],
+            'logradouro' => ['required', 'string', 'max:150'],
             'numero' => ['required', 'string', 'max:20'],
             'complemento' => ['nullable', 'string', 'max:100'],
             'bairro' => ['required', 'string', 'max:100'],
             'cidade' => ['required', 'string', 'max:100'],
             'estado' => ['required', 'string', 'max:2'],
+            'horarios' => ['nullable', 'array'],
+            'horarios.*.abertura' => ['required_with:horarios', 'string', 'max:10'],
+            'horarios.*.fechamento' => ['required_with:horarios', 'string', 'max:10'],
+            'horarios.*.dia_semana' => ['required_with:horarios', 'string', 'max:10'],
         ];
     }
 
