@@ -147,7 +147,7 @@ class ProdutoService extends BaseService
             }
 
             $pivotData = [
-                'id' => '01ke7v5g1m9xkq6a4f2p8j7n',
+                'id' => (string) \Illuminate\Support\Str::ulid(),
                 'preco' => $data['preco'] ?? 0,
                 'preco_promocional' => $data['preco_promocional'] ?? null,
                 'estoque' => $data['estoque'] ?? 0,
