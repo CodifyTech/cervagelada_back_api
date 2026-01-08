@@ -10,6 +10,8 @@ use App\Domains\Loja\Seeders\LojaSeeder;
 use App\Domains\Produto\Seeders\ProdutoSeeder;
 use App\Domains\Loja\Seeders\HorarioLojaSeeder;
 use App\Domains\Noticias\Seeders\NoticiasSeeder;
+use App\Domains\Promocao\Seeders\PromocaoSeeder;
+use App\Domains\Promocao\Seeders\ProdutoPromocaoSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,5 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProdutoSeeder::class);
         $this->call(HorarioLojaSeeder::class);
         $this->call(NoticiasSeeder::class);
+        $this->call(PromocaoSeeder::class);
+        $this->call(ProdutoPromocaoSeeder::class);
     }
 }

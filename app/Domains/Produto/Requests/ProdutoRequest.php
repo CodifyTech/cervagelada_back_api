@@ -20,6 +20,11 @@ class ProdutoRequest extends BaseFormRequest
             'ean' => ['nullable', 'string', 'max:20'],
             'sku' => ['nullable', 'string', 'max:50'],
             'atributos' => ['nullable'],
+            'preco' => ['required_if:loja_id,!=,null', 'numeric', 'min:0'],
+            'preco_promocional' => ['nullable', 'numeric', 'min:0'],
+            'estoque' => ['required_if:loja_id,!=,null', 'numeric', 'min:0'],
+            'destaque' => ['nullable', 'boolean'],
+            'ativo' => ['nullable', 'boolean'],
         ];
     }
 

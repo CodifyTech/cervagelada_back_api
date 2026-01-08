@@ -68,4 +68,13 @@ return [
         'noticias block',
         'noticias manage',
     ],
+    'promocao' => [
+        'promocao read',
+        'promocao create',
+        'promocao delete',
+        'promocao list',
+        'promocao edit',
+        'promocao block',
+        'promocao manage',
+    ],
 ];

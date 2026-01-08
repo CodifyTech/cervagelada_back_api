@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Domains\Shared\Models\BaseModel;
-
+use App\Domains\Promocao\Models\Promocao;
 
 class Loja extends BaseModel
 {
@@ -45,5 +45,15 @@ class Loja extends BaseModel
     public function horarios(): HasMany
     {
         return $this->hasMany(HorarioLoja::class);
+    }
+
+    /**
+     * Get the promocoes for this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function promocoes(): HasMany
+    {
+        return $this->hasMany(Promocao::class);
     }
 }

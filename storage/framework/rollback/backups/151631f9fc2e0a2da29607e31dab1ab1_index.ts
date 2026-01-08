@@ -40,18 +40,18 @@ export default [
     action: 'list',
     subject: 'produto',
   },
+  {
+    title: 'Noticias',
+    icon: { icon: 'tabler-news' },
+    to: 'noticias',
+    action: 'list',
+    subject: 'noticias',
+  },
 {
-                    title: 'Loja',
+                    title: 'Promocao',
                     icon: { icon: 'tabler-template' },
-                    to: 'loja',
+                    to: 'promocao',
                     action: 'list',
-                    subject: 'loja',
-                },
-{
-                    title: 'Noticias',
-                    icon: { icon: 'tabler-template' },
-                    to: 'noticias',
-                    action: 'list',
-                    subject: 'noticias',
+                    subject: 'promocao',
                 },
 ]

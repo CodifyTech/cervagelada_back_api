@@ -12,6 +12,100 @@ class ProdutoService extends BaseService
         $this->setModel($this->produto);
     }
 
+    public function index(array $options = [], ?\Closure $builderCallback = null)
+    {
+        $user = auth()->user();
+
+        // If user belongs to a store, filter products by that store
+        if ($user && $user->loja_id) {
+            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            if ($loja) {
+                // Return products linked to the store, ordered by pivot creation time
+                $query = $loja->produtos()
+                    ->withPivot(['id', 'preco', 'preco_promocional', 'estoque', 'destaque', 'ativo'])
+                    ->orderBy('loja_produtos.created_at', 'desc');
+
+                if ($builderCallback !== null) {
+                    $builderCallback($query);
+                }
+
+                $data = $query->paginate($options['per_page'] ?? 15);
+
+                // Transform the items to include pivot data at the top level
+                $items = collect($data->items())->map(function ($item) {
+                    if ($item->pivot) {
+                        $item->preco = $item->pivot->preco;
+                        $item->preco_promocional = $item->pivot->preco_promocional;
+                        $item->estoque = $item->pivot->estoque;
+                        $item->destaque = (bool)$item->pivot->destaque;
+                        $item->ativo = (bool)$item->pivot->ativo;
+                    }
+                    return $item;
+                });
+
+                return [
+                    'data' => $items,
+                    'total' => $data->total(),
+                    'page' => $data->currentPage(),
+                    'current_page' => $data->currentPage(),
+                    'last_page' => $data->lastPage(),
+                ];
+            }
+        }
+
+        // Default or Admin behavior
+        return parent::index($options, $builderCallback);
+    }
+
+    public function store(array $data)
+    {
+        $user = auth()->user();
+        if ($user && $user->loja_id) {
+            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            if ($loja) {
+                return $this->createOrUpdateForStore($data, $loja);
+            }
+        }
+
+        return parent::store($data);
+    }
+
+    public function update(array $data, string $id)
+    {
+        $user = auth()->user();
+        if ($user && $user->loja_id) {
+            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            if ($loja) {
+                // Ensure the data has the product id for createOrUpdateForStore
+                $data['produto_id'] = $id;
+                return $this->createOrUpdateForStore($data, $loja);
+            }
+        }
+
+        return parent::update($data, $id);
+    }
+
+    public function show(string $id)
+    {
+        $produto = $this->findById($id);
+        $user = auth()->user();
+
+        $lojaProduct = \DB::table('loja_produtos')
+            ->where('loja_id', $user->loja_id)
+            ->where('produto_id', $id)
+            ->first();
+
+        if ($lojaProduct) {
+            $produto->preco = $lojaProduct->preco;
+            $produto->preco_promocional = $lojaProduct->preco_promocional;
+            $produto->estoque = $lojaProduct->estoque;
+            $produto->destaque = (bool)$lojaProduct->destaque;
+            $produto->ativo = (bool)$lojaProduct->ativo;
+        }
+
+        return $produto;
+    }
+
     use \App\Domains\Shared\Traits\S3FileOperations;
 
     public function createOrUpdateForStore(array $data, \App\Domains\Loja\Models\Loja $loja)
@@ -21,16 +115,12 @@ class ProdutoService extends BaseService
             $produto = null;
             $produtoId = $data['produto_id'] ?? null;
 
-            // 1. Find Product
             if ($produtoId) {
-                // Find by ID
-                $produto = $this->model::find($produtoId);
+                $produto = $this->produto::find($produtoId);
             } elseif (!empty($data['ean'])) {
-                // Find by EAN
-                $produto = $this->model::where('ean', $data['ean'])->first();
+                $produto = $this->produto::where('ean', $data['ean'])->first();
             }
 
-            // 2. Create Product (if not found)
             if (!$produto) {
                 $productData = [
                     'nome' => $data['nome'] ?? null,
@@ -38,7 +128,6 @@ class ProdutoService extends BaseService
                     'marca' => $data['marca'] ?? null,
                     'teor_alcoolico' => $data['teor_alcoolico'] ?? null,
                     'volume_ml' => $data['volume_ml'] ?? null,
-                    // Image upload handled below
                     'pedido_minimo' => $data['pedido_minimo'] ?? null,
                     'fabricante' => $data['fabricante'] ?? null,
                     'ean' => $data['ean'] ?? null,
@@ -46,18 +135,9 @@ class ProdutoService extends BaseService
                     'atributos' => $data['atributos'] ?? null,
                 ];
 
-                // Remove nulls to avoid overwriting defaults or issues
-                //$productData = array_filter($productData, fn($value) => !is_null($value));
-                // Actually, create needs all fields. Validation should ensure required ones.
-
-                $produto = $this->model::create($productData);
+                $produto = $this->produto::create($productData);
             }
 
-            // 3. Handle Image Upload (only if it's a new product or upgrading existing?)
-            // Usually only the owner or if creating new.
-            // Assuming this flow is "Loja creates/edits product".
-            // If product is shared, maybe only update image if it doesn't have one?
-            // For now, if image is provided, upload it.
             if (isset($data['url_imagem']) && $data['url_imagem'] instanceof \Illuminate\Http\UploadedFile) {
                 $fileName = $this->putS3File($data['url_imagem'], 'produtos');
                 if ($fileName) {
@@ -66,11 +146,11 @@ class ProdutoService extends BaseService
                 }
             }
 
-            // 4. Link/Update Store (Pivot)
             $pivotData = [
-                'preco' => $data['preco'],
+                'id' => '01ke7v5g1m9xkq6a4f2p8j7n',
+                'preco' => $data['preco'] ?? 0,
                 'preco_promocional' => $data['preco_promocional'] ?? null,
-                'estoque' => $data['estoque'],
+                'estoque' => $data['estoque'] ?? 0,
                 'destaque' => $data['destaque'] ?? false,
                 'ativo' => $data['ativo'] ?? true,
             ];
@@ -82,12 +162,12 @@ class ProdutoService extends BaseService
             }
 
             \DB::commit();
-            return $produto;
-
+            return $produto->load(['lojas' => function ($q) use ($loja) {
+                $q->where('lojas.id', $loja->id);
+            }]);
         } catch (\Exception $e) {
             \DB::rollBack();
             throw $e;
         }
     }
-
 }

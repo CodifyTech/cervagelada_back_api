@@ -59,4 +59,22 @@ return [
         'produto block',
         'produto manage',
     ],
+    'noticias' => [
+        'noticias read',
+        'noticias create',
+        'noticias delete',
+        'noticias list',
+        'noticias edit',
+        'noticias block',
+        'noticias manage',
+    ],
+    'promocao' => [
+        'promocao read',
+        'promocao create',
+        'promocao delete',
+        'promocao list',
+        'promocao edit',
+        'promocao block',
+        'promocao manage',
+    ],
 ];

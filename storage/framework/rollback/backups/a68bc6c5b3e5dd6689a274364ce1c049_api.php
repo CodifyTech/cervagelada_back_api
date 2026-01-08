@@ -19,3 +19,6 @@ require __DIR__.'/domains/produto.php';
 
 // Noticias Domain Routes
 require __DIR__.'/domains/noticias.php';
+
+// Promocao Domain Routes
+require __DIR__.'/domains/promocao.php';
