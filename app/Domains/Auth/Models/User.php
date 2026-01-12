@@ -17,7 +17,8 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Domains\Endereco\Models\Endereco;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-/**
+use App\Domains\Avaliacao\Models\Avaliacao;
+use Illuminate\Database\Eloquent\Relations\HasMany;/**
  * @property string $id
  * @property string $name
  * @property string $email
@@ -181,5 +182,15 @@ class User extends Authenticatable implements JWTSubject
     public function loja(): BelongsTo
     {
         return $this->belongsTo(\App\Domains\Loja\Models\Loja::class);
+    }
+
+    /**
+     * Get the avaliacoes for this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function avaliacoes(): HasMany
+    {
+        return $this->hasMany(Avaliacao::class);
     }
 }

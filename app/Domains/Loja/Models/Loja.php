@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Domains\Shared\Models\BaseModel;
 use App\Domains\Promocao\Models\Promocao;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 
 class Loja extends BaseModel
 {
     use HasFactory;
-
 
     /**
      * The table associated with the model.
@@ -55,5 +57,32 @@ class Loja extends BaseModel
     public function promocoes(): HasMany
     {
         return $this->hasMany(Promocao::class);
+    }
+    /**
+     * Get the pedidos for this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pedidos(): HasMany
+    {
+        return $this->hasMany(Pedido::class);
+    }
+    /**
+     * Get the avaliacoes for this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function avaliacoes(): HasMany
+    {
+        return $this->hasMany(Avaliacao::class);
+    }
+    /**
+     * Get the transacoesfinanceiras for this record.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transacoesFinanceiras(): HasMany
+    {
+        return $this->hasMany(TransacoesFinanceiras::class);
     }
 }

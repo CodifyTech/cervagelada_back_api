@@ -13,7 +13,7 @@ use App\Domains\Auth\Models\User;
 class Endereco extends BaseModel
 {
     use HasFactory;
-    
+
 
     /**
      * The table associated with the model.
@@ -27,8 +27,8 @@ class Endereco extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['apelido', 'cep', 'rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'latitude', 'longitude', 'principal', 'user_id'];
-    
+    protected $fillable = ['apelido', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'latitude', 'longitude', 'principal', 'user_id'];
+
 
     /**
      * Get the useres for this record.

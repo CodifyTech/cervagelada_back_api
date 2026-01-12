@@ -11,7 +11,7 @@ class EnderecoRequest extends BaseFormRequest
         return [
             'apelido' => ['nullable', 'string', 'max:50'],
             'cep' => ['required', 'string', 'max:10'],
-            'rua' => ['required', 'string', 'max:150'],
+            'logradouro' => ['required', 'string', 'max:150'],
             'numero' => ['required', 'string', 'max:20'],
             'complemento' => ['nullable', 'string', 'max:100'],
             'bairro' => ['required', 'string', 'max:100'],

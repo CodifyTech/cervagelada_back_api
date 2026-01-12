@@ -24,7 +24,7 @@ class LojaService extends BaseService
             unset($data['horarios']);
 
             // Create the store
-            $loja = $this->model::create($data);
+            $loja = $this->loja::create($data);
 
             // Create horarios if provided
             if (!empty($horarios)) {
@@ -49,7 +49,7 @@ class LojaService extends BaseService
     {
         \DB::beginTransaction();
         try {
-            $loja = $this->model::findOrFail($id);
+            $loja = $this->loja::findOrFail($id);
 
             // Extract horarios from data
             $horarios = $data['horarios'] ?? null;

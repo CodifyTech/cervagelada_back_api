@@ -12,6 +12,10 @@ use App\Domains\Loja\Seeders\HorarioLojaSeeder;
 use App\Domains\Noticias\Seeders\NoticiasSeeder;
 use App\Domains\Promocao\Seeders\PromocaoSeeder;
 use App\Domains\Promocao\Seeders\ProdutoPromocaoSeeder;
+use App\Domains\Pedido\Seeders\PedidoSeeder;
+use App\Domains\ItemPedido\Seeders\ItemPedidoSeeder;
+use App\Domains\Avaliacao\Seeders\AvaliacaoSeeder;
+use App\Domains\TransacoesFinanceiras\Seeders\TransacoesFinanceirasSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,5 +30,9 @@ class DatabaseSeeder extends Seeder
         $this->call(NoticiasSeeder::class);
         $this->call(PromocaoSeeder::class);
         $this->call(ProdutoPromocaoSeeder::class);
+        $this->call(PedidoSeeder::class);
+        $this->call(ItemPedidoSeeder::class);
+        $this->call(AvaliacaoSeeder::class);
+        $this->call(TransacoesFinanceirasSeeder::class);
     }
 }

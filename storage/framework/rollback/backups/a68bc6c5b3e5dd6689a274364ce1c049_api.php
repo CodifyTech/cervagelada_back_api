@@ -22,3 +22,15 @@ require __DIR__.'/domains/noticias.php';
 
 // Promocao Domain Routes
 require __DIR__.'/domains/promocao.php';
+
+// Pedido Domain Routes
+require __DIR__.'/domains/pedido.php';
+
+// ItemPedido Domain Routes
+require __DIR__.'/domains/item-pedido.php';
+
+// Avaliacao Domain Routes
+require __DIR__.'/domains/avaliacao.php';
+
+// TransacoesFinanceiras Domain Routes
+require __DIR__.'/domains/transacoes-financeiras.php';
