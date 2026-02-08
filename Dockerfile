@@ -1,7 +1,6 @@
-# Usa a imagem oficial do PHP com FPM
 FROM php:8.2-fpm
 
-# Instala dependências do sistema e Nginx
+# Instala dependências e cria diretórios de log
 RUN apt-get update && apt-get install -y \
     nginx \
     git \
@@ -12,9 +11,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     supervisor \
+    && mkdir -p /var/log/supervisor \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instala extensões PHP necessárias para o Laravel
+# Instala extensões PHP
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 
 # Instala Composer
@@ -37,42 +37,24 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/sites-available/default
 
-# Configuração do Supervisor
-RUN echo '[supervisord] \
-nodaemon=true \
-\
-[program:nginx] \
-command=nginx -g "daemon off;" \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0 \
-\
-[program:php-fpm] \
-command=docker-php-entrypoint php-fpm \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0' > /etc/supervisor/conf.d/supervisord.conf
-
-# Define o diretório de trabalho padrão
+# Define diretório de trabalho
 WORKDIR /var/www/html
 
-# --- CORREÇÃO AQUI ---
-# Usamos o * para que o comando não falhe se o composer.lock não existir
+# Copia arquivos do Composer
 COPY composer*.json ./
 
 # Instala dependências
-# --no-scripts: Importante para evitar erros se scripts do Laravel tentarem rodar antes do código estar todo lá
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
+# --- MUDANÇA AQUI: Copia o arquivo supervisord.conf que você criou ---
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copia o restante da aplicação
 COPY . .
 
-# Ajusta permissões
+# Permissões
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expõe a porta 80 (Nginx)
 EXPOSE 80
 
 # Inicia o Supervisor
