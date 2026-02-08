@@ -20,7 +20,7 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd opcache
 # Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configuração do Nginx (Inline para evitar arquivos externos)
+# Configuração do Nginx
 RUN echo 'server { \
     listen 80; \
     root /var/www/html/public; \
@@ -37,7 +37,7 @@ RUN echo 'server { \
     } \
 }' > /etc/nginx/sites-available/default
 
-# Configuração do Supervisor (para rodar Nginx e PHP-FPM juntos)
+# Configuração do Supervisor
 RUN echo '[supervisord] \
 nodaemon=true \
 \
@@ -58,20 +58,22 @@ stderr_logfile_maxbytes=0' > /etc/supervisor/conf.d/supervisord.conf
 # Define o diretório de trabalho padrão
 WORKDIR /var/www/html
 
-# Copia dependências do Composer primeiro (para cache)
-COPY composer.json composer.lock ./
+# --- CORREÇÃO AQUI ---
+# Usamos o * para que o comando não falhe se o composer.lock não existir
+COPY composer*.json ./
 
-# Instala dependências (Otimizado para produção)
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+# Instala dependências
+# --no-scripts: Importante para evitar erros se scripts do Laravel tentarem rodar antes do código estar todo lá
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 # Copia o restante da aplicação
 COPY . .
 
-# Ajusta permissões (Crítico para Laravel)
+# Ajusta permissões
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expõe a porta 80 (Nginx)
 EXPOSE 80
 
-# Inicia o Supervisor (que inicia Nginx e PHP-FPM)
+# Inicia o Supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
