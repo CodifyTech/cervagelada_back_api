@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        URL::forceHttps();
+        URL::forceHttps(config('pp.url'));
 
         HasMany::macro('createUpdateOrDelete', function (iterable $records) {
             /** @var HasMany $hasMany */
