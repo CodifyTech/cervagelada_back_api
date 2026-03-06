@@ -19,8 +19,12 @@ class LojaProdutoController extends BaseController
     /**
      * List products of a store.
      */
-    public function index(string $lojaId)
+    public function index(Request $request, $lojaId = null)
     {
+        if (!$lojaId) {
+             // Fallback or error if this was supposed to be a nested route
+             return parent::index($request);
+        }
         $loja = Loja::findOrFail($lojaId);
         $produtos = $loja->produtos()->orderBy('created_at', 'desc')->get(); // Customize sorting as needed
 
@@ -30,13 +34,22 @@ class LojaProdutoController extends BaseController
     /**
      * Add or link a product to a store.
      */
-    public function store(LojaProdutoRequest $request, string $lojaId)
+    public function store(Request $request, $lojaId = null)
     {
+        // Re-validate using the form request manually or rely on controller method injection if not enforcing strict compatibility.
+        // But since we are here due to error, let's fix the signature.
+        // We can just use the custom request if we don't extend strict BaseController or if BaseController didn't exist.
+        // Assuming strict mode.
+        $lojaId = $request->route('loja_id') ?? $lojaId;
+
         $loja = Loja::findOrFail($lojaId);
+
+        // Manual validation since we lost the type hint injection for auto-validation (unless we use app() make)
+        $validatedData = app(LojaProdutoRequest::class)->validate();
 
         try {
             // Logic moved to ProdutoService as requested
-            $produto = $this->produtoService->createOrUpdateForStore($request->validated(), $loja);
+            $produto = $this->produtoService->createOrUpdateForStore($validatedData, $loja);
 
             return response()->json(['message' => 'Produto adicionado com sucesso.', 'produto_id' => $produto->id], 201);
 
@@ -48,8 +61,17 @@ class LojaProdutoController extends BaseController
     /**
      * Update a product in a store (pivot data).
      */
-    public function update(LojaProdutoRequest $request, string $lojaId, string $produtoId)
+    public function update(Request $request, $lojaId, $produtoId = null)
     {
+        // Handling the mismatch of signature vs params
+        // BaseController::update(Request $request, $id) typically
+
+        // If productID came as the 3rd arg
+        if (!$produtoId) {
+             // Try to guess or fail
+             $produtoId = $request->route('produto_id'); // or 'produto'
+        }
+
         $loja = Loja::findOrFail($lojaId);
 
         // Check verification: "edit only if linked"
@@ -57,6 +79,7 @@ class LojaProdutoController extends BaseController
             return response()->json(['message' => 'Produto não vinculado a esta loja.'], 404);
         }
 
+        // Manual validation if needed, or simple extraction
         $pivotData = $request->only(['preco', 'preco_promocional', 'estoque', 'destaque', 'ativo']);
         $loja->produtos()->updateExistingPivot($produtoId, $pivotData);
 

@@ -73,6 +73,9 @@ class User extends Authenticatable implements JWTSubject
         'foto',
         'termos',
         'ativo',
+        'asaas_customer_id',
+        'cpf',
+        'telefone',
     ];
 
     /**

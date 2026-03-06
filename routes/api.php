@@ -34,3 +34,6 @@ require __DIR__.'/domains/avaliacao.php';
 
 // TransacoesFinanceiras Domain Routes
 require __DIR__.'/domains/transacoes-financeiras.php';
+
+use App\Domains\Shared\Controller\AsaasWebhookController;
+\Illuminate\Support\Facades\Route::post('/webhooks/asaas', [AsaasWebhookController::class, 'handle']);

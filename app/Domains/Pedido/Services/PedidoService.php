@@ -4,11 +4,15 @@ namespace App\Domains\Pedido\Services;
 
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Shared\Services\AsaasService;
+use Illuminate\Support\Str;
 
 class PedidoService extends BaseService
 {
-    public function __construct(private readonly Pedido $pedido)
-    {
+    public function __construct(
+        private readonly Pedido $pedido,
+        private readonly AsaasService $asaasService
+    ) {
         $this->setModel($this->pedido);
     }
 
@@ -26,10 +30,36 @@ class PedidoService extends BaseService
             unset($data['itens']);
 
             $lojaId = $data['loja_id'];
+            $user = auth()->user();
 
-            // Set user_id if not provided
-            if (!isset($data['user_id']) && auth()->check()) {
-                $data['user_id'] = auth()->id();
+            // 1. Sync Customer with Asaas
+            if ($user) {
+                if (empty($user->asaas_customer_id)) {
+                    $customerData = [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'cpfCnpj' => $data['cpf'] ?? $user->cpf, // Prefer data from request
+                        'mobilePhone' => $data['telefone'] ?? $user->telefone,
+                    ];
+
+                    // Basic validation for creating customer
+                    if (empty($customerData['cpfCnpj']) || empty($customerData['mobilePhone'])) {
+                         throw new \Exception("CPF e Telefone são obrigatórios para gerar o pagamento.");
+                    }
+
+                    $asaasCustomer = $this->asaasService->criarCliente($customerData);
+
+                    if (isset($asaasCustomer['id'])) {
+                        $user->update([
+                            'asaas_customer_id' => $asaasCustomer['id'],
+                            'cpf' => $customerData['cpfCnpj'],
+                            'telefone' => $customerData['mobilePhone']
+                        ]);
+                    } else {
+                        throw new \Exception("Erro ao criar cliente no Asaas: " . json_encode($asaasCustomer));
+                    }
+                }
+                $data['user_id'] = $user->id;
             }
 
             // Fallback status
@@ -66,11 +96,11 @@ class PedidoService extends BaseService
                 $subtotal += $precoTotal;
 
                 $itemsToCreate[] = [
-                    'id' => \Illuminate\Support\Str::ulid(),
+                    'id' => Str::ulid(),
                     'produto_id' => $produtoId,
                     'quantidade_solicitada' => $quantidade,
                     'quantidade_final' => $quantidade,
-                    'preco_unitario' => $preco,
+                    'preco_unitario' => $preco, // Use decimal value
                     'preco_total' => $precoTotal,
                     'ajuste_preco' => 0,
                     'observacoes' => $item['observacoes'] ?? null,
@@ -94,7 +124,56 @@ class PedidoService extends BaseService
                 $pedido->itemPedidos()->create($itemData);
             }
 
-            return $pedido->load('itemPedidos');
+            // 2. Create Payment in Asaas
+            if (isset($data['forma_pagamento'])) {
+                $formaPagamento = $data['forma_pagamento']; // PIX, CREDIT_CARD
+
+                $cobrancaData = [
+                    'customer' => $user->asaas_customer_id,
+                    'billingType' => $formaPagamento,
+                    'value' => $data['total'],
+                    'dueDate' => now()->addDays(1)->format('Y-m-d'),
+                    'description' => "Pedido #{$pedido->id}",
+                    'externalReference' => $pedido->id,
+                ];
+
+                if ($formaPagamento === 'CREDIT_CARD') {
+                    if (!isset($data['credit_card_token'])) {
+                         throw new \Exception("Token do cartão de crédito é obrigatório.");
+                    }
+                     $cobrancaData['creditCardToken'] = $data['credit_card_token'];
+                }
+
+                $cobranca = $this->asaasService->criarCobranca($cobrancaData);
+
+                if (isset($cobranca['id'])) {
+                    $transacaoData = [
+                        'tipo' => 'credito', // It's a payment IN
+                        'valor' => $data['total'],
+                        'descricao' => "Pagamento Pedido #{$pedido->id}",
+                        'liquidado' => false,
+                        'loja_id' => $lojaId,
+                        'pedido_id' => $pedido->id,
+                        'gateway_id' => $cobranca['id'],
+                        'gateway_status' => $cobranca['status'],
+                        'forma_pagamento' => $formaPagamento,
+                    ];
+
+                    if ($formaPagamento === 'PIX') {
+                         $qrCodeData = $this->asaasService->obterQRCode($cobranca['id']);
+                         $transacaoData['pix_qr_code'] = $qrCodeData['payload'] ?? null;
+                         $transacaoData['pix_qr_code_url'] = $qrCodeData['encodedImage'] ?? null;
+                    }
+
+                    $pedido->transacoesFinanceiras()->create($transacaoData);
+                } else {
+                     // Log error but maybe don't fail the order entirely? Or fail?
+                     // For now, let's fail to maintain consistency
+                     throw new \Exception("Erro ao criar cobrança no Asaas: " . json_encode($cobranca));
+                }
+            }
+
+            return $pedido->load(['itemPedidos', 'transacoesFinanceiras']);
         });
     }
 
@@ -120,6 +199,8 @@ class PedidoService extends BaseService
                         ->where('produto_id', $item->produto_id)
                         ->increment('estoque', $item->quantidade_final);
                 }
+
+                // TODO: Refund functionality if payment was made?
             }
 
             $pedido->update($data);

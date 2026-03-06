@@ -13,7 +13,7 @@ use App\Domains\Pedido\Models\Pedido;
 class TransacoesFinanceiras extends BaseModel
 {
     use HasFactory;
-    
+
 
     /**
      * The table associated with the model.
@@ -27,8 +27,11 @@ class TransacoesFinanceiras extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['tipo', 'valor', 'descricao', 'liquidado', 'liquidado_em', 'loja_id', 'pedido_id'];
-    
+    protected $fillable = [
+        'tipo', 'valor', 'descricao', 'liquidado', 'liquidado_em', 'loja_id', 'pedido_id',
+        'gateway_id', 'gateway_status', 'forma_pagamento', 'pix_qr_code', 'pix_qr_code_url'
+    ];
+
 
     /**
      * Get the Loja that owns this record.
