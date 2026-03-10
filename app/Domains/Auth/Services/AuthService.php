@@ -17,6 +17,9 @@ use App\Domains\Auth\Requests\RegisterRequest;
 use Illuminate\Validation\ValidationException;
 use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Auth\Requests\ForgotPasswordRequest;
+use App\Domains\Auth\Requests\RegisterStoreRequest;
+use App\Domains\Loja\Models\Loja;
+use Illuminate\Support\Facades\DB;
 
 class AuthService extends BaseService
 {
@@ -78,6 +81,48 @@ class AuthService extends BaseService
         ]));
 
         return response()->json($loggedIn->getData());
+    }
+
+    public function registerWithStore(RegisterStoreRequest $request): JsonResponse
+    {
+        return DB::transaction(function () use ($request) {
+            $loja = Loja::create($request->only([
+                'nome_fantasia', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km',
+                'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo',
+                'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento',
+                'bairro', 'cidade', 'estado'
+            ]));
+
+            if ($request->has('horarios')) {
+                foreach ($request->horarios as $horario) {
+                    $loja->horarios()->create($horario);
+                }
+            }
+
+            $user = $this->user->create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'celular' => $request->celular,
+                'cpf' => $request->cpf,
+                'password' => Hash::make($request->password),
+                'termos' => $request->termos,
+                'tenant_id' => $loja->id,
+                'loja_id' => $loja->id,
+            ]);
+
+            if (! empty($request->roles)) {
+                $user->assignRole($request->roles);
+            }
+
+            $user->sendEmailVerificationNotification();
+
+            $loggedIn = $this->login(new LoginRequest([
+                'email' => $request->email,
+                'password' => $request->password,
+            ]));
+
+            return response()->json($loggedIn->getData());
+        });
     }
 
     public function forgotPassword(ForgotPasswordRequest $request): array

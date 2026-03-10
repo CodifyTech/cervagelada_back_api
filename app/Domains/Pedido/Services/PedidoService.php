@@ -127,4 +127,114 @@ class PedidoService extends BaseService
             return $pedido->refresh();
         });
     }
+
+    /**
+     * Returns a single Pedido with all relations needed for the detail screen.
+     *
+     * @param  string  $id
+     * @return Pedido
+     */
+    public function show(string $id)
+    {
+        return Pedido::with([
+            'itemPedidos.produto',
+            'user',
+            'loja',
+        ])->findOrFail($id);
+    }
+
+    /**
+     * Returns paginated orders for the authenticated user's store.
+     * Supports filtering by status, date range, and customer name search.
+     *
+     * @param  array  $options
+     * @return array
+     */
+    public function listarLoja(array $options = []): array
+    {
+        $lojaId = $this->resolveLojaId();
+
+        $query = Pedido::with(['user', 'itemPedidos'])
+            ->where('loja_id', $lojaId);
+
+        // Filter by status
+        if (!empty($options['status'])) {
+            $query->where('status', $options['status']);
+        }
+
+        // Filter by date range
+        if (!empty($options['data_inicio'])) {
+            $query->whereDate('created_at', '>=', $options['data_inicio']);
+        }
+        if (!empty($options['data_fim'])) {
+            $query->whereDate('created_at', '<=', $options['data_fim']);
+        }
+
+        // Search by customer name
+        if (!empty($options['search'])) {
+            $search = $options['search'];
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        $perPage = intval($options['per_page'] ?? 15);
+        $data = $query->paginate($perPage);
+
+        return [
+            'data'         => $data->items(),
+            'total'        => $data->total(),
+            'page'         => $data->currentPage(),
+            'current_page' => $data->currentPage(),
+            'last_page'    => $data->lastPage(),
+        ];
+    }
+
+    /**
+     * Returns order status counts (for dashboard summary cards) for the
+     * authenticated user's store.
+     *
+     * @return array
+     */
+    public function resumoLoja(): array
+    {
+        $lojaId = $this->resolveLojaId();
+
+        $counts = Pedido::where('loja_id', $lojaId)
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        $statuses = ['pendente', 'preparando', 'pronto', 'em_rota', 'entregue', 'cancelado'];
+        $result = [];
+        foreach ($statuses as $status) {
+            $result[$status] = $counts[$status] ?? 0;
+        }
+        $result['total'] = array_sum($result);
+
+        return $result;
+    }
+
+    /**
+     * Resolves the loja_id for the currently authenticated user.
+     * Uses the loja_id stored directly on the users table.
+     *
+     * @return string
+     * @throws \Exception
+     */
+    protected function resolveLojaId(): string
+    {
+        $user = auth()->user();
+
+        $lojaId = $user->loja_id ?? null;
+
+        if (!$lojaId) {
+            throw new \Exception('Loja não encontrada para o usuário autenticado.', 403);
+        }
+
+        return $lojaId;
+    }
 }

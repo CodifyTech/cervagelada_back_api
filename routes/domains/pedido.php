@@ -17,9 +17,12 @@ Route::group([
     'as' => 'pedido'
 ], function () {
 
-    // Pedido Routes
+    // Static routes MUST come before apiResource to avoid the {pedido} wildcard capturing them
+    Route::get('pedidos/listar/loja', [PedidoController::class, 'listarLoja']);
+    Route::get('pedidos/resumo/loja', [PedidoController::class, 'resumoLoja']);
+    Route::patch('pedidos/{id}/status', [PedidoController::class, 'atualizarStatus']);
+
+    // Pedido Resource Routes
     Route::apiResource('pedidos', PedidoController::class);
     Route::post('pedidos/search', [PedidoController::class, 'search']);
-    
-    Route::get('pedidos/listar/loja', [PedidoController::class, 'listarLoja']);
 });

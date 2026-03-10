@@ -6,6 +6,7 @@ use App\Domains\Auth\Requests\ForgotPasswordRequest;
 use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Auth\Requests\LoginRequest;
 use App\Domains\Auth\Requests\RegisterRequest;
+use App\Domains\Auth\Requests\RegisterStoreRequest;
 use App\Domains\Auth\Services\AuthService;
 use App\Domains\Shared\Controller\BaseController;
 
@@ -37,6 +38,16 @@ class AuthController extends BaseController
     public function register(RegisterRequest $request)
     {
         return $this->authService->register($request);
+    }
+
+    /**
+     * Create the authenticated User and Store (Tenant).
+     *
+     * @param RegisterStoreRequest $request
+     */
+    public function registerStore(RegisterStoreRequest $request)
+    {
+        return $this->authService->registerWithStore($request);
     }
 
     public function forgotPassword(ForgotPasswordRequest $payload)
