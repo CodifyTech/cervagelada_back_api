@@ -6,6 +6,7 @@ use App\Domains\Shared\Macros\BelongsToManyCreateUpdateOrDelete;
 use App\Domains\Shared\Macros\CreateUpdateOrDelete;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use URL;
 
@@ -22,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         URL::forceHttps(config('pp.url'));
+        Schema::defaultStringLength(191);
 
         HasMany::macro('createUpdateOrDelete', function (iterable $records) {
             /** @var HasMany $hasMany */

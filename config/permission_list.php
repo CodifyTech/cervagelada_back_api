@@ -113,4 +113,7 @@ return [
         'transacoesfinanceiras block',
         'transacoesfinanceiras manage',
     ],
+    'dashboard' => [
+        'dashboard read',
+    ],
 ];
