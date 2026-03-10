@@ -70,4 +70,14 @@ class DashboardController extends BaseController
         $limit = $request->get('limit', 5);
         return response()->json($this->service->getPedidosRecentes($limit));
     }
+
+    /**
+     * Consolidated dashboard data.
+     */
+    public function dashboard(Request $request): JsonResponse
+    {
+        $ano = $request->get('ano', date('Y'));
+        $limit = $request->get('limit', 5);
+        return response()->json($this->service->getDashboard($ano, $limit));
+    }
 }

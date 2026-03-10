@@ -61,6 +61,21 @@ class DashboardService extends BaseService
     }
 
     /**
+     * Get all dashboard data at once.
+     */
+    public function getDashboard(int $ano, int $limit = 5): array
+    {
+        return [
+            'metricas' => $this->getMetricas(),
+            'vendas_mensais' => $this->getVendasMensais($ano),
+            'pedidos_por_mes' => $this->getPedidosPorMes($ano),
+            'categorias_mais_vendidas' => $this->getCategoriasMaisVendidas(),
+            'top_produtos' => $this->getTopProdutos($limit),
+            'pedidos_recentes' => $this->getPedidosRecentes($limit),
+        ];
+    }
+
+    /**
      * Resolves the loja_id for the currently authenticated user.
      *
      * @return string

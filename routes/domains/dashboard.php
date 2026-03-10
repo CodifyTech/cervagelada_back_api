@@ -22,4 +22,5 @@ Route::group([
     Route::get('categorias-mais-vendidas', [DashboardController::class, 'categoriasMaisVendidas']);
     Route::get('top-produtos', [DashboardController::class, 'topProdutos']);
     Route::get('pedidos-recentes', [DashboardController::class, 'pedidosRecentes']);
+    Route::get('dashboard', [DashboardController::class, 'dashboard']);
 });
