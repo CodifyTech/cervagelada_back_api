@@ -14,15 +14,18 @@ enum RoleEnum: string
             self::Admin => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.manage'),
+                ...config('permission_list.dashboard'),
             ],
             self::AdminSystem => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.profile'),
                 ...config('permission_list.users'),
+                ...config('permission_list.dashboard')
             ],
             self::User => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.profile'),
+                ...config('permission_list.dashboard'),
             ],
         };
     }

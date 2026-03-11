@@ -19,30 +19,31 @@ class PedidoSeeder extends Seeder
      */
     public function run(): void
     {
-        // Garantir que existam Lojas para o relacionamento
-        // $this->call(\App\Domains\Loja\Seeders\LojaSeeder::class);
+        $lojas = Loja::all();
+        $users = \App\Domains\Auth\Models\User::all();
+        
+        // We will create orders for the last 12 months to populate the charts
+        $hoje = \Carbon\Carbon::now();
 
-        // Para usar factories, crie o arquivo de factory correspondente:
-        // Pedido::factory(10)->create();
-
-        // Criar registros manualmente de exemplo:
-        /*
-        Pedido::create([
-            'nome' => 'Exemplo de Pedido',
-            // Adicione mais campos conforme necessário
-        ]);
-        */
-
-        // Exemplo com relacionamentos:
-        /*
-        $relatedModel = RelatedModel::first();
-        if ($relatedModel) {
-            Pedido::create([
-                'nome' => 'Exemplo com relação',
-                'related_model_id' => $relatedModel->id,
-                // Outros campos...
-            ]);
+        foreach ($lojas as $loja) {
+            // Create between 20 and 40 orders per loja distributed over 12 months
+            $numPedidos = rand(20, 40);
+            
+            for ($i = 0; $i < $numPedidos; $i++) {
+                $user = $users->random();
+                $dataCriacao = $hoje->copy()->subMonths(rand(0, 11))->subDays(rand(0, 28));
+                
+                Pedido::create([
+                    'loja_id' => $loja->id,
+                    'user_id' => $user->id,
+                    'subtotal' => 0, // Will be updated by ItemPedidoSeeder or after item creation
+                    'taxa_entrega' => rand(5, 15),
+                    'total' => 0, // Will be updated
+                    'status' => ['pendente', 'preparando', 'pronto', 'em_rota', 'entregue', 'entregue', 'entregue'][rand(0, 6)],
+                    'created_at' => $dataCriacao,
+                    'updated_at' => $dataCriacao,
+                ]);
+            }
         }
-        */
     }
 }

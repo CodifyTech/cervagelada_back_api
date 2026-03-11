@@ -19,30 +19,44 @@ class ItemPedidoSeeder extends Seeder
      */
     public function run(): void
     {
-        // Garantir que existam Pedidos para o relacionamento
-        // $this->call(\App\Domains\Pedido\Seeders\PedidoSeeder::class);
+        $pedidos = Pedido::all();
 
-        // Para usar factories, crie o arquivo de factory correspondente:
-        // ItemPedido::factory(10)->create();
+        foreach ($pedidos as $pedido) {
+            $lojaId = $pedido->loja_id;
+            
+            // Get products available in this store from pivot table
+            $lojaProdutos = \DB::table('loja_produtos')
+                ->where('loja_id', $lojaId)
+                ->get();
 
-        // Criar registros manualmente de exemplo:
-        /*
-        ItemPedido::create([
-            'nome' => 'Exemplo de ItemPedido',
-            // Adicione mais campos conforme necessário
-        ]);
-        */
+            if ($lojaProdutos->isEmpty()) continue;
 
-        // Exemplo com relacionamentos:
-        /*
-        $relatedModel = RelatedModel::first();
-        if ($relatedModel) {
-            ItemPedido::create([
-                'nome' => 'Exemplo com relação',
-                'related_model_id' => $relatedModel->id,
-                // Outros campos...
+            $numItens = rand(1, 5);
+            $subtotal = 0;
+            $itensSelecionados = $lojaProdutos->random(min($numItens, $lojaProdutos->count()));
+
+            foreach ($itensSelecionados as $lojaProduto) {
+                $quantidade = rand(1, 4);
+                $preco = $lojaProduto->preco_promocional ?? $lojaProduto->preco;
+                $totalItem = $preco * $quantidade;
+                $subtotal += $totalItem;
+
+                ItemPedido::create([
+                    'pedido_id' => $pedido->id,
+                    'produto_id' => $lojaProduto->produto_id,
+                    'quantidade_solicitada' => $quantidade,
+                    'quantidade_final' => $quantidade,
+                    'preco_unitario' => $preco,
+                    'preco_total' => $totalItem,
+                    'ajuste_preco' => 0,
+                ]);
+            }
+
+            // Update pedido totals
+            $pedido->update([
+                'subtotal' => $subtotal,
+                'total' => $subtotal + $pedido->taxa_entrega,
             ]);
         }
-        */
     }
 }

@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Domains\Shared\Models\BaseModel;
 use App\Domains\Loja\Models\Loja;
 use App\Domains\ItemPedido\Models\ItemPedido;
-use App\Domains\Avaliacao\Models\Avaliacao;class Pedido extends BaseModel
-use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;{
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
+
+class Pedido extends BaseModel
+{
     use HasFactory;
 
 

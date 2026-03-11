@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(EnderecoSeeder::class);
         $this->call(LojaSeeder::class);
         $this->call(ProdutoSeeder::class);
+        $this->call(\App\Domains\Loja\Seeders\LojaProdutoSeeder::class);
         $this->call(HorarioLojaSeeder::class);
         $this->call(NoticiasSeeder::class);
         $this->call(PromocaoSeeder::class);
