@@ -12,11 +12,11 @@ class TransacoesFinanceirasController extends BaseController
 {
     public function __construct(private readonly TransacoesFinanceirasService $service)
     {
-        $this->setACL('transacoesfinanceiras', [
-            'list' => ['transacoesfinanceiras.index'],
-            'create' => ['transacoesfinanceiras.store'],
-            'edit'=> ['transacoesfinanceiras.update'],
-            'delete' => ['transacoesfinanceiras.destroy']
+        $this->setACL('transacoes-financeiras', [
+            'list' => ['transacoes-financeiras.index'],
+            'create' => ['transacoes-financeiras.store'],
+            'edit'=> ['transacoes-financeiras.update'],
+            'delete' => ['transacoes-financeiras.destroy']
         ]);
         parent::__construct();
         $this->setService($this->service);

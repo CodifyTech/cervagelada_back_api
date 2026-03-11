@@ -1,5 +1,8 @@
 <?php
 
+// Public routes (no admin auth required)
+require __DIR__ . '/public.php';
+
 require __DIR__ . '/auth.php';
 
 require __DIR__ . '/roles.php';

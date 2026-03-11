@@ -12,6 +12,7 @@ class UserRequest extends BaseFormRequest
         return [
             'foto' => ['nullable'],
             'name' => ['required', 'string', 'max:255'],
+            'telefone' => ['nullable', 'string', 'max:20'],
         ];
     }
 

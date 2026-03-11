@@ -4,9 +4,11 @@ namespace App\Domains\Produto\Controllers;
 
 use App\Domains\Shared\Controller\BaseController;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 use App\Domains\Produto\Services\ProdutoService;
 use App\Domains\Produto\Requests\ProdutoRequest;
+use App\Domains\Produto\Models\Produto;
 
 class ProdutoController extends BaseController
 {
@@ -23,38 +25,24 @@ class ProdutoController extends BaseController
         $this->setRequest('request', ProdutoRequest::class);
     }
 
-    /**
-     * Display a listing of the resource.
-     * Overridden to filter by User's Store.
-     */
     public function index(Request $request, ?\Closure $builderCallback = null)
     {
         return parent::index($request, $builderCallback);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * Overridden to link to User's Store.
-     */
     public function store(Request $request)
     {
         return parent::store($request);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         return parent::update($request, $id);
     }
 
-    /**
-     * Search product by EAN.
-     */
     public function searchByEan(string $ean)
     {
-        $produto = \App\Domains\Produto\Models\Produto::where('ean', $ean)->first();
+        $produto = Produto::where('ean', $ean)->first();
 
         if ($produto) {
             return response()->json([
@@ -67,5 +55,50 @@ class ProdutoController extends BaseController
             'exists' => false,
             'data' => (object)[]
         ]);
+    }
+
+    public function pendentes(Request $request): JsonResponse
+    {
+        $query = Produto::pendentes()
+            ->with('aprovador')
+            ->orderBy('created_at', 'desc');
+
+        if ($request->filled('busca')) {
+            $query->where('nome', 'like', '%' . $request->input('busca') . '%');
+        }
+
+        return response()->json($query->paginate($request->input('per_page', 20)));
+    }
+
+    public function aprovar(string $id): JsonResponse
+    {
+        $produto = Produto::findOrFail($id);
+
+        $produto->update([
+            'status_aprovacao' => 'aprovado',
+            'motivo_reprovacao' => null,
+            'aprovado_por' => auth()->id(),
+            'aprovado_em' => now(),
+        ]);
+
+        return response()->json($produto->fresh('aprovador'));
+    }
+
+    public function reprovar(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'motivo' => 'required|string|max:1000',
+        ]);
+
+        $produto = Produto::findOrFail($id);
+
+        $produto->update([
+            'status_aprovacao' => 'reprovado',
+            'motivo_reprovacao' => $request->input('motivo'),
+            'aprovado_por' => auth()->id(),
+            'aprovado_em' => now(),
+        ]);
+
+        return response()->json($produto->fresh('aprovador'));
     }
 }

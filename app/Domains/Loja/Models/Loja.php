@@ -12,6 +12,8 @@ use App\Domains\Promocao\Models\Promocao;
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Avaliacao\Models\Avaliacao;
 use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
+use App\Casts\UploadCast;
+use Illuminate\Database\Eloquent\Builder;
 
 class Loja extends BaseModel
 {
@@ -29,7 +31,26 @@ class Loja extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['nome_fantasia', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km', 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo', 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado'];
+    protected $fillable = ['nome_fantasia', 'url_logo', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km', 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo', 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado'];
+
+    protected $casts = [
+        'url_logo' => UploadCast::class,
+    ];
+
+    public string $fileDir = 'lojas';
+
+    /**
+     * Scope to filter stores within delivery radius using Haversine formula.
+     */
+    public function scopePorRaio(Builder $query, float $lat, float $lng): Builder
+    {
+        $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
+
+        return $query
+            ->selectRaw("*, {$haversine} AS distancia", [$lat, $lng, $lat])
+            ->whereRaw("{$haversine} <= raio_entrega_km", [$lat, $lng, $lat])
+            ->orderByRaw("{$haversine} ASC", [$lat, $lng, $lat]);
+    }
 
     /**
      * Get the products for the store.

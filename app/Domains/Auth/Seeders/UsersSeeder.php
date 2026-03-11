@@ -214,6 +214,26 @@ class UsersSeeder extends Seeder
                 ],
                 'roleName' => 'user',
             ],
+
+            // Perfis de teste nomeados
+            [
+                'data' => [
+                    'name' => 'Seller Teste',
+                    'email' => 'seller@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'user',
+            ],
+            [
+                'data' => [
+                    'name' => 'Consumidor Teste',
+                    'email' => 'consumidor@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'user',
+            ],
         ];
 
         foreach ($users as $user) {

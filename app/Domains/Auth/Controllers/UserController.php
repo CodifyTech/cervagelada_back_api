@@ -12,7 +12,7 @@ class UserController extends BaseController
 {
     public function __construct(private readonly UserService $userService)
     {
-        $this->setACL('users', [
+        $this->setACL('user', [
             'list' => ['index'],
             'create' => ['store'],
         ]);

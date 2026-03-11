@@ -12,11 +12,11 @@ class ItemPedidoController extends BaseController
 {
     public function __construct(private readonly ItemPedidoService $service)
     {
-        $this->setACL('itempedido', [
-            'list' => ['itempedido.index'],
-            'create' => ['itempedido.store'],
-            'edit'=> ['itempedido.update'],
-            'delete' => ['itempedido.destroy']
+        $this->setACL('item-pedido', [
+            'list' => ['item-pedido.index'],
+            'create' => ['item-pedido.store'],
+            'edit'=> ['item-pedido.update'],
+            'delete' => ['item-pedido.destroy']
         ]);
         parent::__construct();
         $this->setService($this->service);

@@ -7,12 +7,12 @@ return [
     'manage' => [
         'all manage',
     ],
-    'users' => [
-        'users read',
-        'users list',
-        'users create',
-        'users edit',
-        'users delete',
+    'user' => [
+        'user read',
+        'user list',
+        'user create',
+        'user edit',
+        'user delete',
     ],
     'profile' => [
         'profile read',
@@ -86,14 +86,14 @@ return [
         'pedido block',
         'pedido manage',
     ],
-    'itempedido' => [
-        'itempedido read',
-        'itempedido create',
-        'itempedido delete',
-        'itempedido list',
-        'itempedido edit',
-        'itempedido block',
-        'itempedido manage',
+    'item-pedido' => [
+        'item-pedido read',
+        'item-pedido create',
+        'item-pedido delete',
+        'item-pedido list',
+        'item-pedido edit',
+        'item-pedido block',
+        'item-pedido manage',
     ],
     'avaliacao' => [
         'avaliacao read',
@@ -104,14 +104,14 @@ return [
         'avaliacao block',
         'avaliacao manage',
     ],
-    'transacoesfinanceiras' => [
-        'transacoesfinanceiras read',
-        'transacoesfinanceiras create',
-        'transacoesfinanceiras delete',
-        'transacoesfinanceiras list',
-        'transacoesfinanceiras edit',
-        'transacoesfinanceiras block',
-        'transacoesfinanceiras manage',
+    'transacoes-financeiras' => [
+        'transacoes-financeiras read',
+        'transacoes-financeiras create',
+        'transacoes-financeiras delete',
+        'transacoes-financeiras list',
+        'transacoes-financeiras edit',
+        'transacoes-financeiras block',
+        'transacoes-financeiras manage',
     ],
     'dashboard' => [
         'dashboard read',

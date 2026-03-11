@@ -17,9 +17,16 @@ Route::group([
     'as' => 'produto'
 ], function () {
 
+    // Approval routes (must come before apiResource to avoid wildcard capture)
+    Route::get('produtos/pendentes', [ProdutoController::class, 'pendentes']);
+    Route::post('produtos/{id}/aprovar', [ProdutoController::class, 'aprovar']);
+    Route::post('produtos/{id}/reprovar', [ProdutoController::class, 'reprovar']);
+
+    // EAN search (must come before apiResource)
+    Route::get('produtos/ean/{ean}', [ProdutoController::class, 'searchByEan']);
+
     // Produto Routes
     Route::apiResource('produtos', ProdutoController::class);
     Route::post('produtos/search', [ProdutoController::class, 'search']);
-    Route::get('produtos/ean/{ean}', [ProdutoController::class, 'searchByEan']);
 
 });

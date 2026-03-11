@@ -30,27 +30,22 @@ class Pedido extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id'];
+    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'endereco_id'];
 
 
-    /**
-     * Get the User that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Domains\Auth\Models\User::class);
     }
 
-    /**
-     * Get the Loja that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function loja(): BelongsTo
     {
         return $this->belongsTo(Loja::class);
+    }
+
+    public function endereco(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Endereco\Models\Endereco::class);
     }
     /**
      * Get the itempedidos for this record.

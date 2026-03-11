@@ -176,6 +176,20 @@ class AuthService extends BaseService
         return response()->json(auth()->user());
     }
 
+    public function updateProfile(): JsonResponse
+    {
+        $user = auth()->user();
+        $data = request()->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'telefone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($data);
+
+        return response()->json($user->fresh());
+    }
+
     /**
      * Refresh a token.
      *

@@ -14,28 +14,37 @@ class Produto extends BaseModel
 {
     use HasFactory;
 
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'produtos';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = ['nome', 'descricao', 'marca', 'teor_alcoolico', 'volume_ml', 'url_imagem', 'pedido_minimo', 'fabricante', 'ean', 'sku', 'atributos'];
+    protected $fillable = [
+        'nome', 'descricao', 'marca', 'teor_alcoolico', 'volume_ml',
+        'url_imagem', 'pedido_minimo', 'fabricante', 'ean', 'sku', 'atributos',
+        'status_aprovacao', 'motivo_reprovacao', 'aprovado_por', 'aprovado_em',
+    ];
 
-    /**
-     * Get the stores for the product.
-     */
+    protected $casts = [
+        'aprovado_em' => 'datetime',
+    ];
+
+    public function aprovador(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'aprovado_por');
+    }
+
     public function lojas(): BelongsToMany
     {
         return $this->belongsToMany(\App\Domains\Loja\Models\Loja::class, 'loja_produtos', 'produto_id', 'loja_id')
                     ->withPivot(['id', 'preco', 'preco_promocional', 'estoque', 'destaque', 'ativo'])
                     ->withTimestamps();
+    }
+
+    public function scopeAprovados($query)
+    {
+        return $query->where('status_aprovacao', 'aprovado');
+    }
+
+    public function scopePendentes($query)
+    {
+        return $query->where('status_aprovacao', 'pendente');
     }
 }

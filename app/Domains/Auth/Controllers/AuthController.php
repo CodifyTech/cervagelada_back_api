@@ -69,6 +69,11 @@ class AuthController extends BaseController
         return $this->authService->profile();
     }
 
+    public function updateProfile()
+    {
+        return $this->authService->updateProfile();
+    }
+
     /**
      * Log the user out (Invalidate the token).
      */

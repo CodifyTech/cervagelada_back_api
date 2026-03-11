@@ -4,9 +4,6 @@ namespace App\Domains\Endereco\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Domains\Shared\Models\BaseModel;
 use App\Domains\Auth\Models\User;
 
@@ -31,12 +28,12 @@ class Endereco extends BaseModel
 
 
     /**
-     * Get the useres for this record.
+     * Get the user that owns this address.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function useres(): HasMany
+    public function user(): BelongsTo
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class);
     }
 }

@@ -10,6 +10,7 @@ class LojaRequest extends BaseFormRequest
     {
         return [
             'nome_fantasia' => ['required', 'string', 'max:150'],
+            'url_logo' => ['nullable', 'image', 'max:2048'],
             'tipo_loja' => ['required', 'in:distribuidor,cervejaria'],
             'latitude' => ['required', 'numeric'],
             'longitude' => ['required', 'numeric'],

@@ -19,7 +19,7 @@ enum RoleEnum: string
             self::AdminSystem => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.profile'),
-                ...config('permission_list.users'),
+                ...config('permission_list.user'),
                 ...config('permission_list.dashboard')
             ],
             self::User => [

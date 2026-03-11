@@ -1,0 +1,1447 @@
+[
+  {
+    "idx": 1,
+    "summary": "EPIC-01: Estabilizacao e Qualidade da Base",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Fundacao\n**Repositorios:** cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nObjetivo: estabilizar a base atual dos tres repositorios, corrigir inconsistencias estruturais, padronizar ACL e garantir que o build funciona sem erros bloqueantes.\n\nJustificativa: a base apresenta erros de tipagem, placeholders em formularios, stores com services inconsistentes e subjects divergentes entre frontend e backend. Sem essa estabilizacao, toda feature nova carregara debito tecnico.\n\nEntregaveis:\n- Builds de backend e frontend sem erros bloqueantes\n- ACL coerente entre painel e API\n- Modulos gerados operacionais (pedido, transacoes, avaliacao)\n- Suite minima de testes de negocio\n\nCriterios de saida:\n- pnpm build no frontend sem erro\n- php artisan test no backend sem falha critica\n- Navegacao completa no painel sem tela quebrada",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-0",
+      "Epic",
+      "EPIC-01",
+      "Fundacao",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 2,
+    "summary": "[BE] Corrigir erros de tipagem em controllers e configuracoes",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nCorrigir erros reportados pelo IDE/PHPStan em PedidoController, LojaController e demais controllers com tipos incorretos ou imports faltando.\n\nTarefas:\n- Executar php artisan ide-helper:generate\n- Revisar retornos de metodos que retornam mixed\n- Corrigir imports de classes e type hints nos requests\n- Validar que artisan route:list executa sem erro\n\nCriterios de aceite:\n- Nenhum erro fatal ao carregar qualquer rota\n- IDE helper atualizado",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 3,
+    "summary": "[FE] Corrigir placeholders e inconsistencias no modulo de Pedido",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 0\n\n---\n\nO formulario PedidoForm.vue possui campos com item-title placeholder '[Informe Nome do Campo]'. Campos de itens do pedido nao estao integrados ao formulario.\n\nTarefas:\n- Substituir placeholders por labels corretos\n- Integrar componente de itens do pedido no formulario\n- Vincular loja_id ao usuario logado quando seller\n- Testar criacao e edicao de pedido\n\nCriterios de aceite:\n- Formulario sem nenhum placeholder generico\n- CRUD de pedido funcional no painel",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 4,
+    "summary": "[FE] Corrigir inconsistencia do store de Transacoes Financeiras",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 0\n\n---\n\nO useTransacoesFinanceirasStore referencia TransacoesFinanceiraService (sem 's'). Revisar naming e garantir que o CRUD funciona.\n\nTarefas:\n- Padronizar nome do service (TransacoesFinanceirasService)\n- Testar listagem, criacao e edicao\n- Verificar vinculo com loja_id e pedido_id\n\nCriterios de aceite:\n- Store e service com nomes coerentes\n- CRUD de transacoes operacional",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 5,
+    "summary": "[BE+FE] Padronizar subjects e actions do ACL entre painel e API",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** ACL\n**Repositorios:** cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nSubjects usados no frontend (abilityConfig.ts) e no backend (permission_list.php) apresentam divergencias de naming (ex: item-pedido vs itempedido).\n\nTarefas:\n- Mapear subjects do frontend (abilityConfig.ts)\n- Mapear subjects do backend (permission_list.php)\n- Criar tabela de correspondencia\n- Padronizar em ambos os lados\n- Testar que menus aparecem para roles com permissao\n\nCriterios de aceite:\n- Tabela subjects x actions e unica\n- Nenhum menu desaparece por nomenclatura errada\n- Seeders geram permissoes sem duplicidade semantica",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "ACL",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 6,
+    "summary": "[FE] Ativar modulos comentados na navegacao (pedido, avaliacao, transacoes)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 0\n\n---\n\nOs menus de Pedido, Avaliacao e Transacoes Financeiras estao comentados no navigation/vertical/index.ts.\n\nTarefas:\n- Descomentar itens de navegacao\n- Revisar subjects e permissions para cada modulo\n- Verificar que as paginas carregam corretamente\n- Testar acesso por roles diferentes\n\nCriterios de aceite:\n- Todos os modulos aparecem no menu para roles autorizados\n- Navegacao completa sem erros",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 7,
+    "summary": "[BE] Criar seeders de dados para desenvolvimento",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nNenhum seeder popula dados de teste. Sem dados de teste, e impossivel validar o sistema.\n\nTarefas:\n- Criar seeder de roles e permissions padronizados\n- Criar seeder de usuario admin, seller e consumidor\n- Criar seeder de lojas (distribuidor e cervejaria) com horarios\n- Criar seeder de produtos e loja_produtos\n- Criar seeder de pedidos com itens\n- Criar seeder de promocoes com produtos vinculados\n- Criar seeder de noticias\n\nCriterios de aceite:\n- php artisan db:seed popula base funcional\n- Dashboard carrega com dados reais\n- Fluxo de pedido pode ser testado de ponta a ponta",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 8,
+    "summary": "[BE] Criar suite minima de testes de negocio",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-01: Estabilizacao\n**Modulo:** Qualidade\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nCobrir os fluxos de maior risco com testes automatizados: pedido, estoque e cancelamento.\n\nTarefas:\n- Testar criacao de pedido com baixa de estoque\n- Testar cancelamento com reposicao de estoque\n- Testar registro de loja (register-store)\n- Testar filtros do dashboard por loja\n- Testar listagem de produtos por loja\n\nCriterios de aceite:\n- Casos criticos possuem testes automatizados\n- php artisan test passa sem falha",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-01",
+      "Qualidade",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 9,
+    "summary": "EPIC-02: Arquitetura do App Consumidor",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-02: Arquitetura\n**Modulo:** Fundacao\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nObjetivo: formalizar a arquitetura do produto para definir claramente o papel de cada repositorio e como o app consumidor sera construido.\n\nDecisoes necessarias:\n- O repositorio Nuxt (cervagelada) sera evoluido para app consumidor ou permanecera como landing page?\n- O app consumidor sera construido dentro do Nuxt com rotas ou tera repositorio separado?\n- Quais endpoints serao publicos (sem auth) vs protegidos?\n- Como o frontend consumidor se comunicara com a API?\n- Como sera a sessao do consumidor (JWT, session, guest)?\n\nEntregaveis:\n- ADR (Architecture Decision Record) aprovado\n- Diagrama de responsabilidades por repositorio\n- Definicao dos contratos da API publica\n\nCriterios de saida:\n- Equipe alinhada sobre onde cada feature mora\n- Nenhum retrabalho de arquitetura nas fases seguintes",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-0",
+      "Epic",
+      "EPIC-02",
+      "Fundacao",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 10,
+    "summary": "[ARCH] Definir responsabilidade de cada repositorio",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-02: Arquitetura\n**Modulo:** Fundacao\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nDocumentar qual repo hospeda qual funcionalidade: site institucional, app consumidor, painel admin, API publica, API interna.\n\nTarefas:\n- Mapear funcionalidades atuais por repo\n- Decidir se Nuxt sera landing + app ou apenas landing\n- Documentar em ADR\n\nCriterios de aceite:\n- ADR escrito e aprovado pela equipe",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-02",
+      "Fundacao",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 11,
+    "summary": "[ARCH] Definir contratos da API publica do consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-02: Arquitetura\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nMapear todos os endpoints que o app consumidor consumira sem autenticacao ou com autenticacao leve.\n\nTarefas:\n- Listar endpoints publicos necessarios (lojas por raio, catalogo, busca)\n- Listar endpoints que exigem auth de consumidor (carrinho, pedido, perfil)\n- Definir formato de resposta padrao\n- Documentar contratos em OpenAPI ou Markdown\n\nCriterios de aceite:\n- Lista de endpoints aprovada\n- Formato de resposta definido",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-02",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 12,
+    "summary": "[ARCH] Definir estrategia de sessao do consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-02: Arquitetura\n**Modulo:** Fundacao\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 0\n\n---\n\nDecidir como o consumidor sera identificado: JWT, session cookie, guest token, ou combinacao.\n\nTarefas:\n- Avaliar cenarios: guest browsing, login social, login email\n- Decidir se carrinho funciona sem login\n- Documentar fluxo de autenticacao\n\nCriterios de aceite:\n- Decisao documentada\n- Fluxo guest-to-authenticated definido",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-0",
+      "Task",
+      "EPIC-02",
+      "Fundacao",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 13,
+    "summary": "EPIC-03: Localizacao e Endereco",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Localizacao\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nObjetivo: implementar o fluxo completo de localizacao do consumidor para habilitar a descoberta de lojas por proximidade. Cobre RF-01, RF-02 e RF-03.\n\nRequisitos cobertos:\n- RF-01: Confirmacao de endereco via CEP e geolocalizacao\n- RF-02: Validacao continua de localizacao (endereco salvo vs local atual)\n- RF-03: Mensagem de area nao atendida\n\nDependencias:\n- EPIC-02 (definicao de arquitetura do app consumidor)\n\nEntregaveis:\n- Consumidor define endereco por CEP ou geolocalizacao\n- Endereco persiste entre sessoes\n- Sistema detecta divergencia e pergunta ao usuario\n- Mensagem clara quando nao ha lojas na regiao",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-1",
+      "Epic",
+      "EPIC-03",
+      "Localizacao",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 14,
+    "summary": "[BE] Integrar servico de consulta de CEP (ViaCEP)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nCriar service no backend para consultar CEP e retornar endereco completo com coordenadas.\n\nTarefas:\n- Criar CepService com integracao ViaCEP\n- Validar CEP invalido ou inexistente\n- Retornar endereco com logradouro, bairro, cidade, estado\n- Integrar geocoding para obter lat/lng a partir do endereco\n- Criar endpoint publico GET /api/public/cep/{cep}\n\nCriterios de aceite:\n- CEP valido retorna endereco completo\n- CEP invalido retorna erro tratado\n- Coordenadas sao retornadas quando possivel",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 15,
+    "summary": "[BE] Criar endpoints publicos de endereco do consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nEndpoints para consumidor gerenciar enderecos sem depender de auth:api do painel.\n\nTarefas:\n- POST /api/public/enderecos (salvar endereco com user_id opcional)\n- GET /api/public/enderecos/meus (listar enderecos do usuario autenticado)\n- PUT /api/public/enderecos/{id} (atualizar)\n- DELETE /api/public/enderecos/{id} (remover)\n- Suportar endereco principal (flag)\n\nCriterios de aceite:\n- Consumidor autenticado gerencia seus enderecos\n- Endereco principal e marcado automaticamente se unico",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 16,
+    "summary": "[SITE] Implementar consulta de CEP no modal de verificacao de idade",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nO AgeVerificationModal ja tem campo CEP com maska mas nao faz consulta. Integrar com a API.\n\nTarefas:\n- Chamar endpoint de CEP ao completar 8 digitos\n- Exibir endereco retornado para confirmacao\n- Persistir endereco em cookie/localStorage\n- Mostrar endereco no header do site\n- Tratar CEP invalido com mensagem de erro\n\nCriterios de aceite:\n- CEP preenchido busca endereco automaticamente\n- Endereco persiste ao navegar entre sessoes",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 17,
+    "summary": "[SITE] Implementar geolocalizacao via browser API",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nSolicitar permissao de geolocalizacao e usar como alternativa ao CEP.\n\nTarefas:\n- Solicitar navigator.geolocation.getCurrentPosition\n- Reverse geocode para obter endereco\n- Exibir endereco para confirmacao do usuario\n- Persistir como endereco atual\n- Tratar recusa de permissao com fallback para CEP\n\nCriterios de aceite:\n- Geolocalizacao funciona quando permitida\n- Recusa cai graciosamente no fluxo de CEP",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 18,
+    "summary": "[SITE] Implementar reconciliacao de endereco (local atual vs salvo)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nQuando consumidor retorna ao app, comparar geolocalizacao atual com endereco salvo.\n\nTarefas:\n- Ao carregar a pagina, comparar local com endereco salvo\n- Se divergir, exibir dialog: 'Comprar para endereco salvo ou usar novo?'\n- Atualizar contexto de compra com a decisao\n- Nao perguntar novamente se usuario ja decidiu na sessao\n\nCriterios de aceite:\n- Dialog aparece apenas quando ha divergencia relevante (> 1km)\n- Contexto de compra reflete a decisao",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 19,
+    "summary": "[BE] Implementar calculo de distancia e filtro por raio",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nCriar logica de calculo de distancia entre coordenadas do consumidor e das lojas.\n\nTarefas:\n- Implementar formula Haversine no backend\n- Crear scope 'porRaio' no model Loja\n- Filtrar lojas onde distancia <= raio_entrega_km\n- Retornar distancia calculada no resultado\n- Criar endpoint publico GET /api/public/lojas?lat=X&lng=Y\n\nCriterios de aceite:\n- Apenas lojas dentro do raio sao retornadas\n- Distancia e tempo estimado sao incluidos na resposta",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 20,
+    "summary": "[SITE] Implementar mensagem de area nao atendida (RF-03)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-03: Localizacao\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nExibir fallback quando nao houver lojas para a localizacao do consumidor.\n\nTarefas:\n- Tratar resposta vazia da API de lojas\n- Exibir mensagem: 'No momento nao temos adegas disponiveis na sua localizacao'\n- Oferecer CTA para alterar endereco\n- Opcionalmente coletar email para avisar quando houver cobertura\n\nCriterios de aceite:\n- Nenhuma secao de loja fica vazia sem explicacao\n- Botao de alterar endereco funciona",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-03",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 21,
+    "summary": "EPIC-04: Descoberta de Lojas",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** Marketplace\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nObjetivo: substituir dados hardcoded por listagens dinamicas de lojas na experiencia publica. Cobre RF-04 e RF-05.\n\nRequisitos cobertos:\n- RF-04: Listagem de distribuidoras em carrossel com filtro por raio\n- RF-05: Listagem de cervejarias artesanais em carrossel separado\n\nDependencias:\n- EPIC-03 (localizacao do consumidor definida)\n\nEntregaveis:\n- Carrosseis de distribuidoras e cervejarias com dados reais\n- Filtro por raio de entrega e tipo de loja\n- Cards com nome, tipo, rating, logo e tempo de entrega",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-1",
+      "Epic",
+      "EPIC-04",
+      "Marketplace",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 22,
+    "summary": "[BE] Criar endpoints publicos de listagem de lojas por tipo e raio",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nExpor lojas sem exigir autenticacao do painel.\n\nTarefas:\n- GET /api/public/lojas/distribuidoras?lat=X&lng=Y (tipo_loja=distribuidor)\n- GET /api/public/lojas/cervejarias?lat=X&lng=Y (tipo_loja=cervejaria)\n- Filtrar por ativo=true e dentro do raio\n- Incluir distancia, tempo_entrega e horario_funcionamento\n- Ordenar por proximidade\n- Suportar paginacao\n\nCriterios de aceite:\n- Endpoints nao exigem auth\n- Resultado inclui dados de vitrine (nome, logo, tempo, distancia)",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-04",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 23,
+    "summary": "[BE] Adicionar campo de logo/imagem na tabela lojas",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nA tabela lojas nao possui campo de imagem/logo. Necessario para exibir cards no site.\n\nTarefas:\n- Criar migration adicionando url_logo (varchar 255 nullable)\n- Atualizar model Loja (fillable, cast de upload)\n- Atualizar LojaRequest com validacao de imagem\n- Atualizar formulario no painel\n\nCriterios de aceite:\n- Loja pode ter imagem de logo\n- Upload funciona no painel admin",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-04",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 24,
+    "summary": "[FE] Adicionar upload de logo no formulario de Loja",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 1\n\n---\n\nIncluir campo de upload de imagem no LojaForm.vue do painel.\n\nTarefas:\n- Adicionar CDFFileUpload ou EnviarImagem no formulario\n- Vincular ao campo url_logo\n- Preview da imagem atual na edicao\n\nCriterios de aceite:\n- Seller/admin pode fazer upload do logo da loja",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-04",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 25,
+    "summary": "[SITE] Integrar carrossel de distribuidoras com dados reais",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nSubstituir dados hardcoded de SectionDistribuidoras.vue por chamada API.\n\nTarefas:\n- Criar composable useLojas() ou useFetch para lojas\n- Chamar endpoint publico de distribuidoras com lat/lng\n- Substituir array estatico por dados da API\n- Implementar skeleton loading\n- Tratar erro e lista vazia\n\nCriterios de aceite:\n- Cards mostram dados reais das lojas ativas\n- Conteudo muda com a localizacao do usuario",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-04",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 26,
+    "summary": "[SITE] Integrar carrossel de cervejarias com dados reais",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-04: Descoberta de Lojas\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nSubstituir dados hardcoded de SectionCervejarias.vue por chamada API.\n\nTarefas:\n- Chamar endpoint publico de cervejarias com lat/lng\n- Substituir array estatico\n- Skeleton loading\n- Tratar lista vazia\n\nCriterios de aceite:\n- Cards de cervejarias com dados reais\n- Carrossel separado do de distribuidoras",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-04",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 27,
+    "summary": "EPIC-05: Vitrine da Loja",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-05: Vitrine da Loja\n**Modulo:** Marketplace\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nObjetivo: criar a pagina publica individual de cada loja com catalogo, horarios e informacoes operacionais. Cobre RF-06.\n\nRequisitos cobertos:\n- RF-06: Pagina da loja com lista de produtos, preco, quantidade e prazo de entrega\n\nDependencias:\n- EPIC-04 (descoberta de lojas funcional)\n\nEntregaveis:\n- Pagina publica acessivel por URL /loja/{slug}\n- Cabecalho com identidade da loja\n- Listagem de produtos com preco e estoque\n- Tempo de entrega visivel",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-1",
+      "Epic",
+      "EPIC-05",
+      "Marketplace",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 28,
+    "summary": "[BE] Criar endpoint publico de detalhes da loja",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-05: Vitrine da Loja\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nExpor dados completos de uma loja para a vitrine publica.\n\nTarefas:\n- GET /api/public/lojas/{id}\n- Retornar: dados da loja, horarios, total de produtos, avaliacao media\n- Sem exigir autenticacao\n\nCriterios de aceite:\n- Endpoint publico funcional\n- Inclui horarios de funcionamento e status aberto/fechado",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-05",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 29,
+    "summary": "[BE] Criar endpoint publico de catalogo da loja",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-05: Vitrine da Loja\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nListar produtos de uma loja com preco da loja e disponibilidade.\n\nTarefas:\n- GET /api/public/lojas/{id}/produtos\n- Retornar dados da tabela loja_produtos: preco, preco_promocional, estoque, destaque\n- Filtrar apenas ativo=true e estoque > 0\n- Suportar paginacao, busca por nome e ordenacao\n- Incluir dados do produto base (nome, imagem, marca, volume)\n\nCriterios de aceite:\n- Frontend consumidor monta vitrine apenas com esse endpoint\n- Preco e estoque sao da associacao loja-produto",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-05",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 30,
+    "summary": "[SITE] Criar roteamento e pagina de vitrine da loja",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-05: Vitrine da Loja\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nImplementar navegacao para pagina individual da loja no Nuxt.\n\nTarefas:\n- Criar diretorio app/pages/ com rota /loja/[id].vue\n- Configurar Nuxt para file-based routing\n- Implementar cabecalho da loja (nome, logo, horario, tempo entrega)\n- Implementar grid/lista de produtos\n- Card de produto com imagem, nome, preco, botao adicionar\n- Responsivo mobile-first\n\nCriterios de aceite:\n- Clicar em loja no carrossel leva para a vitrine\n- Produtos reais da loja sao exibidos",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-05",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 31,
+    "summary": "EPIC-06: Catalogo e Produtos",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Catalogo\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nObjetivo: implementar catalogo padronizado de SKUs, match de produtos por sellers, aprovacao de produtos proprios e descricao sob demanda. Cobre RF-07, RF-08 e RF-09.\n\nRequisitos cobertos:\n- RF-07: Catalogo padronizado com 6000+ SKUs e match por sellers\n- RF-08: Cadastro de produtos proprios de cervejarias com aprovacao\n- RF-09: Descricao do produto sob demanda (modal/popup)\n\nDependencias:\n- EPIC-05 (vitrine funcional)\n\nEntregaveis:\n- Base de SKUs padronizados com EAN\n- Fluxo de match: seller busca por EAN e vincula preco da loja\n- Cervejaria cadastra produto proprio que vai para fila de aprovacao\n- Descricao detalhada abre em modal/drawer no site",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-2",
+      "Epic",
+      "EPIC-06",
+      "Catalogo",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 32,
+    "summary": "[BE] Criar migration para status de aprovacao de produto",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nAdicionar campo de aprovacao para produtos proprios de cervejarias.\n\nTarefas:\n- Criar migration adicionando: status_aprovacao enum (pendente, aprovado, reprovado) default pendente\n- Adicionar campo motivo_reprovacao (text nullable)\n- Adicionar campo aprovado_por (ulid nullable FK users)\n- Adicionar campo aprovado_em (datetime nullable)\n- Atualizar model Produto com novos campos\n\nCriterios de aceite:\n- Produto pode ter status de aprovacao\n- Migration nao quebra dados existentes (default pendente)",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 33,
+    "summary": "[BE] Implementar fluxo de aprovacao de produto no controller",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nCriar acoes admin para aprovar e reprovar produtos de cervejarias.\n\nTarefas:\n- POST /api/produtos/{id}/aprovar\n- POST /api/produtos/{id}/reprovar com motivo\n- Filtrar produtos publicos apenas onde status_aprovacao=aprovado\n- Enviar notificacao ao seller ao aprovar/reprovar\n\nCriterios de aceite:\n- Admin aprova/reprova com rastreabilidade\n- Produto nao aprovado nao aparece em endpoints publicos",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 34,
+    "summary": "[FE] Criar tela de aprovacao de produtos no painel admin",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 2\n\n---\n\nInterface para admin revisar e aprovar produtos pendentes.\n\nTarefas:\n- Criar pagina /produto/aprovacao com listagem filtrada por status pendente\n- Botoes de aprovar e reprovar (com campo de motivo)\n- Filtros por cervejaria, data de criacao\n- Badge de status no card\n\nCriterios de aceite:\n- Admin ve fila de aprovacao sem misturar com catalogo geral\n- Acao e imediata e refletida no status",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 35,
+    "summary": "[BE] Modelar e importar catalogo base de SKUs",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nDefinir schema e estrategia para carga inicial de 6000+ SKUs padronizados.\n\nTarefas:\n- Definir fonte de dados (planilha, API publica de produtos)\n- Criar comando artisan para importar SKUs\n- Mapear campos: nome, marca, EAN, volume, teor, fabricante, imagem\n- Garantir unicidade por EAN\n- Documentar processo de atualizacao periodica\n\nCriterios de aceite:\n- Base de SKUs populada e consultavel\n- EAN e indexado e buscavel",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 36,
+    "summary": "[FE] Melhorar fluxo de match de produto por EAN no painel seller",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 2\n\n---\n\nO painel ja tem busca por EAN (searchByEan). Melhorar UX para fluxo de match completo.\n\nTarefas:\n- Ao buscar EAN e encontrar produto existente, pre-preencher dados\n- Seller informa apenas: preco, estoque, destaque\n- Se EAN nao encontrado, habilitar cadastro completo (se cervejaria)\n- Feedback visual claro de match encontrado/nao encontrado\n\nCriterios de aceite:\n- Seller vincula produto existente em poucos cliques\n- Cervejaria cria produto novo quando necessario",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 37,
+    "summary": "[SITE] Implementar modal de descricao de produto sob demanda (RF-09)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-06: Catalogo\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 2\n\n---\n\nDescricao detalhada oculta, acessivel por clique em 'Descricao'.\n\nTarefas:\n- Criar componente ProductDetailModal.vue\n- Exibir descricao, atributos, imagem ampliada\n- Integrar CTA de adicionar ao carrinho\n- Abrir por clique no card de produto\n\nCriterios de aceite:\n- Descricao nao polui o card compacto\n- Modal responsivo abre e fecha corretamente",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-06",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 38,
+    "summary": "EPIC-07: Carrinho e Checkout",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-07: Carrinho\n**Modulo:** Checkout\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nObjetivo: construir o fluxo de compra do consumidor em ate 3 telas: loja, carrinho, confirmacao. Cobre RF-10 e RF-11.\n\nRequisitos cobertos:\n- RF-10: Carrinho de compras com adicao, ajuste de quantidades e persistencia\n- RF-11: Finalizacao de pedido em 3 etapas (loja > carrinho > confirmacao)\n\nDependencias:\n- EPIC-05 (vitrine com produtos reais)\n- EPIC-08 (pagamento - pode ser paralelo com mock)\n\nEntregaveis:\n- Carrinho persistente por sessao/usuario\n- Regra de mono-loja (1 loja por carrinho)\n- Tela de carrinho com subtotal, taxa e total\n- Tela de confirmacao com endereco e resumo\n- Pedido criado no banco com status aguardando_pagamento",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-2",
+      "Epic",
+      "EPIC-07",
+      "Checkout",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 39,
+    "summary": "[SITE] Implementar carrinho de compras persistente",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-07: Carrinho\n**Modulo:** Checkout\n**Repositorios:** cervagelada\n**Fase:** Fase 2\n\n---\n\nCriar estado de carrinho no app consumidor.\n\nTarefas:\n- Criar store/composable de carrinho (Pinia ou useState)\n- Adicionar, remover e alterar quantidade de itens\n- Persistir em localStorage ou sessionStorage\n- Validar mono-loja: impedir itens de lojas diferentes\n- Exibir badge de quantidade no icone do carrinho no header\n- Recalcular subtotal a cada alteracao\n\nCriterios de aceite:\n- Carrinho sobrevive a refresh\n- Itens de outra loja geram aviso e opcao de limpar",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-07",
+      "Checkout",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 40,
+    "summary": "[SITE] Criar pagina de carrinho com resumo de compra",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-07: Carrinho\n**Modulo:** Checkout\n**Repositorios:** cervagelada\n**Fase:** Fase 2\n\n---\n\nTela 2 do fluxo de checkout.\n\nTarefas:\n- Criar pagina /carrinho\n- Listar itens com imagem, nome, preco unitario, quantidade, subtotal\n- Permitir ajuste de quantidade e remocao\n- Calcular subtotal dos itens\n- Exibir taxa de entrega estimada\n- Exibir total\n- Botao 'Continuar para Confirmacao'\n\nCriterios de aceite:\n- Totais recalculados em tempo real\n- Carrinho vazio exibe estado vazio com CTA",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-07",
+      "Checkout",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 41,
+    "summary": "[SITE] Criar pagina de confirmacao de pedido",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-07: Carrinho\n**Modulo:** Checkout\n**Repositorios:** cervagelada\n**Fase:** Fase 2\n\n---\n\nTela 3 do fluxo de checkout.\n\nTarefas:\n- Criar pagina /checkout/confirmacao\n- Exibir resumo do pedido (itens, valores)\n- Exibir endereco de entrega com opcao de alterar\n- Exibir tempo estimado de entrega\n- Integrar selecao de metodo de pagamento\n- Botao 'Confirmar Pedido'\n- Chamar API para criar pedido\n- Redirecionar para tela de acompanhamento\n\nCriterios de aceite:\n- Todas as informacoes visiveis antes da confirmacao\n- Pedido criado com sucesso no backend",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-07",
+      "Checkout",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 42,
+    "summary": "[BE] Criar endpoint publico de criacao de pedido para consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-07: Carrinho\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nO endpoint atual POST /api/pedidos exige auth:api do painel. Criar versao publica.\n\nTarefas:\n- POST /api/public/pedidos (auth de consumidor, nao auth do painel)\n- Receber: itens, endereco_id, metodo_pagamento\n- Validar estoque em tempo real\n- Calcular subtotal, taxa_entrega e total no backend\n- Criar pedido com status 'aguardando_pagamento'\n- Retornar id do pedido e dados para pagamento\n\nCriterios de aceite:\n- Frontend nao envia subtotal/total (backend calcula)\n- Estoque insuficiente retorna erro 422 com detalhes",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-07",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 43,
+    "summary": "[BE] Implementar calculo de taxa de entrega",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-07: Carrinho\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 2\n\n---\n\nImplementar regra de calculo da taxa baseada em distancia.\n\nTarefas:\n- Definir formula: taxa fixa, por km ou faixa\n- Calcular com base na distancia entre loja e endereco de entrega\n- Retornar taxa no endpoint de preview do pedido\n- Incorporar no calculo final do pedido\n\nCriterios de aceite:\n- Taxa calculada automaticamente\n- Consumidor ve taxa antes de confirmar",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-07",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 44,
+    "summary": "EPIC-08: Pagamento (Asaas)",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Pagamentos\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nObjetivo: integrar o gateway Asaas para processar pagamentos reais no checkout. Cobre RF-XX.\n\nRequisitos cobertos:\n- RF-XX: Integracao completa com Asaas (cobranca, webhook, estados)\n- Pagamento ANTES do envio ao seller\n- Webhook para pago, recusado, cancelado, estornado\n- Armazenar id da cobranca, metodo e status\n\nDependencias:\n- EPIC-07 (checkout funcional)\n\nEntregaveis:\n- Checkout gera cobranca no Asaas\n- Webhook atualiza status do pedido automaticamente\n- TransacoesFinanceiras refletem estado real\n- Pedido so avanca para seller apos pagamento confirmado",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-3",
+      "Epic",
+      "EPIC-08",
+      "Pagamentos",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 45,
+    "summary": "[BE] Criar AsaasService para integracao com API do gateway",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nImplementar client HTTP para comunicacao com Asaas.\n\nTarefas:\n- Criar app/Domains/Pagamento/ (novo dominio)\n- Implementar AsaasService com metodos: criarCobranca, consultarCobranca, cancelarCobranca\n- Configurar credenciais via env (ASAAS_API_KEY, ASAAS_ENVIRONMENT)\n- Implementar retry e tratamento de erros\n- Log estruturado de todas as chamadas\n\nCriterios de aceite:\n- Service comunica com sandbox Asaas\n- Erros sao tratados sem crash do sistema",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 46,
+    "summary": "[BE] Criar migration e model de pagamento",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nModelar entidade de pagamento separada do pedido.\n\nTarefas:\n- Criar tabela pagamentos: id, pedido_id, asaas_id, metodo, status, valor, pago_em, criado_em\n- Status: aguardando, processando, pago, recusado, cancelado, estornado\n- Metodo: pix, cartao_credito, cartao_debito, boleto\n- Relacionar com Pedido (hasOne/belongsTo)\n- Atualizar model Pedido com relacao pagamento\n\nCriterios de aceite:\n- Pagamento e pedido sao entidades separadas\n- Estado do pagamento nao se confunde com estado do pedido",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 47,
+    "summary": "[BE] Implementar criacao de cobranca no checkout",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nAo criar pedido, gerar cobranca no Asaas e retornar dados de pagamento.\n\nTarefas:\n- Apos criar pedido com status aguardando_pagamento, chamar AsaasService\n- Criar registro na tabela pagamentos com asaas_id\n- Retornar: QR code pix, link de pagamento ou form de cartao\n- Se Asaas falhar, nao criar pedido (rollback)\n\nCriterios de aceite:\n- Checkout produz link/QR de pagamento valido\n- Falha de integracao nao gera pedido orfao",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 48,
+    "summary": "[BE] Implementar webhook Asaas e conciliacao de pagamento",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nReceber eventos do Asaas e atualizar estado do pedido.\n\nTarefas:\n- Criar rota POST /api/webhooks/asaas (publica, sem auth JWT)\n- Validar assinatura/token do webhook\n- Tratar eventos: PAYMENT_CONFIRMED, PAYMENT_RECEIVED, PAYMENT_OVERDUE, PAYMENT_DELETED, PAYMENT_REFUNDED\n- Atualizar tabela pagamentos de forma idempotente\n- Quando pago: atualizar pedido para 'recebido' (pronto para seller)\n- Quando falhou: atualizar pedido para 'cancelado' e repor estoque\n- Log de todos os eventos recebidos\n\nCriterios de aceite:\n- Eventos repetidos nao causam duplicidade\n- Estado interno reflete estado final do Asaas\n- Webhook responde 200 rapidamente (processar async se necessario)",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 49,
+    "summary": "[SITE] Implementar tela de pagamento no checkout",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 3\n\n---\n\nExibir opcoes de pagamento e QR Pix.\n\nTarefas:\n- Apos confirmacao, exibir metodos disponiveis (Pix, cartao)\n- Para Pix: exibir QR code e chave copia-cola\n- Para cartao: integrar formulario seguro (Asaas.js)\n- Exibir timer de expiracao do pagamento\n- Polling ou websocket para detectar pagamento confirmado\n- Redirecionar para tela de acompanhamento apos pago\n\nCriterios de aceite:\n- Consumidor consegue pagar por Pix ou cartao\n- Confirmacao e detectada em tempo real",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 50,
+    "summary": "[FE] Visualizar dados de pagamento no painel admin",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-08: Pagamento\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 3\n\n---\n\nExibir informacoes de pagamento nos detalhes do pedido no painel.\n\nTarefas:\n- Adicionar secao de pagamento no PedidoForm/detalhe\n- Exibir: metodo, status, asaas_id, valor, data\n- Nao permitir edicao manual do status de pagamento\n- Permitir consulta forcar atualizacao via Asaas\n\nCriterios de aceite:\n- Admin/seller ve status de pagamento no pedido\n- Dados sao readonly (controlados pelo gateway)",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-08",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 51,
+    "summary": "EPIC-09: Gestao de Pedido e Operacao Seller",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Pedidos\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nObjetivo: alinhar o ciclo do pedido ao processo real de delivery e dar ferramentas operacionais ao seller. Cobre RF-12 e RF-13.\n\nRequisitos cobertos:\n- RF-12: Envio de pedido ao seller apos pagamento\n- RF-13: Status do pedido (recebido, aceito, em entrega, entregue)\n\nDependencias:\n- EPIC-08 (pagamento confirmado necessario para despachar)\n\nEntregaveis:\n- Maquina de estados do pedido revisada\n- Pedido so chega ao seller apos pagamento confirmado\n- Painel operacional do seller com acoes de fluxo\n- Notificacao de novo pedido para seller\n- Acompanhamento em tempo real para consumidor",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-3",
+      "Epic",
+      "EPIC-09",
+      "Pedidos",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 52,
+    "summary": "[BE] Reestruturar estados do pedido (separar pagamento e fulfillment)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nOs enums atuais (pendente, preparando, pronto, em_rota, entregue, cancelado) nao cobrem estados de pagamento.\n\nTarefas:\n- Migrar enum de status do pedido para: aguardando_pagamento, recebido, aceito, preparando, pronto, em_rota, entregue, cancelado\n- Criar maquina de estados com transicoes validas\n- Atualizar PedidoService com validacao de transicao\n- Atualizar PedidoRequest com novos valores\n- Atualizar dashboard (resumoLoja) com novos status\n\nCriterios de aceite:\n- Transicoes invalidas retornam erro 422\n- Estados de pagamento e fulfillment nao se confundem",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-09",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 53,
+    "summary": "[BE] Bloquear envio ao seller sem pagamento confirmado",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nImplementar regra: pedido so avanca para 'recebido' apos pagamento confirmado.\n\nTarefas:\n- Validar no webhook: ao confirmar pagamento, mudar pedido para 'recebido'\n- Impedir transicao manual de aguardando_pagamento para qualquer estado operacional\n- Tratar timeout de pagamento (expirar pedido e repor estoque)\n\nCriterios de aceite:\n- Seller nao ve pedido antes do pagamento\n- Timeout limpa pedidos nao pagos",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-09",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 54,
+    "summary": "[BE] Implementar notificacao de novo pedido para seller",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nNotificar loja quando pedido pago entrar em fila.\n\nTarefas:\n- Definir canal: email, push, websocket ou webhook proprio\n- Disparar evento NewOrderReceived apos pagamento confirmado\n- Criar Notification class do Laravel\n- Registrar log de disparo e entrega\n\nCriterios de aceite:\n- Seller recebe alerta de novo pedido\n- Falha de notificacao pode ser auditada",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-09",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 55,
+    "summary": "[FE] Criar painel operacional de pedidos para seller",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 3\n\n---\n\nTela otimizada para operacao diaria do seller (diferente do CRUD tecnico).\n\nTarefas:\n- Criar pagina /pedidos/operacao\n- Colunas Kanban ou cards por status: recebido, aceito, preparando, em_rota\n- Botoes de acao contextual: aceitar, iniciar preparo, despachar, concluir\n- Timer desde a entrada do pedido\n- Auto-refresh a cada 30s\n- Filtro por data e busca por cliente\n\nCriterios de aceite:\n- Seller opera pedidos sem acessar CRUD tecnico\n- Acoes atualizam status via PATCH /api/pedidos/{id}/status",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-09",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 56,
+    "summary": "[SITE] Criar tela de acompanhamento de pedido para consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-09: Gestao de Pedido\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 3\n\n---\n\nExibir status em tempo real do pedido.\n\nTarefas:\n- Criar pagina /pedido/{id}/acompanhamento\n- Stepper visual com status: pagamento, recebido, preparando, em rota, entregue\n- Tempo estimado de entrega\n- Polling ou SSE para atualizacoes em tempo real\n- Mostrar PIN de entrega quando pedido sair para rota\n\nCriterios de aceite:\n- Consumidor acompanha pedido sem refresh manual\n- Transicoes sao refletidas em tempo real",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-09",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 57,
+    "summary": "EPIC-10: Entrega e Validacao PIN",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-10: Entrega PIN\n**Modulo:** Entrega\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nObjetivo: implementar validacao de entrega por PIN para evitar fraudes. Cobre RF-14.\n\nRequisitos cobertos:\n- RF-14: Validacao de entrega via PIN (definido pelo usuario ou ultimos digitos do telefone)\n\nDependencias:\n- EPIC-09 (fluxo de pedido operacional)\n\nEntregaveis:\n- PIN gerado por pedido\n- Seller/entregador valida PIN na conclusao\n- Tentativas registradas para auditoria\n- Pedido nao pode ser concluido sem PIN valido",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-3",
+      "Epic",
+      "EPIC-10",
+      "Entrega",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 58,
+    "summary": "[BE] Implementar geracao e validacao de PIN de entrega",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-10: Entrega PIN\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 3\n\n---\n\nGerar PIN e validar na conclusao do pedido.\n\nTarefas:\n- Adicionar campo pin_entrega (varchar 6) e pin_validado_em na tabela pedidos\n- Gerar PIN automaticamente ao criar pedido (4-6 digitos aleatorios)\n- Criar endpoint POST /api/pedidos/{id}/validar-pin\n- Validar PIN antes de permitir transicao para 'entregue'\n- Registrar tentativas de validacao (tabela ou log)\n- Permitir max 3 tentativas antes de bloquear\n\nCriterios de aceite:\n- PIN e unico por pedido\n- Entrega sem PIN valido e bloqueada\n- Tentativas sao auditaveis",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-10",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 59,
+    "summary": "[FE] Adicionar validacao de PIN no painel do seller",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-10: Entrega PIN\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 3\n\n---\n\nInput de PIN na acao de concluir entrega.\n\nTarefas:\n- No painel operacional, ao clicar 'Concluir Entrega', abrir dialog de PIN\n- Input numerico de 4-6 digitos\n- Chamar endpoint de validacao\n- Exibir erro se PIN incorreto\n- Bloquear apos 3 tentativas\n\nCriterios de aceite:\n- Seller precisa do PIN para finalizar\n- Feedback claro de erro",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-10",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 60,
+    "summary": "[SITE] Exibir PIN de entrega para consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-10: Entrega PIN\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 3\n\n---\n\nMostrar PIN na tela de acompanhamento.\n\nTarefas:\n- Exibir PIN em destaque quando pedido estiver em rota\n- Mensagem: 'Informe este codigo ao entregador'\n- Opcionalmente permitir compartilhar PIN via WhatsApp\n\nCriterios de aceite:\n- PIN visivel apenas quando pedido esta em rota\n- Design claro e legivel",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-3",
+      "Task",
+      "EPIC-10",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 61,
+    "summary": "EPIC-11: Promocoes",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-11: Promocoes\n**Modulo:** Promocoes\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nObjetivo: tornar promocoes dinamicas no site publico e melhorar gestao no painel. Cobre RF-15 e RF-16.\n\nRequisitos cobertos:\n- RF-15: Marcacao de produto promocional pelo seller\n- RF-16: Carrossel de promocoes dinamico no site (clique leva para loja)\n\nDependencias:\n- EPIC-04 (lojas publicas)\n- EPIC-05 (vitrine funcional)\n\nEntregaveis:\n- Carrossel de promocoes com dados reais no site\n- Clique no produto leva para loja correta\n- Seller gerencia promocoes pelo painel (ja existente)",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-4",
+      "Epic",
+      "EPIC-11",
+      "Promocoes",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 62,
+    "summary": "[BE] Criar endpoint publico de promocoes ativas",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-11: Promocoes\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nListar promocoes vigentes com produtos e lojas.\n\nTarefas:\n- GET /api/public/promocoes?lat=X&lng=Y\n- Filtrar por: ativo=true, data_inicio <= hoje <= data_fim, loja dentro do raio\n- Retornar: titulo, produtos com preco_promocional, loja_id, loja_nome\n- Ordenar por relevancia ou proximidade\n\nCriterios de aceite:\n- Apenas promocoes ativas e acessiveis aparecem\n- Dados suficientes para montar card de produto promocional",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-11",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 63,
+    "summary": "[SITE] Integrar carrossel de promocoes com dados reais",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-11: Promocoes\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 4\n\n---\n\nSubstituir SectionPromocoes.vue hardcoded por dados da API.\n\nTarefas:\n- Chamar endpoint publico de promocoes\n- Montar cards com: imagem, nome, preco original, preco promocional, loja\n- Clique no card redireciona para vitrine da loja\n- Skeleton loading\n- Tratar lista vazia\n\nCriterios de aceite:\n- Promocoes reais aparecem no carrossel\n- Navegacao para loja funciona",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-11",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 64,
+    "summary": "EPIC-12: Destaques e Monetizacao",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-12: Destaques\n**Modulo:** Monetizacao\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nObjetivo: implementar area de destaques patrocinados para monetizacao da plataforma. Cobre RF-17, RF-18 e RF-19.\n\nRequisitos cobertos:\n- RF-17: Area de destaques patrocinados (R$10.000/30 dias)\n- RF-18: Landing page de destaque com imagem, video, descricao\n- RF-19: Redirecionamento inteligente para loja mais proxima com o produto\n\nDependencias:\n- EPIC-04 (lojas publicas)\n- EPIC-03 (localizacao para loja mais proxima)\n\nEntregaveis:\n- Dominio de destaque patrocinado (campanha, periodo, midia)\n- Landing page publica por destaque\n- Botao 'Comprar' busca loja mais proxima com o produto\n- Gestao no painel admin",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-4",
+      "Epic",
+      "EPIC-12",
+      "Monetizacao",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 65,
+    "summary": "[BE] Criar dominio de Destaque Patrocinado",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-12: Destaques\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nNovo dominio para campanhas de destaques.\n\nTarefas:\n- Criar app/Domains/Destaque/\n- Model Destaque: titulo, descricao, imagem, video_url, cta_texto, cta_url, produto_id (nullable), data_inicio, data_fim, valor_contrato, ativo\n- Migration com tabela destaques\n- Controller com CRUD padrao\n- Request com validacoes\n- Routes admin e publicas\n- Adicionar permissoes ao permission_list.php\n\nCriterios de aceite:\n- Destaque pode ser criado, editado e desativado\n- Campos de midia suportam imagem e video",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-12",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 66,
+    "summary": "[BE] Criar endpoint publico de destaques ativos",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-12: Destaques\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nListar destaques vigentes para o site consumidor.\n\nTarefas:\n- GET /api/public/destaques\n- Filtrar ativo=true e dentro do periodo\n- Ordenar por prioridade ou data\n- Retornar dados de midia e CTA\n\nCriterios de aceite:\n- Destaques expirados nao aparecem\n- Dados suficientes para montar banner/card",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-12",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 67,
+    "summary": "[BE] Implementar busca de loja mais proxima por produto (RF-19)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-12: Destaques\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nAo clicar 'Comprar' em destaque, encontrar loja mais proxima que tenha o produto.\n\nTarefas:\n- GET /api/public/produtos/{id}/loja-proxima?lat=X&lng=Y\n- Buscar em loja_produtos onde produto_id=X, ativo=true, estoque>0\n- Filtrar lojas dentro do raio do consumidor\n- Ordenar por distancia\n- Retornar loja mais proxima com preco\n\nCriterios de aceite:\n- Retorna loja unica mais proxima ou lista ranqueada\n- Se nenhuma loja tiver o produto, retorna mensagem adequada",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-12",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 68,
+    "summary": "[FE] Criar CRUD de destaques patrocinados no painel admin",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-12: Destaques\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 4\n\n---\n\nInterface para admin gerenciar campanhas de destaque.\n\nTarefas:\n- Criar paginas /destaque/ (index, cadastrar, editar)\n- Formulario com: titulo, descricao, imagem, video, CTA, periodo, produto vinculado\n- Listagem com filtro por status e data\n- Adicionar ao menu de navegacao\n\nCriterios de aceite:\n- Admin gerencia destaques pelo painel\n- Upload de imagem e video funcional",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-12",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 69,
+    "summary": "[SITE] Criar area de destaques patrocinados e landing page",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-12: Destaques\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 4\n\n---\n\nImplementar secao e pagina de destaque no site publico.\n\nTarefas:\n- Criar componente SectionDestaques.vue com banner/card de destaque\n- Criar pagina /destaque/[id].vue com landing: imagem, video, descricao\n- Botao 'Conhecer' leva para landing\n- Botao 'Comprar' chama endpoint de loja mais proxima e redireciona\n- Responsivo mobile-first\n\nCriterios de aceite:\n- Destaque exibido com midia rica\n- Botao comprar leva para loja correta",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-12",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 70,
+    "summary": "EPIC-13: Conteudo e Noticias",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-13: Noticias\n**Modulo:** Noticias\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nObjetivo: transformar o modulo de noticias em um feed real consumido pelo site publico, com fonte obrigatoria e sinalizacao de patrocinio. Cobre RF-20, RF-21 e RF-22.\n\nRequisitos cobertos:\n- RF-20: Feed de noticias CervaGelada News\n- RF-21: Pagina interna de noticia (sem redirecionamento externo)\n- RF-22: Conteudo patrocinado com identificacao clara\n\nDependencias:\n- EPIC-01 (base estabilizada)\n\nEntregaveis:\n- Feed publico de noticias com dados da API\n- Pagina interna de leitura de noticia\n- Campo fonte obrigatoria\n- Selo de conteudo patrocinado",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-4",
+      "Epic",
+      "EPIC-13",
+      "Noticias",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 71,
+    "summary": "[BE] Adicionar campos fonte e patrocinado na tabela noticias",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-13: Noticias\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nA tabela noticias nao possui campo de fonte nem flag de conteudo patrocinado.\n\nTarefas:\n- Criar migration adicionando: fonte (varchar 150 nullable), url_fonte (varchar 255 nullable), patrocinado (boolean default false), patrocinador (varchar 150 nullable)\n- Atualizar model Noticias com novos campos\n- Atualizar NoticiasRequest com validacoes\n- Atualizar NoticiasService se necessario\n\nCriterios de aceite:\n- Noticia pode ter fonte e flag de patrocinio\n- Campos sao opcionais para nao quebrar dados existentes",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-13",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 72,
+    "summary": "[BE] Criar endpoint publico de noticias",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-13: Noticias\n**Modulo:** API Publica\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nExpor feed de noticias sem autenticacao.\n\nTarefas:\n- GET /api/public/noticias (listagem paginada, apenas ativo=true)\n- GET /api/public/noticias/{id} (detalhes da noticia)\n- Ordenar por publicado_em DESC\n- Incluir fonte, patrocinado e patrocinador\n\nCriterios de aceite:\n- Endpoints publicos funcional\n- Noticias inativas nao aparecem",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-13",
+      "API Publica",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 73,
+    "summary": "[FE] Adicionar campos fonte e patrocinado no formulario de Noticias",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-13: Noticias\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 4\n\n---\n\nAtualizar NoticiasForm.vue com novos campos.\n\nTarefas:\n- Adicionar campo fonte (texto)\n- Adicionar campo url_fonte (texto)\n- Adicionar switch patrocinado\n- Exibir campo patrocinador condicionalmente\n- Atualizar store e service se necessario\n\nCriterios de aceite:\n- Admin informa fonte ao criar noticia\n- Flag de patrocinio funciona corretamente",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-13",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 74,
+    "summary": "[SITE] Integrar feed de noticias com dados reais",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-13: Noticias\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 4\n\n---\n\nSubstituir SectionNews.vue hardcoded por dados da API.\n\nTarefas:\n- Chamar endpoint publico de noticias\n- Montar cards com: imagem, titulo, data, fonte\n- Badge 'Conteudo Patrocinado' quando aplicavel\n- Skeleton loading\n\nCriterios de aceite:\n- Noticias reais no carrossel\n- Patrocinados claramente identificados",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-13",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 75,
+    "summary": "[SITE] Criar pagina interna de noticia (RF-21)",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-13: Noticias\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 4\n\n---\n\nLeitura de noticia dentro do app, sem redirecionar para site externo.\n\nTarefas:\n- Criar pagina /noticia/[id].vue\n- Exibir: titulo, imagem, conteudo formatado, data, fonte\n- Selo de patrocinio quando aplicavel\n- Botao de compartilhar\n- Link para a fonte original (sem redirecionar automaticamente)\n\nCriterios de aceite:\n- Noticia e lida dentro da aplicacao\n- Fonte e exibida com credito",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-13",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 76,
+    "summary": "EPIC-14: Institucional",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-14: Institucional\n**Modulo:** Institucional\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nObjetivo: tirar dados institucionais (contato, redes sociais) do codigo estatico e torna-los gerenciaveis. Cobre RF-23 e RF-24.\n\nRequisitos cobertos:\n- RF-23: Tela de contato da CervaGelada\n- RF-24: Carrossel de redes sociais\n\nDependencias:\n- Nenhuma critica\n\nEntregaveis:\n- Dados de contato e redes sociais gerenciaveis por admin\n- Secoes publicas consomem dados dinamicos\n- Atualizacao sem deploy",
+    "priority": "Normal",
+    "type": "Epic",
+    "tags": [
+      "Fase-4",
+      "Epic",
+      "EPIC-14",
+      "Institucional",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 77,
+    "summary": "[BE] Criar dominio de Configuracoes da Plataforma",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-14: Institucional\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 4\n\n---\n\nDominio para armazenar configs gerenciaveis.\n\nTarefas:\n- Criar app/Domains/Configuracao/\n- Model Configuracao: chave (unique), valor (text), tipo (string, json, boolean), grupo\n- Migration e seeder com valores iniciais\n- Controller com CRUD admin\n- Registrar configs: contato_email, contato_telefone, contato_whatsapp, redes_facebook, redes_instagram, redes_youtube, redes_tiktok\n- Endpoint publico GET /api/public/configuracoes/{grupo}\n\nCriterios de aceite:\n- Admin atualiza contato e redes sem deploy\n- Endpoint publico retorna valores atuais",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-14",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 78,
+    "summary": "[FE] Criar tela de gerenciamento de configuracoes no painel",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-14: Institucional\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 4\n\n---\n\nInterface admin para editar configs da plataforma.\n\nTarefas:\n- Criar pagina /configuracoes\n- Formulario agrupado: contato, redes sociais, parametros gerais\n- Salvar alteracoes via API\n\nCriterios de aceite:\n- Admin edita dados sem acessar banco\n- Alteracoes refletem imediatamente no site",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-14",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 79,
+    "summary": "[SITE] Integrar secoes de contato e redes sociais com dados dinamicos",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-14: Institucional\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 4\n\n---\n\nSubstituir dados hardcoded de SectionContato e SectionFooter.\n\nTarefas:\n- Chamar endpoint publico de configuracoes\n- Substituir emails, telefones e links de redes estaticos\n- Manter layout responsivo\n\nCriterios de aceite:\n- Dados de contato e redes vem da API\n- Atualizacao pelo painel reflete no site",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-4",
+      "Task",
+      "EPIC-14",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 80,
+    "summary": "EPIC-15: Relatorios e Dashboard",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Relatorios\n**Repositorios:** cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nObjetivo: ampliar o dashboard existente e criar relatorios gerenciais, operacionais e de marketplace. Cobre RNF 5.6.\n\nRequisitos cobertos:\n- Relatorios administrativos: usuarios, sellers, status de cadastros, regioes\n- Relatorios de marketplace: pedidos, status, itens mais vendidos, ticket medio\n- Relatorios exportaveis\n\nDependencias:\n- EPIC-09 (pedidos operacionais)\n\nEntregaveis:\n- Dashboard administrativo ampliado com visao global\n- Relatorios por periodo com filtros\n- Exportacao CSV/PDF\n- Visao por regiao/cidade",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-5",
+      "Epic",
+      "EPIC-15",
+      "Relatorios",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 81,
+    "summary": "[BE] Ampliar dashboard com metricas de usuarios e sellers",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nAdicionar KPIs de cadastros e operacao regional.\n\nTarefas:\n- Total de usuarios (consumidores) ativos\n- Total de sellers (lojas) ativos por tipo\n- Cadastros pendentes de aprovacao\n- Distribuicao por cidade/estado\n- Filtro por periodo\n\nCriterios de aceite:\n- Admin (sem loja_id) ve metricas globais\n- Seller continua vendo so suas metricas",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-15",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 82,
+    "summary": "[BE] Criar endpoints de relatorios de marketplace",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nRelatorios gerenciais e operacionais de pedidos e vendas.\n\nTarefas:\n- GET /api/dashboard/relatorio/pedidos-por-status?periodo=X\n- GET /api/dashboard/relatorio/ticket-medio?periodo=X\n- GET /api/dashboard/relatorio/itens-mais-vendidos?periodo=X&limit=N\n- GET /api/dashboard/relatorio/categorias-mais-vendidas?periodo=X\n- GET /api/dashboard/relatorio/faturamento?periodo=X&agrupamento=dia|semana|mes\n- Suportar filtro por loja_id (admin), ou auto loja_id (seller)\n\nCriterios de aceite:\n- Relatorios retornam dados corretos para o periodo\n- Numeros batem com transacoes registradas",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-15",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 83,
+    "summary": "[BE] Implementar exportacao de relatorios em CSV",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nPermitir download de dados em formato CSV.\n\nTarefas:\n- Adicionar parametro ?export=csv aos endpoints de relatorio\n- Gerar CSV com headers legisiveis em portugues\n- Stream response para datasets grandes\n- Registrar log de exportacao\n\nCriterios de aceite:\n- CSV abre corretamente em Excel/Sheets\n- Exportacao nao trava para volumes moderados",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-15",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 84,
+    "summary": "[FE] Ampliar pagina de dashboard com novos widgets",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 5\n\n---\n\nAdicionar cards e graficos das novas metricas.\n\nTarefas:\n- Card de total de usuarios e sellers\n- Card de cadastros pendentes\n- Grafico de distribuicao regional (mapa ou bar chart por cidade)\n- Tabela de itens mais vendidos\n- Grafico de ticket medio ao longo do tempo\n- Filtros por periodo e loja (admin)\n\nCriterios de aceite:\n- Dashboard e informativo e acionavel\n- Dados carregam sem lentidao perceptivel",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-15",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 85,
+    "summary": "[FE] Criar pagina de relatorios com filtros e exportacao",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-15: Relatorios\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 5\n\n---\n\nPagina dedicada a relatorios detalhados.\n\nTarefas:\n- Criar pagina /relatorios\n- Tabs ou accordion por tipo: pedidos, vendas, sellers, usuarios\n- Filtros: periodo, loja, status, regiao\n- Tabela de resultados com paginacao\n- Botao de exportar CSV\n- Adicionar ao menu de navegacao\n\nCriterios de aceite:\n- Admin acessa relatorios detalhados\n- Exportacao funciona para cada tipo",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-15",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 86,
+    "summary": "EPIC-16: Seguranca e Auditoria",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-16: Seguranca\n**Modulo:** Seguranca\n**Repositorios:** cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nObjetivo: implementar trilha de auditoria e controles de seguranca conforme RNF 5.4.\n\nRequisitos cobertos:\n- Logs de acesso\n- Rastreabilidade de acoes criticas\n- Controle de acesso por perfil (admin, seller, consumidor)\n\nDependencias:\n- EPIC-01 (ACL padronizado)\n\nEntregaveis:\n- Tabela de audit log com eventos criticos\n- Login, falhas de auth, mudancas de status de pedido, eventos financeiros\n- Consulta administrativa de logs\n- Alertas minimos para falhas operacionais",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-5",
+      "Epic",
+      "EPIC-16",
+      "Seguranca",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 87,
+    "summary": "[BE] Criar sistema de audit log para eventos criticos",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-16: Seguranca\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nRegistrar acoes sensiveis em tabela de auditoria.\n\nTarefas:\n- Criar tabela audit_logs: id, user_id, acao, entidade, entidade_id, dados_anteriores (json), dados_novos (json), ip, user_agent, created_at\n- Criar trait Auditable para models\n- Registrar: login/logout, falha de login, mudanca de status de pedido, validacao de PIN, eventos de pagamento, criacao/edicao de loja, aprovacao de produto\n- Criar AuditLogService\n\nCriterios de aceite:\n- Eventos criticos geram registro automatico\n- Log inclui quem, quando, o que mudou",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-16",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 88,
+    "summary": "[BE] Criar endpoints de consulta de audit log",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-16: Seguranca\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nPermitir admin consultar historico de auditoria.\n\nTarefas:\n- GET /api/audit-logs?user_id=X&acao=Y&entidade=Z&periodo=X\n- Paginacao e filtros\n- Apenas admin com permissao de seguranca\n\nCriterios de aceite:\n- Admin consulta logs por usuario, acao e periodo\n- Dados sensiveis nao sao expostos (ex: senhas)",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-16",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 89,
+    "summary": "[FE] Criar pagina de consulta de logs de auditoria no painel",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-16: Seguranca\n**Modulo:** Backoffice\n**Repositorios:** cervagelada_frontend\n**Fase:** Fase 5\n\n---\n\nInterface admin para consultar trilha de auditoria.\n\nTarefas:\n- Criar pagina /seguranca/audit-logs\n- Tabela com: data, usuario, acao, entidade, detalhes\n- Filtros por periodo, usuario e tipo de acao\n- Expandir linha para ver detalhes (dados anteriores vs novos)\n- Adicionar ao menu (modulo Seguranca)\n\nCriterios de aceite:\n- Admin ve historico de acoes criticas\n- Dados exibidos de forma legivel",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-16",
+      "Backoffice",
+      "cervagelada_frontend"
+    ]
+  },
+  {
+    "idx": 90,
+    "summary": "[BE] Implementar alertas operacionais minimos",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-16: Seguranca\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nDetectar falhas criticas e alertar equipe.\n\nTarefas:\n- Monitorar: falha de webhook Asaas, timeout de pagamento, erros 500 recorrentes\n- Implementar via log channel ou notification (email/Slack)\n- Criar config de thresholds (ex: 3 falhas em 5min)\n- Nao depender de monitoramento externo inicialmente\n\nCriterios de aceite:\n- Falhas relevantes geram alerta\n- Equipe diagnostica incidentes sem depender de relato do usuario",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-16",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 91,
+    "summary": "EPIC-17: Testes e Qualidade",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-17: Testes\n**Modulo:** Qualidade\n**Repositorios:** cervagelada, cervagelada_frontend, cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nObjetivo: garantir cobertura de testes nos fluxos criticos do produto.\n\nEntregaveis:\n- Testes unitarios e de integracao no backend\n- Testes E2E do fluxo principal do consumidor\n- CI configurado para rodar testes automaticamente\n\nDependencias:\n- Todas as epics anteriores (testes acompanham features)",
+    "priority": "Major",
+    "type": "Epic",
+    "tags": [
+      "Fase-5",
+      "Epic",
+      "EPIC-17",
+      "Qualidade",
+      "cervagelada",
+      "cervagelada_frontend",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 92,
+    "summary": "[BE] Criar testes de integracao do fluxo de pagamento",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-17: Testes\n**Modulo:** Qualidade\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nTestar integracao com Asaas em sandbox.\n\nTarefas:\n- Testar criacao de cobranca\n- Testar processamento de webhook (pago, recusado, estornado)\n- Testar conciliacao de transacoes\n- Testar timeout e cancelamento\n\nCriterios de aceite:\n- Fluxo de pagamento coberto por testes automatizados",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-17",
+      "Qualidade",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 93,
+    "summary": "[BE] Criar testes de integracao dos endpoints publicos",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-17: Testes\n**Modulo:** Qualidade\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nTestar todos os endpoints publicos do consumidor.\n\nTarefas:\n- Testar consulta de CEP\n- Testar listagem de lojas por raio\n- Testar catalogo por loja\n- Testar criacao de pedido\n- Testar busca de loja por produto\n\nCriterios de aceite:\n- Endpoints publicos validados contra cenarios reais",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-17",
+      "Qualidade",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 94,
+    "summary": "[E2E] Criar suite de testes E2E do fluxo do consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-17: Testes\n**Modulo:** Qualidade\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nTestar jornada completa: localizacao > loja > carrinho > checkout > acompanhamento.\n\nTarefas:\n- Configurar Playwright ou Cypress\n- Cenario 1: definir endereco por CEP, ver lojas\n- Cenario 2: abrir vitrine, adicionar ao carrinho\n- Cenario 3: ir para checkout, confirmar pedido\n- Cenario 4: acompanhar status do pedido\n\nCriterios de aceite:\n- Suite E2E roda em CI\n- Regressao do funil principal e detectada automaticamente",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-17",
+      "Qualidade",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 95,
+    "summary": "[DEVOPS] Configurar CI para rodar testes automaticamente",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-17: Testes\n**Modulo:** DevOps\n**Repositorios:** cervagelada, cervagelada_back_api\n**Fase:** Fase 5\n\n---\n\nPipeline de CI para backend e testes E2E.\n\nTarefas:\n- Configurar GitHub Actions ou equivalente\n- Backend: php artisan test em cada PR\n- E2E: rodar suite apos deploy em staging\n- Reportar resultado no PR\n\nCriterios de aceite:\n- PRs nao podem ser mergeados sem testes passando\n- Resultado visivel no GitHub",
+    "priority": "Normal",
+    "type": "Task",
+    "tags": [
+      "Fase-5",
+      "Task",
+      "EPIC-17",
+      "DevOps",
+      "cervagelada",
+      "cervagelada_back_api"
+    ]
+  },
+  {
+    "idx": 96,
+    "summary": "EPIC-18: Setup de Roteamento e Navegacao do Site",
+    "description": "**Tipo:** Epic\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Fundacao\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nObjetivo: transformar o site Nuxt de single-page em aplicacao com rotas para suportar paginas internas.\n\nJustificativa: o site atual renderiza tudo em app.vue como scroll unico. Para vitrine de loja, pagina de noticia, checkout, e necessario file-based routing.\n\nEntregaveis:\n- Estrutura de paginas Nuxt funcional\n- Home como pagina principal\n- Rotas publicas para loja, noticia, destaque, carrinho, checkout, pedido\n- Layout compartilhado com header e footer",
+    "priority": "Critical",
+    "type": "Epic",
+    "tags": [
+      "Fase-1",
+      "Epic",
+      "EPIC-18",
+      "Fundacao",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 97,
+    "summary": "[SITE] Migrar app.vue para layout + pagina home",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nReestruturar para suportar roteamento.\n\nTarefas:\n- Criar app/layouts/default.vue com header e footer\n- Criar app/pages/index.vue com o conteudo atual de app.vue (todas as sections)\n- Configurar NuxtPage no app.vue\n- Verificar que home continua funcionando identicamente\n\nCriterios de aceite:\n- Site funciona identicamente a antes (home)\n- Roteamento habilitado para novas paginas",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-18",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 98,
+    "summary": "[SITE] Criar infraestrutura de comunicacao com API",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nSetup de HTTP client e estado global para o site consumidor.\n\nTarefas:\n- Instalar e configurar Pinia para state management\n- Criar composable useApi() com Nuxt useFetch ou $fetch\n- Configurar VITE_API_URL ou runtimeConfig para URL da API\n- Criar tratamento padrao de erros\n- Criar composable useLocation() para gerenciar contexto de localizacao\n\nCriterios de aceite:\n- Site consegue buscar dados da API\n- Estado global persistido entre paginas\n- URL da API configuravel por ambiente",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-18",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 99,
+    "summary": "[SITE] Implementar autenticacao de consumidor no site",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 1\n\n---\n\nLogin e registro de consumidor no site publico.\n\nTarefas:\n- Criar pagina /login e /registro\n- Integrar com endpoints existentes de auth (login, register)\n- Armazenar JWT em cookie httpOnly ou localStorage\n- Proteger rotas que exigem auth (carrinho, checkout, pedido)\n- Exibir nome do usuario no header quando logado\n- Botoes login/registro quando nao logado\n\nCriterios de aceite:\n- Consumidor faz login e registro pelo site\n- JWT persiste entre sessoes\n- Rotas protegidas redirecionam para login",
+    "priority": "Critical",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-18",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 100,
+    "summary": "[SITE] Criar pagina de perfil do consumidor",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Site Publico\n**Repositorios:** cervagelada\n**Fase:** Fase 2\n\n---\n\nArea logada para consumidor gerenciar dados e enderecos.\n\nTarefas:\n- Criar pagina /perfil\n- Exibir e editar: nome, email, telefone\n- Listar enderecos com CRUD\n- Listar historico de pedidos\n- Botao de logout\n\nCriterios de aceite:\n- Consumidor gerencia seus dados\n- Historico de pedidos acessivel",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-2",
+      "Task",
+      "EPIC-18",
+      "Site Publico",
+      "cervagelada"
+    ]
+  },
+  {
+    "idx": 101,
+    "summary": "[BE] Adicionar campo telefone na tabela users",
+    "description": "**Tipo:** Task\n**Epic:** EPIC-18: Roteamento Site\n**Modulo:** Backend\n**Repositorios:** cervagelada_back_api\n**Fase:** Fase 1\n\n---\n\nCampo necessario para PIN de entrega e contato.\n\nTarefas:\n- Criar migration adicionando telefone (varchar 20 nullable)\n- Atualizar model User com novo campo\n- Atualizar RegisterRequest e UserRequest\n- Atualizar formulario de registro no painel e site\n\nCriterios de aceite:\n- Usuario pode cadastrar telefone\n- Campo disponivel para geracao de PIN",
+    "priority": "Major",
+    "type": "Task",
+    "tags": [
+      "Fase-1",
+      "Task",
+      "EPIC-18",
+      "Backend",
+      "cervagelada_back_api"
+    ]
+  }
+]
