@@ -72,6 +72,14 @@ class DashboardController extends BaseController
     }
 
     /**
+     * Admin-level extended metrics (users, sellers, orders by status, revenue).
+     */
+    public function metricasAdmin(): JsonResponse
+    {
+        return response()->json($this->service->getMetricasAdmin());
+    }
+
+    /**
      * Consolidated dashboard data.
      */
     public function dashboard(Request $request): JsonResponse

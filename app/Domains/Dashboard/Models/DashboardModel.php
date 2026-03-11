@@ -16,6 +16,74 @@ class DashboardModel extends BaseModel
     protected $table = null;
 
     /**
+     * Get extended metrics: users by type, sellers activity, new registrations.
+     */
+    public function getMetricasUsuarios(): array
+    {
+        $hoje = Carbon::now();
+        $inicioMes = $hoje->copy()->startOfMonth();
+        $inicioMesPassado = $hoje->copy()->subMonth()->startOfMonth();
+        $fimMesPassado = $hoje->copy()->subMonth()->endOfMonth();
+
+        $totalPorRole = DB::table('users')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->selectRaw('roles.nome as role, COUNT(DISTINCT users.id) as total')
+            ->groupBy('roles.nome')
+            ->pluck('total', 'role')
+            ->toArray();
+
+        $novosEsteMes = DB::table('users')
+            ->where('created_at', '>=', $inicioMes)
+            ->count();
+
+        $novosMesPassado = DB::table('users')
+            ->whereBetween('created_at', [$inicioMesPassado, $fimMesPassado])
+            ->count();
+
+        return [
+            'total_usuarios' => DB::table('users')->count(),
+            'por_tipo' => $totalPorRole,
+            'novos_este_mes' => $novosEsteMes,
+            'variacao_cadastros' => $this->calculateVariacao($novosEsteMes, $novosMesPassado),
+        ];
+    }
+
+    /**
+     * Get sellers activity metrics.
+     */
+    public function getMetricasSellers(): array
+    {
+        $hoje = Carbon::now();
+        $trintaDiasAtras = $hoje->copy()->subDays(30);
+
+        $totalLojas = DB::table('lojas')->count();
+        $lojasAtivas = DB::table('lojas')->where('ativo', 1)->count();
+        $lojasInativas = $totalLojas - $lojasAtivas;
+
+        $sellersAtivos = DB::table('lojas')
+            ->where('ativo', 1)
+            ->whereExists(function ($query) use ($trintaDiasAtras) {
+                $query->from('pedidos')
+                    ->whereColumn('pedidos.loja_id', 'lojas.id')
+                    ->where('pedidos.created_at', '>=', $trintaDiasAtras);
+            })
+            ->count();
+
+        $novasLojas = DB::table('lojas')
+            ->where('created_at', '>=', $hoje->copy()->startOfMonth())
+            ->count();
+
+        return [
+            'total_lojas' => $totalLojas,
+            'lojas_ativas' => $lojasAtivas,
+            'lojas_inativas' => $lojasInativas,
+            'sellers_ativos_30d' => $sellersAtivos,
+            'novas_lojas_mes' => $novasLojas,
+        ];
+    }
+
+    /**
      * Get main metrics (receita_total, total_pedidos, ticket_medio).
      * Compares current month with previous month.
      */
@@ -225,6 +293,53 @@ class DashboardModel extends BaseModel
             'vendas' => $vendas,
             'pedidos' => $pedidos,
             'ticket_medio' => $pedidos > 0 ? $vendas / $pedidos : 0,
+        ];
+    }
+
+    /**
+     * Get admin-level metrics: total users by type, sellers, orders by status, revenue, new signups.
+     */
+    public function getMetricasAdmin(): array
+    {
+        $hoje = Carbon::now();
+        $inicioMes = $hoje->copy()->startOfMonth();
+        $inicio7d = $hoje->copy()->subDays(7);
+        $inicio30d = $hoje->copy()->subDays(30);
+
+        $pedidosPorStatus = DB::table('pedidos')
+            ->selectRaw('status, COUNT(*) as total')
+            ->where('created_at', '>=', $inicio30d)
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        $receitaTotal = DB::table('pedidos')
+            ->where('status', '!=', 'cancelado')
+            ->whereMonth('created_at', $hoje->month)
+            ->whereYear('created_at', $hoje->year)
+            ->sum('total');
+
+        $receitaMesPassado = DB::table('pedidos')
+            ->where('status', '!=', 'cancelado')
+            ->whereMonth('created_at', $hoje->copy()->subMonth()->month)
+            ->whereYear('created_at', $hoje->copy()->subMonth()->year)
+            ->sum('total');
+
+        $totalPedidosMes = DB::table('pedidos')
+            ->whereMonth('created_at', $hoje->month)
+            ->whereYear('created_at', $hoje->year)
+            ->count();
+
+        $ticketMedio = $totalPedidosMes > 0 ? floatval($receitaTotal) / $totalPedidosMes : 0;
+
+        return [
+            'usuarios' => $this->getMetricasUsuarios(),
+            'sellers' => $this->getMetricasSellers(),
+            'pedidos_por_status_30d' => $pedidosPorStatus,
+            'receita_total_mes' => floatval($receitaTotal),
+            'variacao_receita' => $this->calculateVariacao($receitaTotal, $receitaMesPassado),
+            'ticket_medio' => round($ticketMedio, 2),
+            'total_pedidos_mes' => $totalPedidosMes,
         ];
     }
 

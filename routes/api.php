@@ -40,3 +40,15 @@ require __DIR__ . '/domains/transacoes-financeiras.php';
 
 // Dashboard Domain Routes
 require __DIR__ . '/domains/dashboard.php';
+
+// Relatorios Domain Routes
+require __DIR__ . '/domains/relatorios.php';
+
+// Auditoria Domain Routes
+require __DIR__ . '/domains/auditoria.php';
+
+// Destaque Domain Routes
+require __DIR__ . '/domains/destaque.php';
+
+// Configuracao Domain Routes
+require __DIR__ . '/domains/configuracao.php';

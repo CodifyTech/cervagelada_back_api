@@ -12,24 +12,16 @@ use App\Domains\Loja\Models\Loja;
 use App\Domains\ItemPedido\Models\ItemPedido;
 use App\Domains\Avaliacao\Models\Avaliacao;
 use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
+use App\Domains\Pagamento\Models\Pagamento;
 
 class Pedido extends BaseModel
 {
     use HasFactory;
 
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'pedidos';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $with = ['pagamento'];
+
     protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'endereco_id'];
 
 
@@ -74,5 +66,10 @@ class Pedido extends BaseModel
     public function transacoesFinanceiras(): HasMany
     {
         return $this->hasMany(TransacoesFinanceiras::class);
+    }
+
+    public function pagamento(): HasOne
+    {
+        return $this->hasOne(Pagamento::class);
     }
 }

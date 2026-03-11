@@ -39,4 +39,10 @@ return [
         'token' => env('MAPBOX_ACCESS_TOKEN'),
     ],
 
+    'asaas' => [
+        'api_key' => env('ASAAS_API_KEY'),
+        'sandbox' => env('ASAAS_SANDBOX', true),
+        'webhook_token' => env('ASAAS_WEBHOOK_TOKEN'),
+    ],
+
 ];

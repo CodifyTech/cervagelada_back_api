@@ -4,6 +4,12 @@ use App\Domains\Shared\Controller\PublicCepController;
 use App\Domains\Loja\Controllers\PublicLojaController;
 use App\Domains\Endereco\Controllers\PublicEnderecoController;
 use App\Domains\Pedido\Controllers\PublicPedidoController;
+use App\Domains\Pagamento\Controllers\AsaasWebhookController;
+use App\Domains\Promocao\Controllers\PublicPromocaoController;
+use App\Domains\Destaque\Controllers\PublicDestaqueController;
+use App\Domains\Produto\Controllers\PublicProdutoController;
+use App\Domains\Noticias\Controllers\PublicNoticiasController;
+use App\Domains\Configuracao\Controllers\PublicConfiguracaoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Webhook (no auth — validated by token header)
+Route::post('webhooks/asaas', [AsaasWebhookController::class, 'handle']);
+
 Route::group(['prefix' => 'public'], function () {
 
     // CEP lookup (no auth required)
@@ -26,6 +35,24 @@ Route::group(['prefix' => 'public'], function () {
     Route::get('lojas/cervejarias', [PublicLojaController::class, 'cervejarias']);
     Route::get('lojas/{id}', [PublicLojaController::class, 'show']);
     Route::get('lojas/{id}/produtos', [PublicLojaController::class, 'catalogo']);
+
+    // Public promotions
+    Route::get('promocoes', [PublicPromocaoController::class, 'index']);
+
+    // Public sponsored highlights
+    Route::get('destaques', [PublicDestaqueController::class, 'index']);
+    Route::get('destaques/{id}', [PublicDestaqueController::class, 'show']);
+
+    // Nearest store for a product
+    Route::get('produtos/{id}/loja-proxima', [PublicProdutoController::class, 'lojaProxima']);
+
+    // Public news feed
+    Route::get('noticias', [PublicNoticiasController::class, 'index']);
+    Route::get('noticias/{id}', [PublicNoticiasController::class, 'show']);
+
+    // Platform configurations
+    Route::get('configuracoes', [PublicConfiguracaoController::class, 'index']);
+    Route::get('configuracoes/{grupo}', [PublicConfiguracaoController::class, 'byGrupo']);
 
     // Consumer address management (requires JWT auth)
     Route::group(['middleware' => 'auth:api'], function () {
@@ -39,5 +66,6 @@ Route::group(['prefix' => 'public'], function () {
         Route::get('pedidos/meus', [PublicPedidoController::class, 'meusPedidos']);
         Route::post('pedidos', [PublicPedidoController::class, 'store']);
         Route::get('pedidos/{id}', [PublicPedidoController::class, 'show']);
+        Route::get('pedidos/{id}/pagamento/status', [PublicPedidoController::class, 'paymentStatus']);
     });
 });

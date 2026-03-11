@@ -19,13 +19,17 @@ use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Auth\Requests\ForgotPasswordRequest;
 use App\Domains\Auth\Requests\RegisterStoreRequest;
 use App\Domains\Loja\Models\Loja;
+use App\Domains\Auditoria\Services\AuditService;
 use Illuminate\Support\Facades\DB;
 
 class AuthService extends BaseService
 {
     private string $token;
 
-    public function __construct(private User $user) {}
+    public function __construct(
+        private User $user,
+        private AuditService $auditService = new AuditService()
+    ) {}
 
     /**
      * @throws \Exception
@@ -34,6 +38,8 @@ class AuthService extends BaseService
     {
         $this->token = $this->validateCredentials($request);
         $this->user = Auth::user();
+
+        $this->auditService->logLogin($this->user->id, $this->user->email);
 
         $ACL = collect($this->user->permissions())
             ->reduce(function ($ACL, $permission) {
@@ -203,8 +209,12 @@ class AuthService extends BaseService
 
     public function logout()
     {
+        $userId = auth()->id();
         try {
             Auth::logout();
+            if ($userId) {
+                $this->auditService->logLogout($userId);
+            }
         } catch (\Exception $e) {
             // Se o token já expirou ou é inválido, ainda consideramos logout bem-sucedido
             Log::info('Logout realizado com token expirado/inválido: ' . $e->getMessage());
@@ -232,6 +242,7 @@ class AuthService extends BaseService
         $token = Auth::attempt($request->only('email', 'password'));
 
         if (!$token) {
+            $this->auditService->logLoginFailed($request->email);
             throw ValidationException::withMessages([
                 'email' => ['As credenciais fornecidas estão incorretas.'],
             ]);

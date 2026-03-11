@@ -61,6 +61,15 @@ class DashboardService extends BaseService
     }
 
     /**
+     * Get admin-level extended metrics (users, sellers, orders by status, revenue).
+     * Does not require a loja_id - aggregates across all lojas.
+     */
+    public function getMetricasAdmin(): array
+    {
+        return $this->dashboardModel->getMetricasAdmin();
+    }
+
+    /**
      * Get all dashboard data at once.
      */
     public function getDashboard(int $ano, int $limit = 5): array

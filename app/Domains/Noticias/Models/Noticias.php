@@ -13,7 +13,7 @@ use App\Domains\Shared\Models\BaseModel;
 class Noticias extends BaseModel
 {
     use HasFactory;
-    
+
 
     /**
      * The table associated with the model.
@@ -27,6 +27,14 @@ class Noticias extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['titulo', 'conteudo', 'url_imagem', 'publicado_em', 'ativo'];
-    
+    protected $fillable = [
+        'titulo', 'conteudo', 'url_imagem', 'publicado_em', 'ativo',
+        'fonte', 'url_fonte', 'patrocinado', 'patrocinador',
+    ];
+
+    protected $casts = [
+        'ativo'       => 'boolean',
+        'patrocinado' => 'boolean',
+        'publicado_em' => 'datetime',
+    ];
 }

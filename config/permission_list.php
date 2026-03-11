@@ -113,7 +113,31 @@ return [
         'transacoes-financeiras block',
         'transacoes-financeiras manage',
     ],
+    'destaque' => [
+        'destaque read',
+        'destaque create',
+        'destaque delete',
+        'destaque list',
+        'destaque edit',
+        'destaque block',
+        'destaque manage',
+    ],
+    'configuracao' => [
+        'configuracao read',
+        'configuracao create',
+        'configuracao delete',
+        'configuracao list',
+        'configuracao edit',
+        'configuracao block',
+        'configuracao manage',
+    ],
     'dashboard' => [
         'dashboard read',
+    ],
+    'relatorios' => [
+        'relatorios read',
+    ],
+    'audit' => [
+        'audit read',
     ],
 ];

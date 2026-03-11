@@ -2,6 +2,7 @@
 
 namespace App\Domains\Pedido\Controllers;
 
+use App\Domains\Pagamento\Services\PagamentoService;
 use App\Domains\Pedido\Services\DeliveryFeeService;
 use App\Domains\Pedido\Services\PedidoService;
 use App\Http\Controllers\Controller;
@@ -10,7 +11,10 @@ use Illuminate\Http\Request;
 
 class PublicPedidoController extends Controller
 {
-    public function __construct(private readonly PedidoService $pedidoService) {}
+    public function __construct(
+        private readonly PedidoService $pedidoService,
+        private readonly PagamentoService $pagamentoService,
+    ) {}
 
     /**
      * POST /api/public/pedidos — Create order from consumer cart.
@@ -45,13 +49,39 @@ class PublicPedidoController extends Controller
         try {
             $pedido = $this->pedidoService->store($orderData);
 
-            return response()->json([
+            // Create charge on Asaas
+            $metodo = $data['metodo_pagamento'];
+            $result = $this->pagamentoService->criarCobranca($pedido, $metodo);
+
+            $response = [
                 'id' => $pedido->id,
                 'status' => $pedido->status,
                 'subtotal' => $pedido->subtotal,
                 'taxa_entrega' => $pedido->taxa_entrega,
                 'total' => $pedido->total,
-            ], 201);
+                'pagamento' => [
+                    'id' => $result['pagamento']->id,
+                    'status' => $result['pagamento']->status,
+                    'metodo' => $result['pagamento']->metodo,
+                    'asaas_charge_id' => $result['pagamento']->asaas_charge_id,
+                ],
+            ];
+
+            // Add PIX data if available
+            if ($metodo === 'pix' && $result['pix']) {
+                $response['pagamento']['pix'] = [
+                    'qr_code' => $result['pix']['encodedImage'] ?? null,
+                    'copy_paste' => $result['pix']['payload'] ?? null,
+                    'expiration_date' => $result['pix']['expirationDate'] ?? null,
+                ];
+            }
+
+            // Add invoice URL for card/boleto
+            if (isset($result['charge']['invoiceUrl'])) {
+                $response['pagamento']['invoice_url'] = $result['charge']['invoiceUrl'];
+            }
+
+            return response()->json($response, 201);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -88,7 +118,7 @@ class PublicPedidoController extends Controller
      */
     public function meusPedidos(): JsonResponse
     {
-        $pedidos = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto'])
+        $pedidos = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto', 'pagamento'])
             ->where('user_id', auth()->id())
             ->orderByDesc('created_at')
             ->paginate(15);
@@ -101,10 +131,33 @@ class PublicPedidoController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $pedido = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto', 'endereco'])
+        $pedido = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto', 'endereco', 'pagamento'])
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
         return response()->json($pedido);
+    }
+
+    /**
+     * GET /api/public/pedidos/{id}/pagamento/status — Check payment status (for polling).
+     */
+    public function paymentStatus(string $id): JsonResponse
+    {
+        $pedido = \App\Domains\Pedido\Models\Pedido::with('pagamento')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        if (!$pedido->pagamento) {
+            return response()->json(['message' => 'Pagamento não encontrado'], 404);
+        }
+
+        // Sync status from Asaas
+        $pagamento = $this->pagamentoService->sincronizarStatus($pedido->pagamento);
+
+        return response()->json([
+            'status' => $pagamento->status,
+            'metodo' => $pagamento->metodo,
+            'pago_em' => $pagamento->pago_em,
+        ]);
     }
 }

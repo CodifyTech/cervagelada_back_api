@@ -4,11 +4,14 @@ namespace App\Domains\Pedido\Services;
 
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Auditoria\Services\AuditService;
 
 class PedidoService extends BaseService
 {
-    public function __construct(private readonly Pedido $pedido)
-    {
+    public function __construct(
+        private readonly Pedido $pedido,
+        private AuditService $auditService = new AuditService()
+    ) {
         $this->setModel($this->pedido);
     }
 
@@ -124,6 +127,10 @@ class PedidoService extends BaseService
 
             $pedido->update($data);
 
+            if ($oldStatus !== $newStatus) {
+                $this->auditService->logOrderStatusChanged($pedido->id, $oldStatus, $newStatus);
+            }
+
             return $pedido->refresh();
         });
     }
@@ -140,6 +147,7 @@ class PedidoService extends BaseService
             'itemPedidos.produto',
             'user',
             'loja',
+            'pagamento',
         ])->findOrFail($id);
     }
 
@@ -154,7 +162,7 @@ class PedidoService extends BaseService
     {
         $lojaId = $this->resolveLojaId();
 
-        $query = Pedido::with(['user', 'itemPedidos'])
+        $query = Pedido::with(['user', 'itemPedidos', 'pagamento'])
             ->where('loja_id', $lojaId);
 
         // Filter by status

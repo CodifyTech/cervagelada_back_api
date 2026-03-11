@@ -17,6 +17,7 @@ Route::group([
     'prefix' => 'dashboard'
 ], function () {
     Route::get('metricas', [DashboardController::class, 'metricas']);
+    Route::get('metricas-admin', [DashboardController::class, 'metricasAdmin']);
     Route::get('vendas-mensais', [DashboardController::class, 'vendasMensais']);
     Route::get('pedidos-por-mes', [DashboardController::class, 'pedidosPorMes']);
     Route::get('categorias-mais-vendidas', [DashboardController::class, 'categoriasMaisVendidas']);

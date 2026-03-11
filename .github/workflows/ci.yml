@@ -1,0 +1,78 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+
+jobs:
+  tests:
+    name: PHP Tests
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, pdo_mysql, bcmath, redis, zip
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy .env
+        run: cp .env.example .env || echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env
+
+      - name: Generate app key
+        run: php artisan key:generate
+
+      - name: Run Pest tests (SQLite in-memory)
+        run: php artisan test --parallel --no-ansi
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+          JWT_SECRET: test-secret-key-for-ci-only
+          CACHE_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+
+  lint:
+    name: PHP Lint (Pint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run Pint (if installed)
+        run: |
+          if [ -f "vendor/bin/pint" ]; then
+            ./vendor/bin/pint --test
+          else
+            echo "Pint not installed — skipping lint"
+          fi

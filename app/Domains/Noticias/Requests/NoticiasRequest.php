@@ -9,11 +9,15 @@ class NoticiasRequest extends BaseFormRequest
     public function base(): array
     {
         return [
-            'titulo' => ['required', 'string', 'max:150'],
-            'conteudo' => ['required', 'string'],
-            'url_imagem' => ['nullable', 'string', 'max:255'],
+            'titulo'       => ['required', 'string', 'max:150'],
+            'conteudo'     => ['required', 'string'],
+            'url_imagem'   => ['nullable', 'string', 'max:255'],
             'publicado_em' => ['required', 'date'],
-            'ativo' => ['required', 'boolean'],
+            'ativo'        => ['required', 'boolean'],
+            'fonte'        => ['nullable', 'string', 'max:150'],
+            'url_fonte'    => ['nullable', 'url', 'max:255'],
+            'patrocinado'  => ['nullable', 'boolean'],
+            'patrocinador' => ['nullable', 'string', 'max:150'],
         ];
     }
 
