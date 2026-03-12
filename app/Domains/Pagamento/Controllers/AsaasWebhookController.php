@@ -5,6 +5,8 @@ namespace App\Domains\Pagamento\Controllers;
 use App\Domains\Pagamento\Models\Pagamento;
 use App\Domains\Pagamento\Services\PagamentoService;
 use App\Domains\Auditoria\Services\AuditService;
+use App\Domains\Pedido\Enums\OrderStatus;
+use App\Domains\Pedido\Events\NewOrderReceived;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -123,8 +125,11 @@ class AsaasWebhookController extends Controller
      */
     private function onPaymentConfirmed($pedido): void
     {
-        if ($pedido->status === 'aguardando_pagamento') {
-            $pedido->update(['status' => 'pendente']);
+        if ($pedido->status === OrderStatus::AGUARDANDO_PAGAMENTO) {
+            $pedido->update(['status' => OrderStatus::RECEBIDO->value]);
+
+            // Notify seller about the new paid order
+            NewOrderReceived::dispatch($pedido->load(['itemPedidos', 'loja', 'user']));
         }
     }
 
@@ -133,7 +138,7 @@ class AsaasWebhookController extends Controller
      */
     private function onPaymentFailed($pedido): void
     {
-        if ($pedido->status === 'aguardando_pagamento') {
+        if ($pedido->status === OrderStatus::AGUARDANDO_PAGAMENTO) {
             // Restore stock
             foreach ($pedido->itemPedidos as $item) {
                 \DB::table('loja_produtos')
@@ -142,7 +147,7 @@ class AsaasWebhookController extends Controller
                     ->increment('estoque', $item->quantidade_final);
             }
 
-            $pedido->update(['status' => 'cancelado']);
+            $pedido->update(['status' => OrderStatus::CANCELADO->value]);
         }
     }
 
@@ -151,8 +156,8 @@ class AsaasWebhookController extends Controller
      */
     private function onPaymentRefunded($pedido): void
     {
-        if (!in_array($pedido->status, ['cancelado', 'entregue'])) {
-            $pedido->update(['status' => 'cancelado']);
+        if (!in_array($pedido->status, [OrderStatus::CANCELADO, OrderStatus::ENTREGUE])) {
+            $pedido->update(['status' => OrderStatus::CANCELADO->value]);
         }
     }
 }

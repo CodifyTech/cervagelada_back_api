@@ -3,6 +3,7 @@
 namespace App\Domains\Pedido\Services;
 
 use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Pedido\Enums\OrderStatus;
 use App\Domains\Shared\Services\BaseService;
 use App\Domains\Auditoria\Services\AuditService;
 
@@ -37,7 +38,7 @@ class PedidoService extends BaseService
 
             // Fallback status
             if (!isset($data['status'])) {
-                $data['status'] = 'pendente';
+                $data['status'] = OrderStatus::AGUARDANDO_PAGAMENTO->value;
             }
 
             // Calculation and Stock Validation
@@ -90,6 +91,9 @@ class PedidoService extends BaseService
             $data['taxa_entrega'] = $taxaEntrega;
             $data['total'] = $subtotal + $taxaEntrega;
 
+            // Generate unique delivery PIN
+            $data['pin_entrega'] = $this->generateUniquePin();
+
             /** @var Pedido $pedido */
             $pedido = $this->model->create($data);
 
@@ -113,10 +117,19 @@ class PedidoService extends BaseService
         return \DB::transaction(function () use ($data, $id) {
             $pedido = $this->findById($id);
             $oldStatus = $pedido->status;
-            $newStatus = $data['status'] ?? $oldStatus;
+            $newStatusValue = $data['status'] ?? $oldStatus->value;
+            $newStatus = $newStatusValue instanceof OrderStatus ? $newStatusValue : OrderStatus::from($newStatusValue);
+
+            // Validate state transition
+            if ($oldStatus !== $newStatus && !$oldStatus->canTransitionTo($newStatus)) {
+                throw new \Exception(
+                    "Transição inválida: '{$oldStatus->value}' → '{$newStatus->value}' não é permitida.",
+                    422
+                );
+            }
 
             // If cancelling an order that wasn't cancelled before, return stock
-            if ($newStatus === 'cancelado' && $oldStatus !== 'cancelado') {
+            if ($newStatus === OrderStatus::CANCELADO && $oldStatus !== OrderStatus::CANCELADO) {
                 foreach ($pedido->itemPedidos as $item) {
                     \DB::table('loja_produtos')
                         ->where('loja_id', $pedido->loja_id)
@@ -128,7 +141,7 @@ class PedidoService extends BaseService
             $pedido->update($data);
 
             if ($oldStatus !== $newStatus) {
-                $this->auditService->logOrderStatusChanged($pedido->id, $oldStatus, $newStatus);
+                $this->auditService->logOrderStatusChanged($pedido->id, $oldStatus->value, $newStatus->value);
             }
 
             return $pedido->refresh();
@@ -216,7 +229,7 @@ class PedidoService extends BaseService
             ->pluck('total', 'status')
             ->toArray();
 
-        $statuses = ['pendente', 'preparando', 'pronto', 'em_rota', 'entregue', 'cancelado'];
+        $statuses = OrderStatus::values();
         $result = [];
         foreach ($statuses as $status) {
             $result[$status] = $counts[$status] ?? 0;
@@ -224,6 +237,62 @@ class PedidoService extends BaseService
         $result['total'] = array_sum($result);
 
         return $result;
+    }
+
+    /**
+     * Validate delivery PIN for a given order.
+     * Returns the updated Pedido on success, throws on failure.
+     */
+    public function validarPin(string $id, string $pin): Pedido
+    {
+        return \DB::transaction(function () use ($id, $pin) {
+            $pedido = Pedido::lockForUpdate()->findOrFail($id);
+
+            if ($pedido->pin_validado_em) {
+                throw new \Exception('PIN já foi validado para este pedido.', 422);
+            }
+
+            if ($pedido->pin_tentativas >= 3) {
+                throw new \Exception('Número máximo de tentativas excedido. Contate o suporte.', 429);
+            }
+
+            if ($pedido->pin_entrega !== $pin) {
+                $pedido->increment('pin_tentativas');
+                $this->auditService->log('pin_validation_failed', 'pedido', $id, null, null, [
+                    'tentativa' => $pedido->pin_tentativas + 1,
+                ]);
+
+                $restantes = 3 - ($pedido->pin_tentativas + 1);
+                throw new \Exception(
+                    "PIN incorreto. {$restantes} tentativa(s) restante(s).",
+                    422
+                );
+            }
+
+            // PIN correct — mark as validated and transition to entregue
+            $oldStatus = $pedido->status;
+            $pedido->update([
+                'pin_validado_em' => now(),
+                'status' => OrderStatus::ENTREGUE->value,
+            ]);
+
+            $this->auditService->log('pin_validated', 'pedido', $id);
+            $this->auditService->logOrderStatusChanged($id, $oldStatus->value, OrderStatus::ENTREGUE->value);
+
+            return $pedido->refresh();
+        });
+    }
+
+    /**
+     * Generate a unique 6-digit PIN.
+     */
+    private function generateUniquePin(): string
+    {
+        do {
+            $pin = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (Pedido::where('pin_entrega', $pin)->whereNotIn('status', ['entregue', 'cancelado'])->exists());
+
+        return $pin;
     }
 
     /**

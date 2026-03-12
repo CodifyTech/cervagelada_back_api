@@ -128,6 +128,7 @@ class PublicPedidoController extends Controller
 
     /**
      * GET /api/public/pedidos/{id} — Show a single order (consumer must own it).
+     * Includes delivery PIN when order status is 'em_rota'.
      */
     public function show(string $id): JsonResponse
     {
@@ -135,7 +136,17 @@ class PublicPedidoController extends Controller
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
-        return response()->json($pedido);
+        $data = $pedido->toArray();
+
+        // Only expose PIN when order is in delivery
+        if ($pedido->status === 'em_rota' && !$pedido->pin_validado_em) {
+            $data['pin_entrega'] = $pedido->pin_entrega;
+        } else {
+            unset($data['pin_entrega']);
+        }
+        unset($data['pin_tentativas']);
+
+        return response()->json($data);
     }
 
     /**

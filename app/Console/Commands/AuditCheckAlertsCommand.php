@@ -5,10 +5,8 @@ namespace App\Console\Commands;
 use App\Domains\Auditoria\Models\AuditLog;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use App\Domains\Auth\Models\User;
 
 class AuditCheckAlertsCommand extends Command
@@ -21,6 +19,8 @@ class AuditCheckAlertsCommand extends Command
         $this->checkBruteForceAttempts();
         $this->checkStalledOrders();
         $this->checkRefusedPayments();
+        $this->checkWebhookFailures();
+        $this->checkRecurring500Errors();
 
         return self::SUCCESS;
     }
@@ -30,8 +30,10 @@ class AuditCheckAlertsCommand extends Command
      */
     private function checkBruteForceAttempts(): void
     {
-        $threshold = 5;
-        $window = Carbon::now()->subMinutes(10);
+        $threshold = (int) config('alerts.brute_force.threshold', 5);
+        $windowMin = (int) config('alerts.brute_force.window_minutes', 10);
+        $cooldown = (int) config('alerts.brute_force.cooldown_minutes', 30);
+        $window = Carbon::now()->subMinutes($windowMin);
 
         $suspects = AuditLog::where('action', 'login_failed')
             ->where('created_at', '>=', $window)
@@ -41,14 +43,13 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($suspects as $suspect) {
-            $alreadyAlerted = $this->alreadyAlerted("brute_force_{$suspect->ip_address}", 30);
-            if (!$alreadyAlerted) {
+            if (!$this->alreadyAlerted("brute_force_{$suspect->ip_address}", $cooldown)) {
                 $message = "⚠️ Possível ataque de força bruta: {$suspect->attempts} tentativas de login falhadas do IP {$suspect->ip_address}";
                 $this->notifyAdmins('brute_force', $message, [
                     'ip_address' => $suspect->ip_address,
                     'attempts' => $suspect->attempts,
                 ]);
-                Log::warning('[AuditAlert] Brute force detected', [
+                Log::channel($this->alertChannel())->warning('[AuditAlert] Brute force detected', [
                     'ip' => $suspect->ip_address,
                     'attempts' => $suspect->attempts,
                 ]);
@@ -61,7 +62,9 @@ class AuditCheckAlertsCommand extends Command
      */
     private function checkStalledOrders(): void
     {
-        $threshold = Carbon::now()->subHours(2);
+        $hoursThreshold = (int) config('alerts.stalled_orders.hours_threshold', 2);
+        $cooldown = (int) config('alerts.stalled_orders.cooldown_minutes', 120);
+        $threshold = Carbon::now()->subHours($hoursThreshold);
 
         $stalledOrders = DB::table('pedidos')
             ->where('status', 'em_entrega')
@@ -71,8 +74,7 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($stalledOrders as $order) {
-            $alreadyAlerted = $this->alreadyAlerted("stalled_order_{$order->id}", 120);
-            if (!$alreadyAlerted) {
+            if (!$this->alreadyAlerted("stalled_order_{$order->id}", $cooldown)) {
                 $hoursAgo = Carbon::parse($order->updated_at)->diffForHumans();
                 $message = "⏰ Pedido #{$order->id} em status 'em_entrega' desde {$hoursAgo} sem atualização.";
                 $this->notifyAdmins('stalled_order', $message, [
@@ -89,7 +91,9 @@ class AuditCheckAlertsCommand extends Command
      */
     private function checkRefusedPayments(): void
     {
-        $lastRun = Carbon::now()->subMinutes(5);
+        $windowMin = (int) config('alerts.refused_payments.window_minutes', 5);
+        $cooldown = (int) config('alerts.refused_payments.cooldown_minutes', 60);
+        $lastRun = Carbon::now()->subMinutes($windowMin);
 
         $refused = DB::table('pagamentos')
             ->where('status', 'recusado')
@@ -98,8 +102,7 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($refused as $payment) {
-            $alreadyAlerted = $this->alreadyAlerted("refused_payment_{$payment->id}", 60);
-            if (!$alreadyAlerted) {
+            if (!$this->alreadyAlerted("refused_payment_{$payment->id}", $cooldown)) {
                 $message = "💳 Pagamento recusado para pedido #{$payment->pedido_id}.";
                 $this->notifyAdmins('payment_refused', $message, [
                     'pagamento_id' => $payment->id,
@@ -107,6 +110,68 @@ class AuditCheckAlertsCommand extends Command
                 ]);
             }
         }
+    }
+
+    /**
+     * Alert on Asaas webhook failures (invalid token or missing charge).
+     */
+    private function checkWebhookFailures(): void
+    {
+        $threshold = (int) config('alerts.webhook_failures.threshold', 3);
+        $windowMin = (int) config('alerts.webhook_failures.window_minutes', 5);
+        $cooldown = (int) config('alerts.webhook_failures.cooldown_minutes', 30);
+        $window = Carbon::now()->subMinutes($windowMin);
+
+        $failureCount = AuditLog::where('action', 'webhook_asaas_invalid_token')
+            ->where('created_at', '>=', $window)
+            ->count();
+
+        if ($failureCount >= $threshold && !$this->alreadyAlerted('webhook_failures', $cooldown)) {
+            $message = "🔔 {$failureCount} falhas de webhook Asaas nos últimos {$windowMin} minutos — possível problema de integração.";
+            $this->notifyAdmins('webhook_failures', $message, [
+                'failure_count' => $failureCount,
+                'window_minutes' => $windowMin,
+            ]);
+            Log::channel($this->alertChannel())->error('[AuditAlert] Webhook failures threshold exceeded', [
+                'count' => $failureCount,
+                'window' => $windowMin,
+            ]);
+        }
+    }
+
+    /**
+     * Alert on recurring 500 errors in Laravel log.
+     */
+    private function checkRecurring500Errors(): void
+    {
+        $threshold = (int) config('alerts.server_errors.threshold', 5);
+        $windowMin = (int) config('alerts.server_errors.window_minutes', 5);
+        $cooldown = (int) config('alerts.server_errors.cooldown_minutes', 30);
+        $window = Carbon::now()->subMinutes($windowMin);
+
+        $errorCount = AuditLog::where('action', 'server_error_500')
+            ->where('created_at', '>=', $window)
+            ->count();
+
+        if ($errorCount >= $threshold && !$this->alreadyAlerted('server_errors_500', $cooldown)) {
+            $message = "🔴 {$errorCount} erros 500 nos últimos {$windowMin} minutos — verificar logs do servidor.";
+            $this->notifyAdmins('server_errors_500', $message, [
+                'error_count' => $errorCount,
+                'window_minutes' => $windowMin,
+            ]);
+            Log::channel($this->alertChannel())->critical('[AuditAlert] Recurring 500 errors', [
+                'count' => $errorCount,
+                'window' => $windowMin,
+            ]);
+        }
+    }
+
+    /**
+     * Get the log channel for alerts (Slack if configured, otherwise default).
+     */
+    private function alertChannel(): string
+    {
+        return config('alerts.log_channel', config('logging.default'));
     }
 
     /**
@@ -130,6 +195,8 @@ class AuditCheckAlertsCommand extends Command
                     'updated_at' => now(),
                 ]);
             }
+
+            Log::channel($this->alertChannel())->info("[AuditAlert] {$type}: {$message}");
         } catch (\Throwable $e) {
             Log::error('[AuditAlert] Failed to send notification: ' . $e->getMessage());
         }

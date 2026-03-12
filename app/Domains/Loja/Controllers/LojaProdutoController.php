@@ -2,7 +2,7 @@
 
 namespace App\Domains\Loja\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Domains\Loja\Models\Loja;
 use App\Domains\Produto\Models\Produto;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Domains\Loja\Requests\LojaProdutoRequest;
 use App\Domains\Produto\Services\ProdutoService;
 
-class LojaProdutoController extends BaseController
+class LojaProdutoController extends Controller
 {
     public function __construct(private readonly ProdutoService $produtoService)
     {
@@ -19,10 +19,10 @@ class LojaProdutoController extends BaseController
     /**
      * List products of a store.
      */
-    public function index(string $lojaId)
+    public function index(Request $request, string $loja)
     {
-        $loja = Loja::findOrFail($lojaId);
-        $produtos = $loja->produtos()->orderBy('created_at', 'desc')->get(); // Customize sorting as needed
+        $lojaModel = Loja::findOrFail($loja);
+        $produtos = $lojaModel->produtos()->orderBy('created_at', 'desc')->get();
 
         return response()->json($produtos);
     }
@@ -30,13 +30,13 @@ class LojaProdutoController extends BaseController
     /**
      * Add or link a product to a store.
      */
-    public function store(LojaProdutoRequest $request, string $lojaId)
+    public function store(LojaProdutoRequest $request, string $loja)
     {
-        $loja = Loja::findOrFail($lojaId);
+        $lojaModel = Loja::findOrFail($loja);
 
         try {
             // Logic moved to ProdutoService as requested
-            $produto = $this->produtoService->createOrUpdateForStore($request->validated(), $loja);
+            $produto = $this->produtoService->createOrUpdateForStore($request->validated(), $lojaModel);
 
             return response()->json(['message' => 'Produto adicionado com sucesso.', 'produto_id' => $produto->id], 201);
 
@@ -48,17 +48,17 @@ class LojaProdutoController extends BaseController
     /**
      * Update a product in a store (pivot data).
      */
-    public function update(LojaProdutoRequest $request, string $lojaId, string $produtoId)
+    public function update(LojaProdutoRequest $request, string $loja, string $produto)
     {
-        $loja = Loja::findOrFail($lojaId);
+        $lojaModel = Loja::findOrFail($loja);
 
         // Check verification: "edit only if linked"
-        if (!$loja->produtos()->where('produto_id', $produtoId)->exists()) {
+        if (!$lojaModel->produtos()->where('produto_id', $produto)->exists()) {
             return response()->json(['message' => 'Produto não vinculado a esta loja.'], 404);
         }
 
         $pivotData = $request->only(['preco', 'preco_promocional', 'estoque', 'destaque', 'ativo']);
-        $loja->produtos()->updateExistingPivot($produtoId, $pivotData);
+        $lojaModel->produtos()->updateExistingPivot($produto, $pivotData);
 
         return response()->json(['message' => 'Produto atualizado com sucesso.']);
     }

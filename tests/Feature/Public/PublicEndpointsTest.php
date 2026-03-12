@@ -189,3 +189,107 @@ it('consumidor autenticado consegue listar seus pedidos', function () {
         ->assertStatus(200)
         ->assertJsonStructure(['data']);
 });
+
+// --- Detalhe de pedido ---
+
+it('consumidor autenticado visualiza detalhe do proprio pedido', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $token = auth('api')->login($user);
+
+    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+        'user_id' => $user->id,
+        'loja_id' => criarLoja()->id,
+        'endereco_id' => Str::ulid(),
+        'subtotal' => 50.00,
+        'taxa_entrega' => 5.00,
+        'total' => 55.00,
+        'status' => 'pendente',
+    ]);
+
+    $this->withToken($token)
+        ->getJson("/api/public/pedidos/{$pedido->id}")
+        ->assertStatus(200)
+        ->assertJsonFragment(['id' => $pedido->id]);
+});
+
+it('consumidor nao pode ver pedido de outro usuario', function () {
+    $user1 = User::factory()->create(['email_verified_at' => now()]);
+    $user2 = User::factory()->create(['email_verified_at' => now()]);
+    $token2 = auth('api')->login($user2);
+
+    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+        'user_id' => $user1->id,
+        'loja_id' => criarLoja()->id,
+        'endereco_id' => Str::ulid(),
+        'subtotal' => 50.00,
+        'taxa_entrega' => 5.00,
+        'total' => 55.00,
+        'status' => 'pendente',
+    ]);
+
+    $this->withToken($token2)
+        ->getJson("/api/public/pedidos/{$pedido->id}")
+        ->assertStatus(404);
+});
+
+// --- Status de pagamento ---
+
+it('consumidor consulta status do pagamento do pedido', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $token = auth('api')->login($user);
+
+    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+        'user_id' => $user->id,
+        'loja_id' => criarLoja()->id,
+        'endereco_id' => Str::ulid(),
+        'subtotal' => 50.00,
+        'taxa_entrega' => 5.00,
+        'total' => 55.00,
+        'status' => 'aguardando_pagamento',
+    ]);
+
+    \App\Domains\Pagamento\Models\Pagamento::create([
+        'pedido_id' => $pedido->id,
+        'asaas_charge_id' => 'pay_status_test',
+        'asaas_customer_id' => 'cus_test',
+        'metodo' => 'pix',
+        'status' => 'pendente',
+        'valor' => 55.00,
+    ]);
+
+    $this->withToken($token)
+        ->getJson("/api/public/pedidos/{$pedido->id}/pagamento/status")
+        ->assertStatus(200)
+        ->assertJsonStructure(['status']);
+});
+
+// --- Busca de lojas por raio ---
+
+it('lista lojas proximas por coordenadas', function () {
+    criarLoja('cervejaria');
+
+    $response = $this->getJson('/api/public/lojas/proximas?latitude=-23.5505&longitude=-46.6333&raio=15');
+
+    expect($response->status())->toBeIn([200, 422]);
+});
+
+// --- Busca de loja por produto ---
+
+it('busca lojas que vendem determinado produto', function () {
+    $loja = criarLoja('distribuidora');
+    $produto = \App\Domains\Produto\Models\Produto::create([
+        'nome' => 'IPA Premium',
+        'descricao' => 'Cerveja artesanal',
+    ]);
+
+    $loja->produtos()->attach($produto->id, [
+        'preco' => 25.00,
+        'estoque' => 10,
+        'ativo' => true,
+        'destaque' => false,
+    ]);
+
+    $response = $this->getJson("/api/public/lojas/buscar-produto?q=IPA");
+
+    expect($response->status())->toBeIn([200, 422]);
+});

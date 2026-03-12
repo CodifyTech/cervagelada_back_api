@@ -4,6 +4,7 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Pagamento\Models\Pagamento;
 use App\Domains\Pedido\Models\Pedido;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
@@ -35,6 +36,46 @@ function criarPagamentoComPedido(string $chargeId = 'pay_test_123', string $stat
     ]);
 
     return compact('user', 'pedido', 'pagamento');
+}
+
+/**
+ * Helper to create a loja with an attached product for order tests.
+ */
+function criarLojaComProduto(): array
+{
+    $loja = \App\Domains\Loja\Models\Loja::create([
+        'nome_fantasia' => 'Loja Pagamento Test',
+        'tipo_loja' => 'distribuidora',
+        'ativo' => true,
+        'latitude' => -23.5505,
+        'longitude' => -46.6333,
+        'raio_entrega_km' => 10,
+        'tempo_entrega_min' => 30,
+        'tempo_entrega_max' => 60,
+        'aceite_automatico' => true,
+        'pedido_minimo' => 0,
+        'taxa_comissao' => 10.00,
+        'cep' => '01001000',
+        'logradouro' => 'Rua Teste',
+        'numero' => '1',
+        'bairro' => 'Centro',
+        'cidade' => 'São Paulo',
+        'estado' => 'SP',
+    ]);
+
+    $produto = \App\Domains\Produto\Models\Produto::create([
+        'nome' => 'Cerveja Teste',
+        'descricao' => 'Cerveja para teste',
+    ]);
+
+    $loja->produtos()->attach($produto->id, [
+        'preco' => 15.00,
+        'estoque' => 100,
+        'ativo' => true,
+        'destaque' => false,
+    ]);
+
+    return compact('loja', 'produto');
 }
 
 // --- Token validation ---
@@ -169,4 +210,86 @@ it('retorna 200 sem erro quando charge_id nao existe no banco', function () {
         'event' => 'PAYMENT_CONFIRMED',
         'payment' => ['id' => 'pay_unknown_xyz', 'status' => 'CONFIRMED'],
     ])->assertStatus(200);
+});
+
+// --- Charge creation with mocked Asaas ---
+
+it('cria cobranca pix com mock do Asaas', function () {
+    Http::fake([
+        'sandbox.asaas.com/api/v3/customers' => Http::response([
+            'data' => [['id' => 'cus_mock_123', 'name' => 'Test']],
+        ]),
+        'sandbox.asaas.com/api/v3/payments' => Http::response([
+            'id' => 'pay_mock_pix_1',
+            'status' => 'PENDING',
+            'billingType' => 'PIX',
+            'value' => 110.00,
+        ]),
+        'sandbox.asaas.com/api/v3/payments/pay_mock_pix_1/pixQrCode' => Http::response([
+            'encodedImage' => 'base64_qr_data',
+            'payload' => '00020126...pix_copy_paste',
+            'expirationDate' => now()->addHour()->toIso8601String(),
+        ]),
+    ]);
+
+    config(['services.asaas.sandbox' => true, 'services.asaas.api_key' => 'test_key']);
+
+    $user = User::factory()->create(['email_verified_at' => now(), 'cpf' => '12345678901']);
+    $token = auth('api')->login($user);
+    $loja = criarLojaComProduto();
+
+    $endereco = \App\Domains\Endereco\Models\Endereco::create([
+        'user_id' => $user->id,
+        'apelido' => 'Casa',
+        'cep' => '01001000',
+        'logradouro' => 'Rua Teste',
+        'numero' => '100',
+        'bairro' => 'Centro',
+        'cidade' => 'São Paulo',
+        'estado' => 'SP',
+        'latitude' => -23.5505,
+        'longitude' => -46.6333,
+    ]);
+
+    $response = $this->withToken($token)->postJson('/api/public/pedidos', [
+        'loja_id' => $loja['loja']->id,
+        'endereco_id' => $endereco->id,
+        'metodo_pagamento' => 'pix',
+        'itens' => [
+            ['produto_id' => $loja['produto']->id, 'quantidade_solicitada' => 2],
+        ],
+    ]);
+
+    $response->assertStatus(201)
+        ->assertJsonStructure(['id', 'status', 'total', 'pagamento' => ['id', 'status', 'pix']]);
+});
+
+it('processa timeout cancelando pagamento pendente apos vencimento', function () {
+    config(['services.asaas.webhook_token' => null]);
+
+    ['pedido' => $pedido, 'pagamento' => $pagamento] = criarPagamentoComPedido('pay_timeout_1');
+
+    // Simulate PAYMENT_OVERDUE webhook (timeout scenario)
+    $this->postJson('/api/webhooks/asaas', [
+        'event' => 'PAYMENT_OVERDUE',
+        'payment' => ['id' => 'pay_timeout_1', 'status' => 'OVERDUE'],
+    ])->assertStatus(200);
+
+    expect($pagamento->fresh()->status)->toBe('vencido');
+});
+
+it('armazena webhook_payload raw para auditoria', function () {
+    config(['services.asaas.webhook_token' => null]);
+
+    ['pagamento' => $pagamento] = criarPagamentoComPedido('pay_audit_1');
+
+    $payload = [
+        'event' => 'PAYMENT_CONFIRMED',
+        'payment' => ['id' => 'pay_audit_1', 'status' => 'CONFIRMED', 'value' => 110.00],
+    ];
+
+    $this->postJson('/api/webhooks/asaas', $payload)->assertStatus(200);
+
+    $fresh = $pagamento->fresh();
+    expect($fresh->webhook_payload)->not->toBeNull();
 });

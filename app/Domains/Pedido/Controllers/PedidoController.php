@@ -3,6 +3,7 @@
 namespace App\Domains\Pedido\Controllers;
 
 use App\Domains\Shared\Controller\BaseController;
+use App\Domains\Pedido\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -49,9 +50,49 @@ class PedidoController extends BaseController
     public function atualizarStatus(Request $request, string $id): JsonResponse
     {
         $request->validate([
-            'status' => ['required', 'in:pendente,preparando,pronto,em_rota,entregue,cancelado'],
+            'status' => ['required', 'in:' . OrderStatus::valuesString()],
         ]);
 
-        return response()->json($this->service->update($request->only('status'), $id));
+        $targetStatus = OrderStatus::from($request->input('status'));
+
+        // Block transition to 'entregue' without PIN validation
+        if ($targetStatus === OrderStatus::ENTREGUE) {
+            return response()->json([
+                'message' => 'Use o endpoint de validação de PIN para concluir a entrega.',
+            ], 422);
+        }
+
+        // Block manual transition from aguardando_pagamento (only webhook can advance)
+        $pedido = $this->service->findById($id);
+        if ($pedido->status === OrderStatus::AGUARDANDO_PAGAMENTO) {
+            return response()->json([
+                'message' => 'Pedido aguardando pagamento. O status será atualizado automaticamente após confirmação.',
+            ], 422);
+        }
+
+        try {
+            return response()->json($this->service->update($request->only('status'), $id));
+        } catch (\Exception $e) {
+            $code = $e->getCode() ?: 422;
+            return response()->json(['message' => $e->getMessage()], $code);
+        }
+    }
+
+    /**
+     * POST /api/pedidos/{id}/validar-pin — Validate delivery PIN and mark as delivered.
+     */
+    public function validarPin(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'pin' => ['required', 'string', 'size:6'],
+        ]);
+
+        try {
+            $pedido = $this->service->validarPin($id, $request->input('pin'));
+            return response()->json($pedido);
+        } catch (\Exception $e) {
+            $code = $e->getCode() ?: 422;
+            return response()->json(['message' => $e->getMessage()], $code);
+        }
     }
 }

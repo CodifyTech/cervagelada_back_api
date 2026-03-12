@@ -21,7 +21,7 @@ class AuditoriaController extends BaseController
      * GET /api/audit-logs
      * List audit logs with filters. Pagination is mandatory.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, ?\Closure $builderCallback = null): JsonResponse
     {
         $query = AuditLog::with('user:id,name,email')
             ->orderByDesc('created_at');

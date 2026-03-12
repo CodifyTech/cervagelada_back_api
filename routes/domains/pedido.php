@@ -21,6 +21,7 @@ Route::group([
     Route::get('pedidos/listar/loja', [PedidoController::class, 'listarLoja']);
     Route::get('pedidos/resumo/loja', [PedidoController::class, 'resumoLoja']);
     Route::patch('pedidos/{id}/status', [PedidoController::class, 'atualizarStatus']);
+    Route::post('pedidos/{id}/validar-pin', [PedidoController::class, 'validarPin']);
 
     // Pedido Resource Routes
     Route::apiResource('pedidos', PedidoController::class);

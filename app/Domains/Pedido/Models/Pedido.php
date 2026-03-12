@@ -13,6 +13,7 @@ use App\Domains\ItemPedido\Models\ItemPedido;
 use App\Domains\Avaliacao\Models\Avaliacao;
 use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Enums\OrderStatus;
 
 class Pedido extends BaseModel
 {
@@ -22,7 +23,13 @@ class Pedido extends BaseModel
 
     protected $with = ['pagamento'];
 
-    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'endereco_id'];
+    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'endereco_id', 'pin_entrega', 'pin_validado_em', 'pin_tentativas'];
+
+    protected $casts = [
+        'status' => OrderStatus::class,
+        'pin_validado_em' => 'datetime',
+        'pin_tentativas' => 'integer',
+    ];
 
 
     public function user(): BelongsTo

@@ -17,5 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(ReturnJsonResponseMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->reportable(function (\Throwable $e) {
+            try {
+                $auditService = app(\App\Domains\Auditoria\Services\AuditService::class);
+                $auditService->log('server_error_500', 'exception', null, null, null, [
+                    'exception' => get_class($e),
+                    'message' => \Illuminate\Support\Str::limit($e->getMessage(), 500),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
+                ]);
+            } catch (\Throwable) {
+                // Avoid recursive failures
+            }
+        });
     })->create();
