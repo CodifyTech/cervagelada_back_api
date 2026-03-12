@@ -19,14 +19,16 @@ class RelatoriosModel extends BaseModel
         $query = DB::table('pedidos')
             ->leftJoin('users', 'pedidos.user_id', '=', 'users.id')
             ->leftJoin('lojas', 'pedidos.loja_id', '=', 'lojas.id')
+            ->leftJoin('pagamentos', 'pagamentos.pedido_id', '=', 'pedidos.id')
+            ->leftJoin('enderecos', 'enderecos.id', '=', 'pedidos.endereco_id')
             ->select(
                 'pedidos.id',
                 'users.name as cliente',
                 'lojas.nome_fantasia as loja',
                 'pedidos.status',
                 'pedidos.total',
-                'pedidos.forma_pagamento',
-                'pedidos.cidade',
+                'pagamentos.metodo as forma_pagamento',
+                'enderecos.cidade',
                 'pedidos.created_at'
             );
 
@@ -85,7 +87,7 @@ class RelatoriosModel extends BaseModel
     public function getSellers(array $filtros): array
     {
         $query = DB::table('lojas')
-            ->leftJoin('users', 'lojas.user_id', '=', 'users.id')
+            ->leftJoin('users', 'users.loja_id', '=', 'lojas.id')
             ->selectRaw('
                 lojas.id,
                 lojas.nome_fantasia,
@@ -183,14 +185,16 @@ class RelatoriosModel extends BaseModel
             $query = DB::table('pedidos')
                 ->leftJoin('users', 'pedidos.user_id', '=', 'users.id')
                 ->leftJoin('lojas', 'pedidos.loja_id', '=', 'lojas.id')
+                ->leftJoin('pagamentos', 'pagamentos.pedido_id', '=', 'pedidos.id')
+                ->leftJoin('enderecos', 'enderecos.id', '=', 'pedidos.endereco_id')
                 ->select(
                     'pedidos.id',
                     'users.name as cliente',
                     'lojas.nome_fantasia as loja',
                     'pedidos.status',
                     'pedidos.total',
-                    'pedidos.forma_pagamento',
-                    'pedidos.cidade',
+                    'pagamentos.metodo as forma_pagamento',
+                    'enderecos.cidade',
                     'pedidos.created_at'
                 );
 
@@ -277,7 +281,7 @@ class RelatoriosModel extends BaseModel
             $query->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
         }
         if (!empty($filtros['cidade'])) {
-            $query->where('pedidos.cidade', 'like', '%' . $filtros['cidade'] . '%');
+            $query->where('enderecos.cidade', 'like', '%' . $filtros['cidade'] . '%');
         }
         if (!empty($filtros['status'])) {
             $query->where('pedidos.status', $filtros['status']);

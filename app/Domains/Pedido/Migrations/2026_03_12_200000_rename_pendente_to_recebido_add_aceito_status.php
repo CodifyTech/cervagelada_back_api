@@ -7,12 +7,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Step 1: Rename 'pendente' → 'recebido' on existing rows
+        // Step 1: Expand enum to include new values while keeping 'pendente' (allows safe UPDATE)
+        DB::statement("ALTER TABLE pedidos MODIFY COLUMN status ENUM(
+            'aguardando_pagamento',
+            'pendente',
+            'recebido',
+            'aceito',
+            'preparando',
+            'pronto',
+            'em_rota',
+            'entregue',
+            'cancelado'
+        ) NOT NULL DEFAULT 'aguardando_pagamento'");
+
+        // Step 2: Rename 'pendente' → 'recebido' on existing rows
         DB::table('pedidos')
             ->where('status', 'pendente')
             ->update(['status' => 'recebido']);
 
-        // Step 2: Alter enum to new values (MySQL)
+        // Step 3: Remove 'pendente' from enum
         DB::statement("ALTER TABLE pedidos MODIFY COLUMN status ENUM(
             'aguardando_pagamento',
             'recebido',
