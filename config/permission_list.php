@@ -140,4 +140,10 @@ return [
     'audit' => [
         'audit read',
     ],
+    'entrega' => [
+        'entrega read',
+        'entrega list',
+        'entrega edit',
+        'entrega manage',
+    ],
 ];

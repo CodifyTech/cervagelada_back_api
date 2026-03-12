@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default_user_role_slug' => env('CDF_DEFAULT_ROLE_SLUG', 'user'),
+    'default_user_role_slug' => env('CDF_DEFAULT_ROLE_SLUG', 'consumidor'),
 
     /*
     |--------------------------------------------------------------------------

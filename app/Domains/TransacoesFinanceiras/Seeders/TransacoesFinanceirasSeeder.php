@@ -20,33 +20,41 @@ class TransacoesFinanceirasSeeder extends Seeder
      */
     public function run(): void
     {
-        // Garantir que existam Lojas para o relacionamento
-        // $this->call(\App\Domains\Loja\Seeders\LojaSeeder::class);
+        $pedidosEntregues = Pedido::where('status', 'entregue')->with('loja')->get();
 
-        // Garantir que existam Pedidos para o relacionamento
-        // $this->call(\App\Domains\Pedido\Seeders\PedidoSeeder::class);
+        foreach ($pedidosEntregues as $pedido) {
+            if (!$pedido->loja || $pedido->total <= 0) continue;
 
-        // Para usar factories, crie o arquivo de factory correspondente:
-        // TransacoesFinanceiras::factory(10)->create();
+            $comissao = round($pedido->total * ($pedido->loja->taxa_comissao / 100), 2);
+            $repasse  = round($pedido->total - $comissao - $pedido->taxa_entrega, 2);
 
-        // Criar registros manualmente de exemplo:
-        /*
-        TransacoesFinanceiras::create([
-            'nome' => 'Exemplo de TransacoesFinanceiras',
-            // Adicione mais campos conforme necessário
-        ]);
-        */
-
-        // Exemplo com relacionamentos:
-        /*
-        $relatedModel = RelatedModel::first();
-        if ($relatedModel) {
+            // Comissão da plataforma
             TransacoesFinanceiras::create([
-                'nome' => 'Exemplo com relação',
-                'related_model_id' => $relatedModel->id,
-                // Outros campos...
+                'loja_id'      => $pedido->loja_id,
+                'pedido_id'    => $pedido->id,
+                'tipo'         => 'comissao',
+                'valor'        => $comissao,
+                'descricao'    => 'Comissão sobre pedido #' . substr($pedido->id, 0, 8),
+                'liquidado'    => true,
+                'liquidado_em' => $pedido->updated_at,
+                'created_at'   => $pedido->created_at,
+                'updated_at'   => $pedido->updated_at,
             ]);
+
+            // Repasse para a loja
+            if ($repasse > 0) {
+                TransacoesFinanceiras::create([
+                    'loja_id'      => $pedido->loja_id,
+                    'pedido_id'    => $pedido->id,
+                    'tipo'         => 'credito',
+                    'valor'        => $repasse,
+                    'descricao'    => 'Repasse do pedido #' . substr($pedido->id, 0, 8),
+                    'liquidado'    => true,
+                    'liquidado_em' => $pedido->updated_at,
+                    'created_at'   => $pedido->created_at,
+                    'updated_at'   => $pedido->updated_at,
+                ]);
+            }
         }
-        */
     }
 }

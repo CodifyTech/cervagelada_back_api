@@ -28,7 +28,11 @@ class RolesPermissionSeeder extends Seeder
 
         // Assign permissions to roles
         Role::all()->map(function ($role) {
-            $roleEnum = RoleEnum::from($role->slug);
+            $roleEnum = RoleEnum::tryFrom($role->slug);
+
+            if (!$roleEnum) {
+                return;
+            }
 
             collect($roleEnum->getPermissions())
                 ->each(function ($p) use (&$role) {

@@ -23,7 +23,7 @@ class Pedido extends BaseModel
 
     protected $with = ['pagamento'];
 
-    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'endereco_id', 'pin_entrega', 'pin_validado_em', 'pin_tentativas'];
+    protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'entregador_id', 'endereco_id', 'pin_entrega', 'pin_validado_em', 'pin_tentativas'];
 
     protected $casts = [
         'status' => OrderStatus::class,
@@ -35,6 +35,11 @@ class Pedido extends BaseModel
     public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Domains\Auth\Models\User::class);
+    }
+
+    public function entregador(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'entregador_id');
     }
 
     public function loja(): BelongsTo

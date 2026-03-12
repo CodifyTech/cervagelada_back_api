@@ -6,7 +6,10 @@ enum RoleEnum: string
 {
     case Admin = 'admin';
     case AdminSystem = 'admin-system';
-    case User = 'user';
+    case Logista = 'logista';
+    case Funcionario = 'funcionario';
+    case Entregador = 'entregador';
+    case Consumidor = 'consumidor';
 
     public function getPermissions(): array
     {
@@ -20,12 +23,105 @@ enum RoleEnum: string
                 ...config('permission_list.auth'),
                 ...config('permission_list.profile'),
                 ...config('permission_list.user'),
-                ...config('permission_list.dashboard')
+                ...config('permission_list.roles'),
+                ...config('permission_list.permission'),
+                ...config('permission_list.configuracao'),
+                ...config('permission_list.audit'),
+                ...config('permission_list.relatorios'),
+                ...config('permission_list.dashboard'),
             ],
-            self::User => [
+            self::Logista => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.profile'),
                 ...config('permission_list.dashboard'),
+                ...config('permission_list.relatorios'),
+                'loja read',
+                'loja edit',
+                ...config('permission_list.produto'),
+                'pedido read',
+                'pedido list',
+                'pedido edit',
+                'item-pedido read',
+                'item-pedido list',
+                ...config('permission_list.promocao'),
+                'avaliacao read',
+                'avaliacao list',
+                'transacoes-financeiras read',
+                'transacoes-financeiras list',
+                ...config('permission_list.destaque'),
+                'endereco read',
+                'endereco edit',
+                ...config('permission_list.entrega'),
+            ],
+            self::Funcionario => [
+                ...config('permission_list.auth'),
+                ...config('permission_list.profile'),
+                ...config('permission_list.dashboard'),
+                'produto read',
+                'produto list',
+                'produto edit',
+                'pedido read',
+                'pedido list',
+                'pedido edit',
+                'item-pedido read',
+                'item-pedido list',
+                'avaliacao read',
+                'avaliacao list',
+                'promocao read',
+                'promocao list',
+                'destaque read',
+                'destaque list',
+                'entrega read',
+                'entrega list',
+            ],
+            self::Entregador => [
+                ...config('permission_list.auth'),
+                ...config('permission_list.profile'),
+                ...config('permission_list.dashboard'),
+                'pedido read',
+                'pedido list',
+                'pedido edit',
+                'item-pedido read',
+                'item-pedido list',
+                'loja read',
+                'endereco read',
+                'entrega read',
+                'entrega list',
+                'entrega edit',
+                'avaliacao read',
+                'avaliacao list',
+            ],
+            self::Consumidor => [
+                ...config('permission_list.auth'),
+                ...config('permission_list.profile'),
+                ...config('permission_list.dashboard'),
+                'loja read',
+                'loja list',
+                'produto read',
+                'produto list',
+                'pedido create',
+                'pedido read',
+                'pedido list',
+                'item-pedido create',
+                'item-pedido read',
+                'item-pedido list',
+                'avaliacao create',
+                'avaliacao read',
+                'avaliacao list',
+                'avaliacao edit',
+                'avaliacao delete',
+                'endereco create',
+                'endereco read',
+                'endereco list',
+                'endereco edit',
+                'endereco delete',
+                'promocao read',
+                'promocao list',
+                'destaque read',
+                'destaque list',
+                'transacoes-financeiras read',
+                'transacoes-financeiras list',
+                'entrega read',
             ],
         };
     }
@@ -35,7 +131,10 @@ enum RoleEnum: string
         return match ($this) {
             self::Admin => 'Administrator',
             self::AdminSystem => 'Admin System',
-            self::User => 'User',
+            self::Logista => 'Logista',
+            self::Funcionario => 'Funcionário',
+            self::Entregador => 'Entregador',
+            self::Consumidor => 'Consumidor',
         };
     }
 }

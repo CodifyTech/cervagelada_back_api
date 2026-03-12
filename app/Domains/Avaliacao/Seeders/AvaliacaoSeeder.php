@@ -21,36 +21,39 @@ class AvaliacaoSeeder extends Seeder
      */
     public function run(): void
     {
-        // Garantir que existam Pedidos para o relacionamento
-        // $this->call(\App\Domains\Pedido\Seeders\PedidoSeeder::class);
+        $comentarios = [
+            'Entrega rápida, cerveja gelada. Adorei!',
+            'Produtos de ótima qualidade, entrega no prazo.',
+            'Muito bom, voltarei a comprar com certeza.',
+            'Atendimento excelente e entrega pontual.',
+            'Cerveja chegou bem embalada e gelada.',
+            'Boa variedade de produtos, recomendo.',
+            'Entrega demorou um pouco, mas produto estava perfeito.',
+            'Pedido correto, sem nenhuma avaria.',
+            'Experiência incrível, melhor app de cerveja!',
+            'Produto veio fora da temperatura ideal.',
+            'Nota máxima! Superou minhas expectativas.',
+            'Bom custo-benefício, preços competitivos.',
+            'Entrega rápida e embalagem caprichada.',
+            'Poderia ter mais opções de cervejas artesanais.',
+            'Tudo certo, sem reclamações.',
+        ];
 
-        // Garantir que existam Users para o relacionamento
-        // $this->call(\App\Domains\Auth\Seeders\UserSeeder::class);
+        $pedidosEntregues = Pedido::where('status', 'entregue')->get();
 
-        // Garantir que existam Lojas para o relacionamento
-        // $this->call(\App\Domains\Loja\Seeders\LojaSeeder::class);
+        foreach ($pedidosEntregues as $pedido) {
+            // ~70% chance of leaving a review per delivered order
+            if (rand(1, 10) > 7) continue;
 
-        // Para usar factories, crie o arquivo de factory correspondente:
-        // Avaliacao::factory(10)->create();
-
-        // Criar registros manualmente de exemplo:
-        /*
-        Avaliacao::create([
-            'nome' => 'Exemplo de Avaliacao',
-            // Adicione mais campos conforme necessário
-        ]);
-        */
-
-        // Exemplo com relacionamentos:
-        /*
-        $relatedModel = RelatedModel::first();
-        if ($relatedModel) {
             Avaliacao::create([
-                'nome' => 'Exemplo com relação',
-                'related_model_id' => $relatedModel->id,
-                // Outros campos...
+                'pedido_id'  => $pedido->id,
+                'user_id'    => $pedido->user_id,
+                'loja_id'    => $pedido->loja_id,
+                'avaliacao'  => rand(3, 5),
+                'comentario' => $comentarios[array_rand($comentarios)],
+                'created_at' => $pedido->created_at,
+                'updated_at' => $pedido->created_at,
             ]);
         }
-        */
     }
 }

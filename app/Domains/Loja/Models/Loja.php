@@ -106,4 +106,14 @@ class Loja extends BaseModel
     {
         return $this->hasMany(TransacoesFinanceiras::class);
     }
+
+    /**
+     * Entregadores associados a esta loja (multi-loja).
+     */
+    public function entregadores(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Auth\Models\User::class, 'entregador_loja', 'loja_id', 'user_id')
+            ->withPivot(['id', 'ativo'])
+            ->withTimestamps();
+    }
 }

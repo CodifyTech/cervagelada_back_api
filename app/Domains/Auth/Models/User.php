@@ -187,6 +187,24 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Lojas onde o entregador atua (multi-loja).
+     */
+    public function lojasEntregador(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Loja\Models\Loja::class, 'entregador_loja', 'user_id', 'loja_id')
+            ->withPivot(['id', 'ativo'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Pedidos onde o user é o entregador.
+     */
+    public function pedidosEntrega(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Pedido\Models\Pedido::class, 'entregador_id');
+    }
+
+    /**
      * Get the avaliacoes for this record.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

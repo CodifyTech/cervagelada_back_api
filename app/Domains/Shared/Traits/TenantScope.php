@@ -156,7 +156,8 @@ trait TenantScope
                     ->join('roles', 'role_user.role_id', '=', 'roles.id')
                     ->where('role_user.user_id', $userId)
                     ->where(function ($query) {
-                        $query->where('roles.slug', 'admin');
+                        $query->where('roles.slug', 'admin')
+                              ->orWhere('roles.slug', 'admin-system');
                     })
                     ->exists();
             } catch (\Exception $e) {

@@ -25,15 +25,51 @@ class UsersSeeder extends Seeder
             ],
             [
                 'data' => [
-                    'name' => 'Usuário',
-                    'email' => 'user@codifytech.com.br',
+                    'name' => 'Admin System',
+                    'email' => 'system@codifytech.com.br',
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'admin-system',
+            ],
+            [
+                'data' => [
+                    'name' => 'Logista Teste',
+                    'email' => 'logista@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'logista',
+            ],
+            [
+                'data' => [
+                    'name' => 'Funcionario Teste',
+                    'email' => 'funcionario@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'funcionario',
+            ],
+            [
+                'data' => [
+                    'name' => 'Entregador Teste',
+                    'email' => 'entregador@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'entregador',
+            ],
+            [
+                'data' => [
+                    'name' => 'Consumidor Teste',
+                    'email' => 'consumidor@cervagelada.com',
+                    'password' => Hash::make('123456'),
+                    'email_verified_at' => now(),
+                ],
+                'roleName' => 'consumidor',
             ],
 
-            // 20 usuários adicionais
+            // Consumidores adicionais
             [
                 'data' => [
                     'name' => 'João Silva',
@@ -41,7 +77,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -50,7 +86,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -59,7 +95,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -68,7 +104,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -77,7 +113,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -86,7 +122,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -95,7 +131,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -104,7 +140,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -113,7 +149,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -122,7 +158,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -131,7 +167,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -140,7 +176,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -149,7 +185,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -158,7 +194,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -167,7 +203,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -176,7 +212,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -185,7 +221,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -194,7 +230,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -203,7 +239,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
             [
                 'data' => [
@@ -212,7 +248,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
 
             // Perfis de teste nomeados
@@ -223,7 +259,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'logista',
             ],
             [
                 'data' => [
@@ -232,7 +268,7 @@ class UsersSeeder extends Seeder
                     'password' => Hash::make('123456'),
                     'email_verified_at' => now(),
                 ],
-                'roleName' => 'user',
+                'roleName' => 'consumidor',
             ],
         ];
 

@@ -23,7 +23,7 @@ class ItemPedidoSeeder extends Seeder
 
         foreach ($pedidos as $pedido) {
             $lojaId = $pedido->loja_id;
-            
+
             // Get products available in this store from pivot table
             $lojaProdutos = \DB::table('loja_produtos')
                 ->where('loja_id', $lojaId)
@@ -53,10 +53,15 @@ class ItemPedidoSeeder extends Seeder
             }
 
             // Update pedido totals
+            $total = $subtotal + $pedido->taxa_entrega;
             $pedido->update([
                 'subtotal' => $subtotal,
-                'total' => $subtotal + $pedido->taxa_entrega,
+                'total'    => $total,
             ]);
+
+            // Sync pagamento valor if it exists
+            \App\Domains\Pagamento\Models\Pagamento::where('pedido_id', $pedido->id)
+                ->update(['valor' => $total]);
         }
     }
 }
