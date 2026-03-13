@@ -2,11 +2,11 @@
 
 namespace App\Domains\ItemPedido\Seeders;
 
+use App\Domains\ItemPedido\Models\ItemPedido;
+use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Models\Pedido;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\ItemPedido\Models\ItemPedido;
-use App\Domains\Pedido\Models\Pedido;
-
 
 class ItemPedidoSeeder extends Seeder
 {
@@ -14,8 +14,6 @@ class ItemPedidoSeeder extends Seeder
 
     /**
      * Run the database seeds for ItemPedido.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -29,7 +27,9 @@ class ItemPedidoSeeder extends Seeder
                 ->where('loja_id', $lojaId)
                 ->get();
 
-            if ($lojaProdutos->isEmpty()) continue;
+            if ($lojaProdutos->isEmpty()) {
+                continue;
+            }
 
             $numItens = rand(1, 5);
             $subtotal = 0;
@@ -56,11 +56,11 @@ class ItemPedidoSeeder extends Seeder
             $total = $subtotal + $pedido->taxa_entrega;
             $pedido->update([
                 'subtotal' => $subtotal,
-                'total'    => $total,
+                'total' => $total,
             ]);
 
             // Sync pagamento valor if it exists
-            \App\Domains\Pagamento\Models\Pagamento::where('pedido_id', $pedido->id)
+            Pagamento::where('pedido_id', $pedido->id)
                 ->update(['valor' => $total]);
         }
     }

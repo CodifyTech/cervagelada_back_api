@@ -27,13 +27,14 @@ class LojaService extends BaseService
             $loja = $this->loja::create($data);
 
             // Create horarios if provided
-            if (!empty($horarios)) {
+            if (! empty($horarios)) {
                 foreach ($horarios as $horario) {
                     $loja->horarios()->create($horario);
                 }
             }
 
             \DB::commit();
+
             return $loja->load('horarios');
 
         } catch (\Exception $e) {
@@ -69,6 +70,7 @@ class LojaService extends BaseService
             }
 
             \DB::commit();
+
             return $loja->load('horarios');
 
         } catch (\Exception $e) {

@@ -21,11 +21,12 @@ class SeedersServiceProvider extends ServiceProvider
     private function getSeedersFiles(): array
     {
         $dirName = app_path()
-            . DIRECTORY_SEPARATOR . "App"
-            . DIRECTORY_SEPARATOR . "Domains"
-            . DIRECTORY_SEPARATOR . "*"
-            . DIRECTORY_SEPARATOR . "Seeders"
-            . DIRECTORY_SEPARATOR . "*.php";
+            .DIRECTORY_SEPARATOR.'App'
+            .DIRECTORY_SEPARATOR.'Domains'
+            .DIRECTORY_SEPARATOR.'*'
+            .DIRECTORY_SEPARATOR.'Seeders'
+            .DIRECTORY_SEPARATOR.'*.php';
+
         return glob($dirName, GLOB_BRACE);
     }
 

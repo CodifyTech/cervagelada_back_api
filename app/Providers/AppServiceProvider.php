@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Domains\Shared\Macros\BelongsToManyCreateUpdateOrDelete;
-use App\Domains\Shared\Macros\CreateUpdateOrDelete;
 use App\Domains\Pedido\Events\NewOrderReceived;
 use App\Domains\Pedido\Listeners\SendNewOrderNotification;
+use App\Domains\Shared\Macros\BelongsToManyCreateUpdateOrDelete;
+use App\Domains\Shared\Macros\CreateUpdateOrDelete;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Event;

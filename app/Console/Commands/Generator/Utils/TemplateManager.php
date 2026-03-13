@@ -8,9 +8,9 @@ class TemplateManager
 {
     public function processStub(string $stubName, array $replacements): string
     {
-        $stubPath = app_path('Domains/Shared/Stubs/' . $stubName);
+        $stubPath = app_path('Domains/Shared/Stubs/'.$stubName);
 
-        if (!File::exists($stubPath)) {
+        if (! File::exists($stubPath)) {
             throw new \Exception("Stub não encontrado: {$stubPath}");
         }
 
@@ -34,7 +34,7 @@ class TemplateManager
         $defaultPath = app_path('Domains/Shared/Stubs/');
         $stubsPath = $stubsPath ?? $defaultPath;
 
-        if (!File::exists($stubsPath)) {
+        if (! File::exists($stubsPath)) {
             throw new \Exception("Diretório de stubs não encontrado: {$stubsPath}");
         }
 

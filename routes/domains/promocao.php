@@ -1,7 +1,7 @@
 <?php
 
-use App\Domains\Promocao\Controllers\PromocaoController;
 use App\Domains\Promocao\Controllers\ProdutoPromocaoController;
+use App\Domains\Promocao\Controllers\PromocaoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,15 +15,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'promocao'
+    'as' => 'promocao',
 ], function () {
 
     // Promocao Routes
     Route::apiResource('promocoes', PromocaoController::class);
     Route::post('promocoes/search', [PromocaoController::class, 'search']);
-    
+
     Route::get('promocoes/listar/loja', [PromocaoController::class, 'listarLoja']);
 
     // ProdutoPromocao Routes
     Route::apiResource('produto-promocoes', ProdutoPromocaoController::class);
-    });
+});

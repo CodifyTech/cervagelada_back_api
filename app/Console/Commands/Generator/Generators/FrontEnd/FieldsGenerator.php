@@ -46,8 +46,8 @@ class FieldsGenerator
         $stubPath = "FrontEnd/Fields/{$fieldType}.frontend.stub";
 
         // Verificar se stub existe, senão usar input como fallback
-        $fullStubPath = app_path('Domains/Shared/Stubs/' . $stubPath);
-        if (!file_exists($fullStubPath)) {
+        $fullStubPath = app_path('Domains/Shared/Stubs/'.$stubPath);
+        if (! file_exists($fullStubPath)) {
             $fieldType = 'input'; // fallback para input básico
             $stubPath = "FrontEnd/Fields/{$fieldType}.frontend.stub";
         }
@@ -123,7 +123,7 @@ class FieldsGenerator
 
         // Adicionar atributo maxlength para campos string e text
         if ((isset($fieldConfig['type']) && in_array(strtolower($fieldConfig['type']), ['string', 'text'])) && isset($fieldConfig['max_length'])) {
-            $variables['{{maxlength}}'] = ' maxlength="' . $fieldConfig['max_length'] . '"';
+            $variables['{{maxlength}}'] = ' maxlength="'.$fieldConfig['max_length'].'"';
         } else {
             $variables['{{maxlength}}'] = '';
         }
@@ -140,7 +140,7 @@ class FieldsGenerator
             $enumItems = array_map(function ($value) {
                 return "{ title: '{$value}', value: '{$value}' }";
             }, $fieldConfig['enum_values']);
-            $variables['{{items}}'] = '[' . implode(', ', $enumItems) . ']';
+            $variables['{{items}}'] = '['.implode(', ', $enumItems).']';
         } else {
             $variables['{{items}}'] = '[]';
         }

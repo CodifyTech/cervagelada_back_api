@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands\Generator\Generators\BackEnd;
 
-use App\Console\Commands\Generator\Utils\TemplateManager;
 use App\Console\Commands\Generator\Utils\RouteManager;
+use App\Console\Commands\Generator\Utils\TemplateManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class ControllerGenerator
 {
     private TemplateManager $templateManager;
+
     private RouteManager $routeManager;
 
     public function __construct(TemplateManager $templateManager, RouteManager $routeManager)
@@ -53,7 +54,7 @@ class ControllerGenerator
         $controllerDir = app_path("Domains/{$domain}/Controllers");
 
         // Criar diretório se não existir
-        if (!File::exists($controllerDir)) {
+        if (! File::exists($controllerDir)) {
             File::makeDirectory($controllerDir, 0755, true);
         }
 
@@ -73,7 +74,7 @@ class ControllerGenerator
         $requestsDir = app_path("Domains/{$domain}/Requests");
 
         // Criar diretório se não existir
-        if (!File::exists($requestsDir)) {
+        if (! File::exists($requestsDir)) {
             File::makeDirectory($requestsDir, 0755, true);
         }
 
@@ -102,7 +103,7 @@ class ControllerGenerator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column);
 
-            if (!$field || !$params) {
+            if (! $field || ! $params) {
                 continue;
             }
 
@@ -110,7 +111,7 @@ class ControllerGenerator
             $paramParts = explode(',', $params);
             $type = trim($paramParts[0]);
 
-            if (!$type) {
+            if (! $type) {
                 continue;
             }
 
@@ -127,19 +128,21 @@ class ControllerGenerator
                 // Verificar se é 'req'
                 if (strtolower($part) === 'req') {
                     $required = true;
+
                     continue;
                 }
 
                 // Verificar se contém valores de enum (com |)
                 if (str_contains($part, '|')) {
                     $enumValues = array_map('trim', explode('|', $part));
+
                     continue;
                 }
 
                 // Caso contrário, é uma opção
-                if (!$option1) {
+                if (! $option1) {
                     $option1 = $part;
-                } elseif (!$option2) {
+                } elseif (! $option2) {
                     $option2 = $part;
                 }
             }
@@ -193,8 +196,8 @@ class ControllerGenerator
                     break;
 
                 case 'enum':
-                    $options = !empty($enumValues) ? $enumValues : explode('|', $option1);
-                    $ruleArray[] = 'in:' . implode(',', $options);
+                    $options = ! empty($enumValues) ? $enumValues : explode('|', $option1);
+                    $ruleArray[] = 'in:'.implode(',', $options);
                     break;
 
                 case 'email':
@@ -202,14 +205,14 @@ class ControllerGenerator
                     break;
             }
 
-            $rules[] = "'{$field}' => [" . implode(', ', array_map(fn($rule) => "'{$rule}'", $ruleArray)) . "],";
+            $rules[] = "'{$field}' => [".implode(', ', array_map(fn ($rule) => "'{$rule}'", $ruleArray)).'],';
         }
 
         // Adicionar regras para chaves estrangeiras
-        if (!empty($config['foreignKeys'])) {
+        if (! empty($config['foreignKeys'])) {
             foreach ($config['foreignKeys'] as $fk) {
                 if ($fk['relation'] === 'belongsTo' || $fk['relation'] === 'hasMany' || $fk['relation'] === 'hasOne') {
-                    $foreignKey = Str::snake($fk['model']) . '_id';
+                    $foreignKey = Str::snake($fk['model']).'_id';
                     $ruleArray = [];
 
                     if ($fk['required']) {
@@ -219,9 +222,9 @@ class ControllerGenerator
                     }
 
                     $ruleArray[] = 'ulid';
-                    $ruleArray[] = 'exists:' . Str::snake(Str::plural($fk['model'])) . ',id';
+                    $ruleArray[] = 'exists:'.Str::snake(Str::plural($fk['model'])).',id';
 
-                    $rules[] = "'{$foreignKey}' => [" . implode(', ', array_map(fn($rule) => "'{$rule}'", $ruleArray)) . "],";
+                    $rules[] = "'{$foreignKey}' => [".implode(', ', array_map(fn ($rule) => "'{$rule}'", $ruleArray)).'],';
                 }
             }
         }
@@ -232,7 +235,7 @@ class ControllerGenerator
     /**
      * Gera métodos FK para o controller.
      *
-     * @param array $config Configuração do gerador
+     * @param  array  $config  Configuração do gerador
      * @return string Código dos métodos FK
      */
     private function generateFKMethods(array $config): string

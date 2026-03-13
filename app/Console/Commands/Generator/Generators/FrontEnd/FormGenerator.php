@@ -3,9 +3,9 @@
 namespace App\Console\Commands\Generator\Generators\FrontEnd;
 
 use App\Console\Commands\Generator\Utils\TemplateManager;
+use Exception;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Exception;
 
 class FormGenerator
 {
@@ -54,12 +54,12 @@ class FormGenerator
             'components'
         );
 
-        if (!File::exists($domainPath)) {
+        if (! File::exists($domainPath)) {
             throw new Exception("Diretório do domínio não encontrado: $domainPath");
         }
 
         // Procurar por arquivos *Form.vue existentes
-        $formFiles = glob($domainPath . '/*Form.vue');
+        $formFiles = glob($domainPath.'/*Form.vue');
 
         if (empty($formFiles)) {
             throw new Exception("Nenhum formulário encontrado no domínio $domain para anexar");
@@ -99,7 +99,7 @@ class FormGenerator
 
         // Nome do arquivo seguindo padrão antigo
         $fileName = "{$modelName}Form.vue";
-        $filePath = $fullPath . '/' . $fileName;
+        $filePath = $fullPath.'/'.$fileName;
 
         // Verificar se o arquivo já existe
         if (File::exists($filePath) && ! ($config['force'] ?? false)) {
@@ -137,10 +137,10 @@ class FormGenerator
         $imports = $this->buildImports($foreignKeys);
 
         // Construir store name
-        $storeName = 'use' . $modelName . 'Store';
+        $storeName = 'use'.$modelName.'Store';
 
         // Construir interface name
-        $interfaceName = 'I' . $modelName;
+        $interfaceName = 'I'.$modelName;
 
         // Construir métodos fetchs
         $methodsFetchs = $this->buildFetchMethods($foreignKeys);
@@ -155,7 +155,7 @@ class FormGenerator
         $fkInputs = $this->buildFkInputs($foreignKeys);
 
         // Construir título do form
-        $formTitle = "isEditing ? 'Editar " . $modelName . "' : 'Novo " . $modelName . "'";
+        $formTitle = "isEditing ? 'Editar ".$modelName."' : 'Novo ".$modelName."'";
 
         // Gerar campos do formulário usando FieldsGenerator
         $formFields = $this->fieldsGenerator->generateFormFields($schema);
@@ -178,7 +178,7 @@ class FormGenerator
     {
         $imports = [];
         foreach ($foreignKeys as $fk) {
-            $interfaceName = 'I' . $fk['model'];
+            $interfaceName = 'I'.$fk['model'];
             $domainKebab = Str::kebab($fk['domain']);
             $imports[] = "import type { {$interfaceName} } from '@/pages/{$domainKebab}/types'";
         }
@@ -190,7 +190,7 @@ class FormGenerator
     {
         $methods = [];
         foreach ($foreignKeys as $fk) {
-            $methodName = 'fetch' . Str::plural($fk['model']);
+            $methodName = 'fetch'.Str::plural($fk['model']);
             $methods[] = "  {$methodName}()";
         }
 
@@ -215,7 +215,7 @@ class FormGenerator
     {
         $methods = [];
         foreach ($foreignKeys as $fk) {
-            $methodName = 'fetch' . Str::plural($fk['model']);
+            $methodName = 'fetch'.Str::plural($fk['model']);
             $methods[] = "{$methodName}";
         }
 
@@ -233,7 +233,7 @@ class FormGenerator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column, 2);
 
-            if (!$field || !$params) {
+            if (! $field || ! $params) {
                 continue;
             }
 
@@ -252,19 +252,21 @@ class FormGenerator
                 // Verificar se é 'req'
                 if (strtolower(trim($part)) === 'req') {
                     $required = true;
+
                     continue;
                 }
 
                 // Verificar se contém valores de enum (com |)
                 if (str_contains($part, '|')) {
                     $enumValues = array_map('trim', explode('|', $part));
+
                     continue;
                 }
 
                 // Caso contrário, é uma opção
-                if (!$option1) {
+                if (! $option1) {
                     $option1 = $part;
-                } elseif (!$option2) {
+                } elseif (! $option2) {
                     $option2 = $part;
                 }
             }
@@ -284,7 +286,7 @@ class FormGenerator
             }
 
             // Adicionar valores de enum se existirem
-            if (!empty($enumValues)) {
+            if (! empty($enumValues)) {
                 $fieldData['enum_values'] = $enumValues;
             }
 
@@ -330,15 +332,15 @@ class FormGenerator
         $domainNamespace = sprintf('App\\Domains\\%s\\Models\\%s', $domainName, $crudName);
 
         // Verificar se a classe existe antes de instanciar
-        if (!class_exists($domainNamespace)) {
+        if (! class_exists($domainNamespace)) {
             // Se a classe não existe, usar um nome padrão para a FK
             $fkName = strtolower($crudName);
         } else {
-            $modelInstance = new $domainNamespace();
+            $modelInstance = new $domainNamespace;
             $fkName = str($modelInstance->getTable())->lower();
         }
 
-        $fields = array_map(fn($field) => str_replace('data.', 'item.', $field), $fields);
+        $fields = array_map(fn ($field) => str_replace('data.', 'item.', $field), $fields);
         $newContent = implode("\n\t\t\t\t\t\t", $fields);
 
         $import = sprintf("import type { %s } from '@/pages/%s/types'", $interface, strtolower($domainName));
@@ -349,7 +351,7 @@ class FormGenerator
             $input = $this->generateDefaultTemplate($title, $newContent);
         }
 
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             throw new Exception("Arquivo não encontrado: $filePath");
         }
 
@@ -364,14 +366,14 @@ class FormGenerator
                 $beforeTemplate = substr($content, 0, strpos($content, $templateContent) + $lastClosingTag);
                 $afterTemplate = substr($content, strpos($content, $templateContent) + $lastClosingTag);
 
-                $content = $beforeTemplate . "\n" . $input . $afterTemplate;
+                $content = $beforeTemplate."\n".$input.$afterTemplate;
             }
         }
 
         // Adiciona import apenas se não existir
-        if (!str_contains($content, $import)) {
+        if (! str_contains($content, $import)) {
             $scriptSetupPos = strpos($content, '<script setup lang="ts">') + strlen('<script setup lang="ts">');
-            $content = substr_replace($content, "\n" . $import, $scriptSetupPos, 0);
+            $content = substr_replace($content, "\n".$import, $scriptSetupPos, 0);
         }
 
         File::put($filePath, $content);
@@ -424,9 +426,11 @@ class FormGenerator
         try {
             $this->setOneToManyRelationship($oneToMany);
             $this->formAttach($filePath, $domainName, $crudName, $fields, $attributesDefault, $interface, $title);
+
             return true;
         } catch (Exception $e) {
-            error_log("Erro ao aplicar formAttach: " . $e->getMessage());
+            error_log('Erro ao aplicar formAttach: '.$e->getMessage());
+
             return false;
         }
     }
@@ -453,7 +457,7 @@ class FormGenerator
         // Gerar campos para attach
         $fields = $this->buildAttachFields($config);
         $attributesDefault = $this->buildDefaultAttributesForAttach($config);
-        $interface = 'I' . $config['model'];
+        $interface = 'I'.$config['model'];
         $title = $config['model'];
 
         try {
@@ -468,7 +472,7 @@ class FormGenerator
             );
         } catch (Exception $e) {
             // Log erro mas não interrompe o processo
-            error_log("FormGenerator: Erro ao processar formAttach: " . $e->getMessage());
+            error_log('FormGenerator: Erro ao processar formAttach: '.$e->getMessage());
             throw $e; // Re-lança para anexo, pois é crítico
         }
     }
@@ -481,7 +485,7 @@ class FormGenerator
         // Verificar se deve anexar ao formulário (configuração do usuário)
         $shouldAttach = $config['shouldAttach'] ?? false;
 
-        if (!$shouldAttach) {
+        if (! $shouldAttach) {
             return; // Não aplicar formAttach se o usuário não escolheu anexar
         }
 
@@ -503,7 +507,7 @@ class FormGenerator
         // Gerar campos para attach
         $fields = $this->buildAttachFields($config);
         $attributesDefault = $this->buildDefaultAttributesForAttach($config);
-        $interface = 'I' . $config['model'];
+        $interface = 'I'.$config['model'];
         $title = $config['model'];
 
         try {
@@ -518,7 +522,7 @@ class FormGenerator
             );
         } catch (Exception $e) {
             // Log erro mas não interrompe o processo
-            error_log("FormGenerator: Erro ao processar formAttach: " . $e->getMessage());
+            error_log('FormGenerator: Erro ao processar formAttach: '.$e->getMessage());
         }
     }
 
@@ -539,6 +543,7 @@ class FormGenerator
                         placeholder="Digite o nome"
                     />
                 </VCol>';
+
             return $fields;
         }
 
@@ -547,7 +552,7 @@ class FormGenerator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column);
 
-            if (!$field || in_array($field, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
+            if (! $field || in_array($field, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
                 continue;
             }
 
@@ -587,7 +592,7 @@ class FormGenerator
             @[$field, $params] = explode('=', $column);
             @[$type] = explode(',', $params ?? '');
 
-            if (!$field || in_array($field, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
+            if (! $field || in_array($field, ['id', 'created_at', 'updated_at', 'deleted_at'])) {
                 continue;
             }
 

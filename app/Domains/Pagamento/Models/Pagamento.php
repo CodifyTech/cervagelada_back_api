@@ -2,8 +2,8 @@
 
 namespace App\Domains\Pagamento\Models;
 
-use App\Domains\Shared\Models\BaseModel;
 use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

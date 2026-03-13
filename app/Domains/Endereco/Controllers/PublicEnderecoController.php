@@ -13,6 +13,7 @@ class PublicEnderecoController extends Controller
     public function index(): JsonResponse
     {
         $enderecos = Endereco::where('user_id', auth()->id())
+            ->withoutGlobalScopes()
             ->orderByDesc('principal')
             ->orderByDesc('created_at')
             ->get();
@@ -43,8 +44,8 @@ class PublicEnderecoController extends Controller
             $data['longitude'] = $coords['longitude'];
         }
 
-        $hasEnderecos = Endereco::where('user_id', auth()->id())->exists();
-        $data['principal'] = !$hasEnderecos;
+        $hasEnderecos = Endereco::where('user_id', auth()->id())->withoutGlobalScopes()->exists();
+        $data['principal'] = ! $hasEnderecos;
 
         $endereco = Endereco::create($data);
 
@@ -53,7 +54,9 @@ class PublicEnderecoController extends Controller
 
     public function update(Request $request, string $id): JsonResponse
     {
-        $endereco = Endereco::where('user_id', auth()->id())->findOrFail($id);
+        $endereco = Endereco::where('user_id', auth()->id())
+            ->withoutGlobalScopes()
+            ->findOrFail($id);
 
         $data = $request->validate([
             'apelido' => 'nullable|string|max:50',
@@ -69,7 +72,7 @@ class PublicEnderecoController extends Controller
             'principal' => 'nullable|boolean',
         ]);
 
-        if (!empty($data['principal']) && $data['principal']) {
+        if (! empty($data['principal']) && $data['principal']) {
             Endereco::where('user_id', auth()->id())
                 ->where('id', '!=', $id)
                 ->update(['principal' => false]);
@@ -88,7 +91,7 @@ class PublicEnderecoController extends Controller
 
     public function destroy(string $id): JsonResponse
     {
-        $endereco = Endereco::where('user_id', auth()->id())->findOrFail($id);
+        $endereco = Endereco::where('user_id', auth()->id())->withoutGlobalScopes()->findOrFail($id);
         $wasPrincipal = $endereco->principal;
         $endereco->delete();
 

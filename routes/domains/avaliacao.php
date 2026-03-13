@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'avaliacao'
+    'as' => 'avaliacao',
 ], function () {
 
     // Avaliacao Routes
     Route::apiResource('avaliacoes', AvaliacaoController::class);
     Route::post('avaliacoes/search', [AvaliacaoController::class, 'search']);
-    
+
     Route::get('avaliacoes/listar/pedido', [AvaliacaoController::class, 'listarPedido']);
     Route::get('avaliacoes/listar/user', [AvaliacaoController::class, 'listarUser']);
     Route::get('avaliacoes/listar/loja', [AvaliacaoController::class, 'listarLoja']);

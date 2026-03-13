@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 class FrontendRollbackHandler
 {
     private Command $command;
+
     private string $frontendPath;
 
     public function __construct(Command $command)
@@ -25,12 +26,13 @@ class FrontendRollbackHandler
             base_path('../vue-frontend'),
             base_path('../nuxt-frontend'),
             base_path('resources/frontend'),
-            base_path('frontend')
+            base_path('frontend'),
         ];
 
         foreach ($possiblePaths as $path) {
             if (is_dir($path)) {
                 $this->frontendPath = $path;
+
                 return;
             }
         }
@@ -38,6 +40,7 @@ class FrontendRollbackHandler
         // Fallback para diretório padrão
         $this->frontendPath = base_path('../frontend');
     }
+
     /**
      * Executa rollback específico para arquivos de frontend
      */
@@ -51,7 +54,7 @@ class FrontendRollbackHandler
             'types_updated' => [],
             'components_updated' => [],
             'pages_updated' => [],
-            'services_updated' => []
+            'services_updated' => [],
         ];
 
         foreach ($files as $file) {
@@ -77,7 +80,7 @@ class FrontendRollbackHandler
             } else {
                 $results['failed'][] = [
                     'file' => $file,
-                    'error' => $result['error']
+                    'error' => $result['error'],
                 ];
             }
         }
@@ -100,15 +103,16 @@ class FrontendRollbackHandler
 
         if (empty($domainFiles)) {
             $this->command->warn("  ⚠️  Nenhum arquivo de frontend encontrado para o domínio: $domain");
+
             return [
                 'success' => [],
                 'failed' => [],
                 'domain' => $domain,
-                'message' => 'Nenhum arquivo encontrado'
+                'message' => 'Nenhum arquivo encontrado',
             ];
         }
 
-        $this->command->line("  📁 Encontrados " . count($domainFiles) . " arquivos de frontend para rollback");
+        $this->command->line('  📁 Encontrados '.count($domainFiles).' arquivos de frontend para rollback');
 
         // Executar rollback dos arquivos
         $results = $this->rollbackFrontendFiles($domainFiles);
@@ -128,7 +132,7 @@ class FrontendRollbackHandler
         $files = [];
 
         // Se temos dados da sessão, usar eles primeiro
-        if (!empty($sessionData['files'])) {
+        if (! empty($sessionData['files'])) {
             foreach ($sessionData['files'] as $file) {
                 if ($this->isFileRelatedToDomain($file, $domain)) {
                     $files[] = $file;
@@ -185,18 +189,18 @@ class FrontendRollbackHandler
     {
         $files = [];
 
-        if (!is_dir($this->frontendPath)) {
+        if (! is_dir($this->frontendPath)) {
             return $files;
         }
 
         $searchPaths = [
-            $this->frontendPath . '/src/components',
-            $this->frontendPath . '/src/pages',
-            $this->frontendPath . '/src/views',
-            $this->frontendPath . '/src/stores',
-            $this->frontendPath . '/src/types',
-            $this->frontendPath . '/src/services',
-            $this->frontendPath . '/src/composables'
+            $this->frontendPath.'/src/components',
+            $this->frontendPath.'/src/pages',
+            $this->frontendPath.'/src/views',
+            $this->frontendPath.'/src/stores',
+            $this->frontendPath.'/src/types',
+            $this->frontendPath.'/src/services',
+            $this->frontendPath.'/src/composables',
         ];
 
         foreach ($searchPaths as $searchPath) {
@@ -237,20 +241,22 @@ class FrontendRollbackHandler
     {
         try {
             // Verificar se é um arquivo de frontend
-            if (!$this->isFrontendFile($file)) {
+            if (! $this->isFrontendFile($file)) {
                 return ['success' => false, 'error' => 'Não é um arquivo de frontend'];
             }
 
             if (file_exists($file)) {
                 // Tentar fazer backup antes de deletar
-                $backupPath = $file . '.rollback_backup_' . time();
+                $backupPath = $file.'.rollback_backup_'.time();
                 if (copy($file, $backupPath)) {
                     if (unlink($file)) {
-                        $this->command->line("  🗑️  Removido: " . $this->getRelativePath($file));
+                        $this->command->line('  🗑️  Removido: '.$this->getRelativePath($file));
+
                         return ['success' => true];
                     } else {
                         // Restaurar backup se falhou ao deletar
                         rename($backupPath, $file);
+
                         return ['success' => false, 'error' => 'Falha ao deletar arquivo'];
                     }
                 } else {
@@ -282,7 +288,7 @@ class FrontendRollbackHandler
             }
         }
 
-        if (!$hasValidExtension) {
+        if (! $hasValidExtension) {
             return false;
         }
 
@@ -296,39 +302,40 @@ class FrontendRollbackHandler
         // Verificar se está no diretório de frontend
         return str_starts_with($file, $this->frontendPath);
     }
+
     /**
      * Executa rollbacks especiais após processamento dos arquivos
      */
     private function performSpecialRollbacks(array &$results): void
     {
         // Rollback de stores Pinia
-        if (!empty($results['stores_updated'])) {
+        if (! empty($results['stores_updated'])) {
             $this->rollbackPiniaStores($results['stores_updated']);
-            $this->command->line("  🏪 Rollback de stores Pinia executado");
+            $this->command->line('  🏪 Rollback de stores Pinia executado');
         }
 
         // Rollback de tipos TypeScript
-        if (!empty($results['types_updated'])) {
+        if (! empty($results['types_updated'])) {
             $this->rollbackTypeDefinitions($results['types_updated']);
-            $this->command->line("  📝 Rollback de definições de tipos executado");
+            $this->command->line('  📝 Rollback de definições de tipos executado');
         }
 
         // Rollback de rotas
-        if (!empty($results['routes_updated'])) {
+        if (! empty($results['routes_updated'])) {
             $this->rollbackRoutes($results['routes_updated']);
-            $this->command->line("  🛣️  Rollback de rotas executado");
+            $this->command->line('  🛣️  Rollback de rotas executado');
         }
 
         // Rollback de componentes
-        if (!empty($results['components_updated'])) {
+        if (! empty($results['components_updated'])) {
             $this->rollbackComponents($results['components_updated']);
-            $this->command->line("  🧩 Rollback de componentes executado");
+            $this->command->line('  🧩 Rollback de componentes executado');
         }
 
         // Rollback de serviços
-        if (!empty($results['services_updated'])) {
+        if (! empty($results['services_updated'])) {
             $this->rollbackServices($results['services_updated']);
-            $this->command->line("  🔧 Rollback de serviços executado");
+            $this->command->line('  🔧 Rollback de serviços executado');
         }
     }
 
@@ -351,7 +358,7 @@ class FrontendRollbackHandler
         // Limpar stores relacionadas ao domínio
         $this->cleanupDomainStores($domain);
 
-        $this->command->line("  ✅ Limpeza do domínio concluída");
+        $this->command->line('  ✅ Limpeza do domínio concluída');
     }
 
     /**
@@ -360,11 +367,11 @@ class FrontendRollbackHandler
     private function cleanupDomainImports(string $domain): void
     {
         $indexFiles = [
-            $this->frontendPath . '/src/components/index.ts',
-            $this->frontendPath . '/src/pages/index.ts',
-            $this->frontendPath . '/src/views/index.ts',
-            $this->frontendPath . '/src/types/index.ts',
-            $this->frontendPath . '/src/services/index.ts'
+            $this->frontendPath.'/src/components/index.ts',
+            $this->frontendPath.'/src/pages/index.ts',
+            $this->frontendPath.'/src/views/index.ts',
+            $this->frontendPath.'/src/types/index.ts',
+            $this->frontendPath.'/src/services/index.ts',
         ];
 
         foreach ($indexFiles as $indexFile) {
@@ -380,8 +387,8 @@ class FrontendRollbackHandler
     private function cleanupDomainRoutes(string $domain): void
     {
         $routerFiles = [
-            $this->frontendPath . '/src/router/index.ts',
-            $this->frontendPath . '/src/router/routes.ts'
+            $this->frontendPath.'/src/router/index.ts',
+            $this->frontendPath.'/src/router/routes.ts',
         ];
 
         foreach ($routerFiles as $routerFile) {
@@ -397,10 +404,10 @@ class FrontendRollbackHandler
     private function cleanupDomainNavigation(string $domain): void
     {
         $navFiles = [
-            $this->frontendPath . '/src/components/Navigation.vue',
-            $this->frontendPath . '/src/components/Sidebar.vue',
-            $this->frontendPath . '/src/components/Menu.vue',
-            $this->frontendPath . '/src/layouts/MainLayout.vue'
+            $this->frontendPath.'/src/components/Navigation.vue',
+            $this->frontendPath.'/src/components/Sidebar.vue',
+            $this->frontendPath.'/src/components/Menu.vue',
+            $this->frontendPath.'/src/layouts/MainLayout.vue',
         ];
 
         foreach ($navFiles as $navFile) {
@@ -415,7 +422,7 @@ class FrontendRollbackHandler
      */
     private function cleanupDomainStores(string $domain): void
     {
-        $storeIndexPath = $this->frontendPath . '/src/stores/index.ts';
+        $storeIndexPath = $this->frontendPath.'/src/stores/index.ts';
 
         if (file_exists($storeIndexPath)) {
             $this->removeDomainStoreReferences($storeIndexPath, $domain);
@@ -554,9 +561,9 @@ class FrontendRollbackHandler
      */
     private function rollbackPiniaStores(array $storeFiles): void
     {
-        $indexStorePath = $this->frontendPath . '/src/stores/index.ts';
+        $indexStorePath = $this->frontendPath.'/src/stores/index.ts';
 
-        if (!file_exists($indexStorePath)) {
+        if (! file_exists($indexStorePath)) {
             return;
         }
 
@@ -592,9 +599,9 @@ class FrontendRollbackHandler
      */
     private function rollbackTypeDefinitions(array $typeFiles): void
     {
-        $mainTypesPath = $this->frontendPath . '/src/types/index.ts';
+        $mainTypesPath = $this->frontendPath.'/src/types/index.ts';
 
-        if (!file_exists($mainTypesPath)) {
+        if (! file_exists($mainTypesPath)) {
             return;
         }
 
@@ -608,7 +615,7 @@ class FrontendRollbackHandler
                 $patterns = [
                     "/export\s+\*\s+from\s+['\"][^'\"]*{$typeName}[^'\"]*['\"];?\s*\n?/i",
                     "/import[^;]*{$typeName}[^;]*;?\s*\n?/i",
-                    "/export\s+{\s*[^}]*{$typeName}[^}]*\s*}[^;]*;?\s*\n?/i"
+                    "/export\s+{\s*[^}]*{$typeName}[^}]*\s*}[^;]*;?\s*\n?/i",
                 ];
 
                 foreach ($patterns as $pattern) {
@@ -624,14 +631,15 @@ class FrontendRollbackHandler
             file_put_contents($mainTypesPath, $content);
         }
     }
+
     /**
      * Rollback específico para rotas
      */
     private function rollbackRoutes(array $routeFiles): void
     {
-        $routerPath = $this->frontendPath . '/src/router/index.ts';
+        $routerPath = $this->frontendPath.'/src/router/index.ts';
 
-        if (!file_exists($routerPath)) {
+        if (! file_exists($routerPath)) {
             return;
         }
 
@@ -667,9 +675,9 @@ class FrontendRollbackHandler
      */
     private function rollbackComponents(array $componentFiles): void
     {
-        $componentIndexPath = $this->frontendPath . '/src/components/index.ts';
+        $componentIndexPath = $this->frontendPath.'/src/components/index.ts';
 
-        if (!file_exists($componentIndexPath)) {
+        if (! file_exists($componentIndexPath)) {
             return;
         }
 
@@ -683,7 +691,7 @@ class FrontendRollbackHandler
                 $patterns = [
                     "/export\s+{\s*default\s+as\s+{$componentName}\s*}\s+from\s+['\"][^'\"]*['\"];?\s*\n?/i",
                     "/import\s+{$componentName}[^;]*;?\s*\n?/i",
-                    "/export\s+{\s*{$componentName}\s*}[^;]*;?\s*\n?/i"
+                    "/export\s+{\s*{$componentName}\s*}[^;]*;?\s*\n?/i",
                 ];
 
                 foreach ($patterns as $pattern) {
@@ -705,9 +713,9 @@ class FrontendRollbackHandler
      */
     private function rollbackServices(array $serviceFiles): void
     {
-        $serviceIndexPath = $this->frontendPath . '/src/services/index.ts';
+        $serviceIndexPath = $this->frontendPath.'/src/services/index.ts';
 
-        if (!file_exists($serviceIndexPath)) {
+        if (! file_exists($serviceIndexPath)) {
             return;
         }
 
@@ -721,7 +729,7 @@ class FrontendRollbackHandler
                 $patterns = [
                     "/export\s+\*\s+from\s+['\"][^'\"]*{$serviceName}[^'\"]*['\"];?\s*\n?/i",
                     "/import\s+[^;]*{$serviceName}[^;]*;?\s*\n?/i",
-                    "/export\s+{\s*[^}]*{$serviceName}[^}]*\s*}[^;]*;?\s*\n?/i"
+                    "/export\s+{\s*[^}]*{$serviceName}[^}]*\s*}[^;]*;?\s*\n?/i",
                 ];
 
                 foreach ($patterns as $pattern) {
@@ -737,6 +745,7 @@ class FrontendRollbackHandler
             file_put_contents($serviceIndexPath, $content);
         }
     }
+
     /**
      * Extrai nome da store do caminho do arquivo
      */
@@ -745,6 +754,7 @@ class FrontendRollbackHandler
         if (preg_match('/\/stores\/([^\/]+)\.ts$/', $path, $matches)) {
             return ucfirst($matches[1]);
         }
+
         return null;
     }
 
@@ -756,6 +766,7 @@ class FrontendRollbackHandler
         if (preg_match('/\/types\/([^\/]+)\.ts$/', $path, $matches)) {
             return $matches[1];
         }
+
         return null;
     }
 
@@ -767,6 +778,7 @@ class FrontendRollbackHandler
         if (preg_match('/\/(?:pages|views)\/([^\/]+)\.vue$/', $path, $matches)) {
             return ucfirst($matches[1]);
         }
+
         return null;
     }
 
@@ -778,6 +790,7 @@ class FrontendRollbackHandler
         if (preg_match('/\/components\/([^\/]+)\.vue$/', $path, $matches)) {
             return $matches[1];
         }
+
         return null;
     }
 
@@ -789,6 +802,7 @@ class FrontendRollbackHandler
         if (preg_match('/\/services\/([^\/]+)\.ts$/', $path, $matches)) {
             return $matches[1];
         }
+
         return null;
     }
 
@@ -799,8 +813,9 @@ class FrontendRollbackHandler
     {
         $basePath = base_path();
         if (str_starts_with($fullPath, $basePath)) {
-            return str_replace($basePath . DIRECTORY_SEPARATOR, '', $fullPath);
+            return str_replace($basePath.DIRECTORY_SEPARATOR, '', $fullPath);
         }
+
         return $fullPath;
     }
 
@@ -813,16 +828,16 @@ class FrontendRollbackHandler
 
         // Verificar arquivos principais
         $criticalFiles = [
-            $this->frontendPath . '/package.json',
-            $this->frontendPath . '/src/main.ts',
-            $this->frontendPath . '/src/App.vue',
-            $this->frontendPath . '/src/router/index.ts',
-            $this->frontendPath . '/src/stores/index.ts'
+            $this->frontendPath.'/package.json',
+            $this->frontendPath.'/src/main.ts',
+            $this->frontendPath.'/src/App.vue',
+            $this->frontendPath.'/src/router/index.ts',
+            $this->frontendPath.'/src/stores/index.ts',
         ];
 
         foreach ($criticalFiles as $file) {
-            if (!file_exists($file)) {
-                $issues[] = "Arquivo crítico não encontrado: " . $this->getRelativePath($file);
+            if (! file_exists($file)) {
+                $issues[] = 'Arquivo crítico não encontrado: '.$this->getRelativePath($file);
             }
         }
 
@@ -844,57 +859,58 @@ class FrontendRollbackHandler
 
         // Verificar arquivos de configuração JSON
         $jsonFiles = [
-            $this->frontendPath . '/package.json',
-            $this->frontendPath . '/tsconfig.json'
+            $this->frontendPath.'/package.json',
+            $this->frontendPath.'/tsconfig.json',
         ];
 
         foreach ($jsonFiles as $file) {
             if (file_exists($file)) {
                 $content = file_get_contents($file);
                 if (json_decode($content) === null && json_last_error() !== JSON_ERROR_NONE) {
-                    $issues[] = "Sintaxe JSON inválida em: " . $this->getRelativePath($file);
+                    $issues[] = 'Sintaxe JSON inválida em: '.$this->getRelativePath($file);
                 }
             }
         }
 
         return $issues;
     }
+
     /**
      * Gera relatório de rollback de frontend
      */
     public function generateFrontendRollbackReport(array $results): string
     {
-        $report = "\n" . str_repeat('=', 60) . "\n";
+        $report = "\n".str_repeat('=', 60)."\n";
         $report .= "🔄 RELATÓRIO DE ROLLBACK - FRONTEND\n";
-        $report .= str_repeat('=', 60) . "\n";
+        $report .= str_repeat('=', 60)."\n";
 
         // Estatísticas gerais
-        $report .= "✅ Arquivos removidos com sucesso: " . count($results['success']) . "\n";
-        $report .= "❌ Falhas ao remover arquivos: " . count($results['failed']) . "\n";
+        $report .= '✅ Arquivos removidos com sucesso: '.count($results['success'])."\n";
+        $report .= '❌ Falhas ao remover arquivos: '.count($results['failed'])."\n";
 
         // Estatísticas específicas
-        $report .= "🏪 Stores atualizadas: " . count($results['stores_updated']) . "\n";
-        $report .= "📝 Arquivos de tipos processados: " . count($results['types_updated']) . "\n";
-        $report .= "🛣️  Rotas processadas: " . count($results['routes_updated']) . "\n";
-        $report .= "🧩 Componentes processados: " . count($results['components_updated']) . "\n";
-        $report .= "📄 Páginas processadas: " . count($results['pages_updated']) . "\n";
-        $report .= "🔧 Serviços processados: " . count($results['services_updated']) . "\n";
+        $report .= '🏪 Stores atualizadas: '.count($results['stores_updated'])."\n";
+        $report .= '📝 Arquivos de tipos processados: '.count($results['types_updated'])."\n";
+        $report .= '🛣️  Rotas processadas: '.count($results['routes_updated'])."\n";
+        $report .= '🧩 Componentes processados: '.count($results['components_updated'])."\n";
+        $report .= '📄 Páginas processadas: '.count($results['pages_updated'])."\n";
+        $report .= '🔧 Serviços processados: '.count($results['services_updated'])."\n";
 
         // Informação do domínio se disponível
         if (isset($results['domain'])) {
-            $report .= "🎯 Domínio processado: " . $results['domain'] . "\n";
+            $report .= '🎯 Domínio processado: '.$results['domain']."\n";
         }
 
         // Detalhes dos arquivos processados
-        if (!empty($results['success'])) {
+        if (! empty($results['success'])) {
             $report .= "\n✅ ARQUIVOS REMOVIDOS COM SUCESSO:\n";
             foreach ($results['success'] as $file) {
-                $report .= "  - " . $this->getRelativePath($file) . "\n";
+                $report .= '  - '.$this->getRelativePath($file)."\n";
             }
         }
 
         // Falhas detalhadas
-        if (!empty($results['failed'])) {
+        if (! empty($results['failed'])) {
             $report .= "\n❌ FALHAS:\n";
             foreach ($results['failed'] as $failure) {
                 $report .= "  - {$failure['file']}: {$failure['error']}\n";
@@ -903,7 +919,7 @@ class FrontendRollbackHandler
 
         // Verificar integridade após rollback
         $integrityIssues = $this->verifyFrontendIntegrity();
-        if (!empty($integrityIssues)) {
+        if (! empty($integrityIssues)) {
             $report .= "\n⚠️  PROBLEMAS DE INTEGRIDADE DETECTADOS:\n";
             foreach ($integrityIssues as $issue) {
                 $report .= "  - $issue\n";
@@ -913,7 +929,7 @@ class FrontendRollbackHandler
             $report .= "\n✅ Integridade do frontend verificada com sucesso!\n";
         }
 
-        $report .= str_repeat('=', 60) . "\n";
+        $report .= str_repeat('=', 60)."\n";
 
         return $report;
     }
@@ -923,22 +939,22 @@ class FrontendRollbackHandler
      */
     public function generateDomainRollbackReport(string $domain, array $results): string
     {
-        $report = "\n" . str_repeat('=', 70) . "\n";
+        $report = "\n".str_repeat('=', 70)."\n";
         $report .= "🎯 RELATÓRIO DE ROLLBACK DE DOMÍNIO - FRONTEND\n";
-        $report .= str_repeat('=', 70) . "\n";
+        $report .= str_repeat('=', 70)."\n";
         $report .= "📦 Domínio: $domain\n";
-        $report .= str_repeat('-', 70) . "\n";
+        $report .= str_repeat('-', 70)."\n";
 
         // Estatísticas específicas do domínio
         $totalFiles = count($results['success']) + count($results['failed']);
         $report .= "📊 ESTATÍSTICAS:\n";
         $report .= "  📁 Total de arquivos encontrados: $totalFiles\n";
-        $report .= "  ✅ Arquivos removidos com sucesso: " . count($results['success']) . "\n";
-        $report .= "  ❌ Falhas ao remover: " . count($results['failed']) . "\n";
+        $report .= '  ✅ Arquivos removidos com sucesso: '.count($results['success'])."\n";
+        $report .= '  ❌ Falhas ao remover: '.count($results['failed'])."\n";
 
         // Breakdown por tipo de arquivo
         $typeBreakdown = $this->getFileTypeBreakdown($results);
-        if (!empty($typeBreakdown)) {
+        if (! empty($typeBreakdown)) {
             $report .= "\n📋 BREAKDOWN POR TIPO:\n";
             foreach ($typeBreakdown as $type => $count) {
                 $icon = $this->getFileTypeIcon($type);
@@ -957,16 +973,16 @@ class FrontendRollbackHandler
         $this->addCategoryDetails($report, $results);
 
         // Problemas encontrados
-        if (!empty($results['failed'])) {
+        if (! empty($results['failed'])) {
             $report .= "\n❌ PROBLEMAS ENCONTRADOS:\n";
             foreach ($results['failed'] as $failure) {
-                $report .= "  - " . basename($failure['file']) . ": {$failure['error']}\n";
+                $report .= '  - '.basename($failure['file']).": {$failure['error']}\n";
             }
         }
 
         // Verificação final
         $integrityIssues = $this->verifyFrontendIntegrity();
-        if (!empty($integrityIssues)) {
+        if (! empty($integrityIssues)) {
             $report .= "\n⚠️  ATENÇÃO - PROBLEMAS DE INTEGRIDADE:\n";
             foreach ($integrityIssues as $issue) {
                 $report .= "  - $issue\n";
@@ -980,7 +996,7 @@ class FrontendRollbackHandler
         $report .= "  2. Execute 'npm run build' para validar a compilação\n";
         $report .= "  3. Teste a aplicação para garantir que tudo funciona corretamente\n";
 
-        $report .= str_repeat('=', 70) . "\n";
+        $report .= str_repeat('=', 70)."\n";
 
         return $report;
     }
@@ -1005,16 +1021,36 @@ class FrontendRollbackHandler
      */
     private function identifyFileType(string $file): string
     {
-        if (str_contains($file, '/components/')) return 'Componentes';
-        if (str_contains($file, '/pages/')) return 'Páginas';
-        if (str_contains($file, '/views/')) return 'Views';
-        if (str_contains($file, '/stores/')) return 'Stores';
-        if (str_contains($file, '/types/')) return 'Tipos';
-        if (str_contains($file, '/services/')) return 'Serviços';
-        if (str_contains($file, '/composables/')) return 'Composables';
-        if (str_ends_with($file, '.vue')) return 'Componentes Vue';
-        if (str_ends_with($file, '.ts')) return 'TypeScript';
-        if (str_ends_with($file, '.js')) return 'JavaScript';
+        if (str_contains($file, '/components/')) {
+            return 'Componentes';
+        }
+        if (str_contains($file, '/pages/')) {
+            return 'Páginas';
+        }
+        if (str_contains($file, '/views/')) {
+            return 'Views';
+        }
+        if (str_contains($file, '/stores/')) {
+            return 'Stores';
+        }
+        if (str_contains($file, '/types/')) {
+            return 'Tipos';
+        }
+        if (str_contains($file, '/services/')) {
+            return 'Serviços';
+        }
+        if (str_contains($file, '/composables/')) {
+            return 'Composables';
+        }
+        if (str_ends_with($file, '.vue')) {
+            return 'Componentes Vue';
+        }
+        if (str_ends_with($file, '.ts')) {
+            return 'TypeScript';
+        }
+        if (str_ends_with($file, '.js')) {
+            return 'JavaScript';
+        }
 
         return 'Outros';
     }
@@ -1051,14 +1087,14 @@ class FrontendRollbackHandler
             'pages_updated' => ['📄 PÁGINAS', 'Páginas/Views processadas'],
             'types_updated' => ['📝 TIPOS', 'Definições TypeScript processadas'],
             'services_updated' => ['🔧 SERVIÇOS', 'Serviços API processados'],
-            'routes_updated' => ['🛣️ ROTAS', 'Arquivos de rota processados']
+            'routes_updated' => ['🛣️ ROTAS', 'Arquivos de rota processados'],
         ];
 
         foreach ($categories as $key => $info) {
-            if (!empty($results[$key])) {
+            if (! empty($results[$key])) {
                 $report .= "\n{$info[0]} ({$info[1]}):\n";
                 foreach ($results[$key] as $file) {
-                    $report .= "  - " . basename($file) . "\n";
+                    $report .= '  - '.basename($file)."\n";
                 }
             }
         }

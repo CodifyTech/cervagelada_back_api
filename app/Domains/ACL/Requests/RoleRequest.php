@@ -19,14 +19,14 @@ class RoleRequest extends BaseFormRequest
     public function store(): array
     {
         return [
-            #'name' => 'required|string|max:255|unique:'.config('permission.table_names.roles', 'roles').',name,'.$this->request->get("id"),
+            // 'name' => 'required|string|max:255|unique:'.config('permission.table_names.roles', 'roles').',name,'.$this->request->get("id"),
         ];
     }
 
     public function update(): array
     {
         return [
-            #'name' => 'required|string|max:255|unique:'.config('permission.table_names.roles', 'roles').',name,'.$this->request->get("id"),
+            // 'name' => 'required|string|max:255|unique:'.config('permission.table_names.roles', 'roles').',name,'.$this->request->get("id"),
         ];
     }
 

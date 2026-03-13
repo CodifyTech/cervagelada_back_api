@@ -4,7 +4,7 @@ namespace App\Domains\Shared\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 trait TenantScope
 {
@@ -23,28 +23,28 @@ trait TenantScope
                 $tenantModels = config('cdf.tenantModels', []);
 
                 // Check if this model should have tenant scope applied
-                if (!isset($tenantModels[$modelClass])) {
+                if (! isset($tenantModels[$modelClass])) {
                     return;
                 }
 
                 $modelConfig = $tenantModels[$modelClass];
-                if (is_array($modelConfig) && !in_array('list', $modelConfig)) {
+                if (is_array($modelConfig) && ! in_array('list', $modelConfig)) {
                     return;
-                } elseif (!is_array($modelConfig) && !$modelConfig) {
+                } elseif (! is_array($modelConfig) && ! $modelConfig) {
                     return;
                 }
 
                 // Tenta obter o tenant já resolvido pelo middleware
                 $tenantId = config('cdf.active_loja_id');
 
-                if (!$tenantId) {
+                if (! $tenantId) {
                     // Fallback: Tenta resolver manualmente se o middleware não rodou (console/testes)
                     $userId = self::getCurrentUserIdSafely();
                     if ($userId) {
                         // Check if user is admin using direct database query
                         $isAdmin = self::isUserAdminDirectQuery($userId);
 
-                        if (!$isAdmin) {
+                        if (! $isAdmin) {
                             $tenantId = self::getUserTenantIdDirectly($userId);
                         }
                     }
@@ -77,7 +77,7 @@ trait TenantScope
                 $tenantTable = config('cdf.tenantTable');
                 $tenantColumn = config('cdf.tenantColumn');
 
-                if (!isset($tenantModels[$modelClass]) || $model->getTable() === $tenantTable) {
+                if (! isset($tenantModels[$modelClass]) || $model->getTable() === $tenantTable) {
                     return;
                 }
 
@@ -87,7 +87,7 @@ trait TenantScope
                     // Tenta obter o tenant já resolvido pelo middleware
                     $tenantId = config('cdf.active_loja_id');
 
-                    if (!$tenantId) {
+                    if (! $tenantId) {
                         $tenantId = self::getUserTenantIdDirectly($userId);
                     }
 
@@ -137,7 +137,8 @@ trait TenantScope
             if ($request && method_exists($request, 'bearerToken') && $request->bearerToken() && class_exists('\Tymon\JWTAuth\Facades\JWTAuth')) {
                 try {
                     $token = $request->bearerToken();
-                    $payload = \Tymon\JWTAuth\Facades\JWTAuth::setToken($token)->getPayload();
+                    $payload = JWTAuth::setToken($token)->getPayload();
+
                     return $payload->get('sub');
                 } catch (\Exception $e) {
                     // JWT parsing failed, continue to other methods
@@ -162,7 +163,7 @@ trait TenantScope
     {
         static $adminCache = [];
 
-        if (!isset($adminCache[$userId])) {
+        if (! isset($adminCache[$userId])) {
             try {
                 // Check the correct table structure for roles
                 $adminCache[$userId] = DB::table('role_user')
@@ -170,7 +171,7 @@ trait TenantScope
                     ->where('role_user.user_id', $userId)
                     ->where(function ($query) {
                         $query->where('roles.slug', 'admin')
-                              ->orWhere('roles.slug', 'admin-system');
+                            ->orWhere('roles.slug', 'admin-system');
                     })
                     ->exists();
             } catch (\Exception $e) {
@@ -221,7 +222,7 @@ trait TenantScope
             return $userTenantId;
         }
 
-        if (!isset($tenantCache[$userId])) {
+        if (! isset($tenantCache[$userId])) {
             try {
                 $user = DB::table('users')
                     ->select($tenantColumn, 'id')

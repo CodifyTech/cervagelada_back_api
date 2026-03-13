@@ -41,8 +41,8 @@ class PermissionRequest extends BaseFormRequest
     public function messages(): array
     {
         return [
-            'actions.*.required' => "A action é obrigatória",
-            'actions.*.unique' => "A action já existe",
+            'actions.*.required' => 'A action é obrigatória',
+            'actions.*.unique' => 'A action já existe',
         ];
     }
 }

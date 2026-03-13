@@ -17,15 +17,16 @@ trait HasRoles
 
     protected function cachedRoles()
     {
-        if (!$this->exists || !$this->id) {
+        if (! $this->exists || ! $this->id) {
             return collect();
         }
 
         return Cache::remember("user_{$this->id}_roles", 3600, function () {
             try {
                 return $this->belongsToManyRoles()->get(['id', 'name', 'slug']);
-            } catch (\Exception $e) {
-                \Log::error('Error in cachedRoles: ' . $e->getMessage());
+            } catch (Exception $e) {
+                \Log::error('Error in cachedRoles: '.$e->getMessage());
+
                 return collect();
             }
         });

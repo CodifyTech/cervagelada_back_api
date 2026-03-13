@@ -13,7 +13,7 @@ class ConfiguracaoSeeder extends Seeder
             // Contato
             ['chave' => 'contato_email',     'valor' => 'contato@cervagelada.com.br', 'tipo' => 'string', 'grupo' => 'contato'],
             ['chave' => 'contato_telefone',  'valor' => '(11) 9999-9999',             'tipo' => 'string', 'grupo' => 'contato'],
-            ['chave' => 'contato_whatsapp',  'valor' => 'https://wa.me/5511999999999','tipo' => 'string', 'grupo' => 'contato'],
+            ['chave' => 'contato_whatsapp',  'valor' => 'https://wa.me/5511999999999', 'tipo' => 'string', 'grupo' => 'contato'],
             ['chave' => 'contato_endereco',  'valor' => 'Avenida Camilo di Lellis, 1065, Centro, Pinhais/PR', 'tipo' => 'string', 'grupo' => 'contato'],
             ['chave' => 'contato_horario',   'valor' => 'Seg. a Sex. das 8:00 às 18:00', 'tipo' => 'string', 'grupo' => 'contato'],
             // Redes Sociais

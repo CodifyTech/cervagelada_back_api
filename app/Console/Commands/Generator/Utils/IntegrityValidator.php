@@ -4,11 +4,11 @@ namespace App\Console\Commands\Generator\Utils;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class IntegrityValidator
 {
     private Command $command;
+
     private string $frontendPath;
 
     public function __construct(Command $command)
@@ -27,12 +27,13 @@ class IntegrityValidator
             base_path('../vue-frontend'),
             base_path('../nuxt-frontend'),
             base_path('resources/frontend'),
-            base_path('frontend')
+            base_path('frontend'),
         ];
 
         foreach ($possiblePaths as $path) {
             if (is_dir($path)) {
                 $this->frontendPath = $path;
+
                 return;
             }
         }
@@ -99,7 +100,7 @@ class IntegrityValidator
     {
         $issues = [];
 
-        if (!is_dir($this->frontendPath)) {
+        if (! is_dir($this->frontendPath)) {
             return ["Frontend não encontrado em: {$this->frontendPath}"];
         }
 
@@ -109,12 +110,12 @@ class IntegrityValidator
             'src/main.ts',
             'src/App.vue',
             'src/router/index.ts',
-            'src/stores/index.ts'
+            'src/stores/index.ts',
         ];
 
         foreach ($criticalFiles as $file) {
-            $fullPath = $this->frontendPath . '/' . $file;
-            if (!file_exists($fullPath)) {
+            $fullPath = $this->frontendPath.'/'.$file;
+            if (! file_exists($fullPath)) {
                 $issues[] = "Arquivo crítico ausente: {$file}";
             }
         }
@@ -122,7 +123,7 @@ class IntegrityValidator
         // Verificar sintaxe de arquivos JSON
         $jsonFiles = ['package.json', 'tsconfig.json', 'vite.config.ts'];
         foreach ($jsonFiles as $file) {
-            $fullPath = $this->frontendPath . '/' . $file;
+            $fullPath = $this->frontendPath.'/'.$file;
             if (file_exists($fullPath) && str_ends_with($file, '.json')) {
                 $jsonIssues = $this->validateJsonFile($fullPath);
                 $issues = array_merge($issues, $jsonIssues);
@@ -164,14 +165,14 @@ class IntegrityValidator
         try {
             // Verificar se há migrations pendentes
             $pendingMigrations = $this->getPendingMigrations();
-            if (!empty($pendingMigrations)) {
-                $issues[] = "Migrations pendentes encontradas: " . implode(', ', $pendingMigrations);
+            if (! empty($pendingMigrations)) {
+                $issues[] = 'Migrations pendentes encontradas: '.implode(', ', $pendingMigrations);
             }
 
             // Verificar se database está acessível
             DB::connection()->getPdo();
         } catch (\Exception $e) {
-            $issues[] = "Problema de conexão com database: " . $e->getMessage();
+            $issues[] = 'Problema de conexão com database: '.$e->getMessage();
         }
 
         return $issues;
@@ -239,7 +240,7 @@ class IntegrityValidator
                 }
             }
         } catch (\Exception $e) {
-            $issues[] = "Erro ao carregar rotas: " . $e->getMessage();
+            $issues[] = 'Erro ao carregar rotas: '.$e->getMessage();
         }
 
         return $issues;
@@ -278,12 +279,12 @@ class IntegrityValidator
             'src/pages',
             'src/stores',
             'src/types',
-            'src/router'
+            'src/router',
         ];
 
         foreach ($requiredDirs as $dir) {
-            $fullPath = $this->frontendPath . '/' . $dir;
-            if (!is_dir($fullPath)) {
+            $fullPath = $this->frontendPath.'/'.$dir;
+            if (! is_dir($fullPath)) {
                 $issues[] = "Diretório ausente: {$dir}";
             }
         }
@@ -306,13 +307,13 @@ class IntegrityValidator
                 $uri = $route->uri();
                 if (str_starts_with($uri, 'api/')) {
                     $action = $route->getAction('controller');
-                    if ($action && !class_exists($action)) {
+                    if ($action && ! class_exists($action)) {
                         $issues[] = "Controller não encontrado para rota: {$uri}";
                     }
                 }
             }
         } catch (\Exception $e) {
-            $issues[] = "Erro ao validar consistência da API: " . $e->getMessage();
+            $issues[] = 'Erro ao validar consistência da API: '.$e->getMessage();
         }
 
         return $issues;
@@ -327,16 +328,16 @@ class IntegrityValidator
 
         // Verificar se arquivos de tipos TypeScript existem para models principais
         $modelsPath = app_path('Domains');
-        $typesPath = $this->frontendPath . '/src/types';
+        $typesPath = $this->frontendPath.'/src/types';
 
         if (is_dir($modelsPath) && is_dir($typesPath)) {
             $modelFiles = $this->scanForPhpFiles($modelsPath, 'Models');
 
             foreach ($modelFiles as $modelFile) {
                 $modelName = basename($modelFile, '.php');
-                $typeFile = $typesPath . '/' . $modelName . '.ts';
+                $typeFile = $typesPath.'/'.$modelName.'.ts';
 
-                if (!file_exists($typeFile)) {
+                if (! file_exists($typeFile)) {
                     $issues[] = "Arquivo de tipo TypeScript ausente: {$modelName}.ts";
                 }
             }
@@ -357,14 +358,14 @@ class IntegrityValidator
             $pendingMigrations = [];
             foreach ($migrationFiles as $file) {
                 $migrationName = pathinfo($file, PATHINFO_FILENAME);
-                if (!in_array($migrationName, $runMigrations)) {
+                if (! in_array($migrationName, $runMigrations)) {
                     $pendingMigrations[] = $migrationName;
                 }
             }
 
             return $pendingMigrations;
         } catch (\Exception $e) {
-            return ["Erro ao verificar migrations: " . $e->getMessage()];
+            return ['Erro ao verificar migrations: '.$e->getMessage()];
         }
     }
 
@@ -375,7 +376,7 @@ class IntegrityValidator
     {
         $files = [];
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             return $files;
         }
 
@@ -386,7 +387,7 @@ class IntegrityValidator
         foreach ($iterator as $file) {
             if ($file->isFile() && $file->getExtension() === 'php') {
                 $fileName = $file->getFilename();
-                if (!$suffix || str_contains($fileName, $suffix)) {
+                if (! $suffix || str_contains($fileName, $suffix)) {
                     $files[] = $file->getPathname();
                 }
             }
@@ -402,7 +403,7 @@ class IntegrityValidator
     {
         $issues = [];
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return $issues;
         }
 
@@ -410,7 +411,7 @@ class IntegrityValidator
         $decoded = json_decode($content);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $issues[] = "JSON inválido em: " . basename($filePath) . " - " . json_last_error_msg();
+            $issues[] = 'JSON inválido em: '.basename($filePath).' - '.json_last_error_msg();
         }
 
         return $issues;
@@ -423,7 +424,7 @@ class IntegrityValidator
     {
         $issues = [];
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return $issues;
         }
 
@@ -431,12 +432,12 @@ class IntegrityValidator
 
         // Verificar sintaxe básica
         if (strpos($content, '<?php') === false) {
-            $issues[] = "Arquivo PHP inválido: " . basename($filePath);
+            $issues[] = 'Arquivo PHP inválido: '.basename($filePath);
         }
 
         // Verificar se extends Model
-        if (!str_contains($content, 'extends Model') && !str_contains($content, 'extends BaseModel')) {
-            $issues[] = "Model não estende classe base: " . basename($filePath);
+        if (! str_contains($content, 'extends Model') && ! str_contains($content, 'extends BaseModel')) {
+            $issues[] = 'Model não estende classe base: '.basename($filePath);
         }
 
         return $issues;
@@ -449,7 +450,7 @@ class IntegrityValidator
     {
         $issues = [];
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return $issues;
         }
 
@@ -457,12 +458,12 @@ class IntegrityValidator
 
         // Verificar sintaxe básica
         if (strpos($content, '<?php') === false) {
-            $issues[] = "Arquivo PHP inválido: " . basename($filePath);
+            $issues[] = 'Arquivo PHP inválido: '.basename($filePath);
         }
 
         // Verificar se extends Controller
-        if (!str_contains($content, 'extends Controller') && !str_contains($content, 'extends BaseController')) {
-            $issues[] = "Controller não estende classe base: " . basename($filePath);
+        if (! str_contains($content, 'extends Controller') && ! str_contains($content, 'extends BaseController')) {
+            $issues[] = 'Controller não estende classe base: '.basename($filePath);
         }
 
         return $issues;
@@ -475,7 +476,7 @@ class IntegrityValidator
     {
         $issues = [];
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             return $issues;
         }
 
@@ -483,7 +484,7 @@ class IntegrityValidator
 
         // Verificar sintaxe básica
         if (strpos($content, '<?php') === false) {
-            $issues[] = "Arquivo PHP inválido: " . basename($filePath);
+            $issues[] = 'Arquivo PHP inválido: '.basename($filePath);
         }
 
         return $issues;
@@ -494,16 +495,16 @@ class IntegrityValidator
      */
     public function generateIntegrityReport(array $issues): string
     {
-        $report = "\n" . str_repeat('=', 60) . "\n";
+        $report = "\n".str_repeat('=', 60)."\n";
         $report .= "🔍 RELATÓRIO DE INTEGRIDADE DO PROJETO\n";
-        $report .= str_repeat('=', 60) . "\n";
+        $report .= str_repeat('=', 60)."\n";
 
         if (empty($issues)) {
             $report .= "✅ PROJETO ÍNTEGRO\n";
             $report .= "Nenhum problema de integridade detectado.\n";
         } else {
-            $report .= "⚠️  PROBLEMAS DETECTADOS: " . count($issues) . "\n";
-            $report .= str_repeat('-', 60) . "\n";
+            $report .= '⚠️  PROBLEMAS DETECTADOS: '.count($issues)."\n";
+            $report .= str_repeat('-', 60)."\n";
 
             foreach ($issues as $issue) {
                 $report .= "  ❌ $issue\n";
@@ -516,7 +517,7 @@ class IntegrityValidator
             $report .= "  4. Considere re-executar a geração se necessário\n";
         }
 
-        $report .= str_repeat('=', 60) . "\n";
+        $report .= str_repeat('=', 60)."\n";
 
         return $report;
     }

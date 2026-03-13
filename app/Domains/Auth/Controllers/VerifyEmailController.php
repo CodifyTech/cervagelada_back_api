@@ -2,8 +2,8 @@
 
 namespace App\Domains\Auth\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Domains\Auth\Models\User;
+use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
 
 class VerifyEmailController extends Controller

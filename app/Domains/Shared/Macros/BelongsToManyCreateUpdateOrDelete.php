@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 class BelongsToManyCreateUpdateOrDelete
 {
     protected BelongsToMany $query;
+
     protected Collection $records;
+
     protected array $pivotAttributes;
 
     public function __construct(BelongsToMany $query, iterable $records, array $pivotAttributes = [])
@@ -47,6 +49,7 @@ class BelongsToManyCreateUpdateOrDelete
 
         if ($existingRecordIds->isEmpty()) {
             $this->query->detach();
+
             return;
         }
 
@@ -62,7 +65,7 @@ class BelongsToManyCreateUpdateOrDelete
 
         foreach ($this->records as $record) {
             // Verifica se $record é um array antes de processá-lo
-            if (!is_array($record)) {
+            if (! is_array($record)) {
                 continue; // Pula este item se não for um array
             }
 
@@ -93,7 +96,7 @@ class BelongsToManyCreateUpdateOrDelete
     protected function extractPivotData($record): array
     {
         // Verificar se $record é um array
-        if (!is_array($record)) {
+        if (! is_array($record)) {
             return []; // Retornar array vazio se não for um array
         }
 
@@ -117,6 +120,7 @@ class BelongsToManyCreateUpdateOrDelete
     protected function extractModelData(array $record): array
     {
         $pivotColumns = $this->query->getPivotColumns();
+
         return collect($record)
             ->except($pivotColumns)
             ->toArray();

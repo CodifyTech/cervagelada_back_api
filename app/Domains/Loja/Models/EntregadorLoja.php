@@ -2,10 +2,11 @@
 
 namespace App\Domains\Loja\Models;
 
+use App\Domains\Auth\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EntregadorLoja extends Model
 {
@@ -21,7 +22,7 @@ class EntregadorLoja extends Model
 
     public function entregador(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function loja(): BelongsTo

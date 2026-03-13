@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class AsaasService
 {
     private string $baseUrl;
+
     private string $apiKey;
 
     public function __construct()
@@ -21,7 +22,7 @@ class AsaasService
     /**
      * Create a charge (cobrança) on Asaas.
      *
-     * @param array $data [customer, billingType, value, dueDate, description, ...]
+     * @param  array  $data  [customer, billingType, value, dueDate, description, ...]
      * @return array Asaas charge response
      */
     public function createCharge(array $data): array
@@ -60,7 +61,7 @@ class AsaasService
     /**
      * Create or find a customer in Asaas.
      *
-     * @param array $data [name, cpfCnpj, email, phone, ...]
+     * @param  array  $data  [name, cpfCnpj, email, phone, ...]
      */
     public function createCustomer(array $data): array
     {
@@ -89,7 +90,7 @@ class AsaasService
             'Content-Type' => 'application/json',
         ])->retry(3, 500)->timeout(30);
 
-        $url = $this->baseUrl . $endpoint;
+        $url = $this->baseUrl.$endpoint;
 
         $response = match (strtoupper($method)) {
             'GET' => $http->get($url, $data),
@@ -108,7 +109,7 @@ class AsaasService
             ]);
 
             $errors = $response->json('errors', []);
-            $message = !empty($errors) ? $errors[0]['description'] : 'Erro na comunicação com o gateway de pagamento';
+            $message = ! empty($errors) ? $errors[0]['description'] : 'Erro na comunicação com o gateway de pagamento';
 
             throw new \RuntimeException($message, $response->status());
         }

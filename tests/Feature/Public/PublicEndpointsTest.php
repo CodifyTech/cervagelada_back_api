@@ -4,6 +4,9 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Destaque\Models\Destaque;
 use App\Domains\Loja\Models\Loja;
 use App\Domains\Noticias\Models\Noticias;
+use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Produto\Models\Produto;
 use App\Domains\Promocao\Models\Promocao;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -16,7 +19,7 @@ uses(RefreshDatabase::class);
 function criarLoja(string $tipo = 'cervejaria', bool $ativa = true): Loja
 {
     return Loja::create([
-        'nome_fantasia' => 'Loja Teste ' . Str::random(5),
+        'nome_fantasia' => 'Loja Teste '.Str::random(5),
         'tipo_loja' => $tipo,
         'ativo' => $ativa,
         'latitude' => -23.5505,
@@ -65,7 +68,7 @@ it('retorna loja publica por id', function () {
 });
 
 it('retorna 404 para loja inexistente', function () {
-    $this->getJson('/api/public/lojas/' . Str::ulid())
+    $this->getJson('/api/public/lojas/'.Str::ulid())
         ->assertStatus(404);
 });
 
@@ -112,8 +115,7 @@ it('lista destaques publicamente', function () {
     if (class_exists(Destaque::class)) {
         $this->getJson('/api/public/destaques')
             ->assertStatus(200);
-    }
-    else {
+    } else {
         $this->getJson('/api/public/destaques')
             ->assertStatus(200);
     }
@@ -196,7 +198,7 @@ it('consumidor autenticado visualiza detalhe do proprio pedido', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $token = auth('api')->login($user);
 
-    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+    $pedido = Pedido::create([
         'user_id' => $user->id,
         'loja_id' => criarLoja()->id,
         'endereco_id' => Str::ulid(),
@@ -217,7 +219,7 @@ it('consumidor nao pode ver pedido de outro usuario', function () {
     $user2 = User::factory()->create(['email_verified_at' => now()]);
     $token2 = auth('api')->login($user2);
 
-    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+    $pedido = Pedido::create([
         'user_id' => $user1->id,
         'loja_id' => criarLoja()->id,
         'endereco_id' => Str::ulid(),
@@ -238,7 +240,7 @@ it('consumidor consulta status do pagamento do pedido', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $token = auth('api')->login($user);
 
-    $pedido = \App\Domains\Pedido\Models\Pedido::create([
+    $pedido = Pedido::create([
         'user_id' => $user->id,
         'loja_id' => criarLoja()->id,
         'endereco_id' => Str::ulid(),
@@ -248,7 +250,7 @@ it('consumidor consulta status do pagamento do pedido', function () {
         'status' => 'aguardando_pagamento',
     ]);
 
-    \App\Domains\Pagamento\Models\Pagamento::create([
+    Pagamento::create([
         'pedido_id' => $pedido->id,
         'asaas_charge_id' => 'pay_status_test',
         'asaas_customer_id' => 'cus_test',
@@ -277,7 +279,7 @@ it('lista lojas proximas por coordenadas', function () {
 
 it('busca lojas que vendem determinado produto', function () {
     $loja = criarLoja('distribuidora');
-    $produto = \App\Domains\Produto\Models\Produto::create([
+    $produto = Produto::create([
         'nome' => 'IPA Premium',
         'descricao' => 'Cerveja artesanal',
     ]);
@@ -289,7 +291,7 @@ it('busca lojas que vendem determinado produto', function () {
         'destaque' => false,
     ]);
 
-    $response = $this->getJson("/api/public/lojas/buscar-produto?q=IPA");
+    $response = $this->getJson('/api/public/lojas/buscar-produto?q=IPA');
 
     expect($response->status())->toBeIn([200, 422]);
 });

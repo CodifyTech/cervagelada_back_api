@@ -1,6 +1,14 @@
 <?php
 
 use App\Domains\Auth\Models\User;
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\Endereco\Models\Endereco;
+use App\Domains\Loja\Models\HorarioLoja;
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Produto\Models\LojaProduto;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 
 return [
     /*
@@ -40,70 +48,63 @@ return [
     'tenantTable' => 'lojas',
     'tenantColumn' => 'loja_id',
     'tenantModels' => [
-        App\Domains\Loja\Models\Loja::class => [
+        Loja::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Auth\Models\User::class => [
+        User::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Pedido\Models\Pedido::class => [
+        Pedido::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Avaliacao\Models\Avaliacao::class => [
+        Avaliacao::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Endereco\Models\Endereco::class => [
+        Endereco::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras::class => [
+        TransacoesFinanceiras::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Loja\Models\HorarioLoja::class => [
+        HorarioLoja::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Pagamento\Models\Pagamento::class => [
+        Pagamento::class => [
             'list' => true,
             'read' => true,
             'create' => true,
             'update' => true,
             'delete' => true,
         ],
-        App\Domains\Configuracao\Models\Configuracao::class => [
-            'list' => true,
-            'read' => true,
-            'create' => true,
-            'update' => true,
-            'delete' => true,
-        ],
-        \App\Domains\Produto\Models\LojaProduto::class => [
+        LojaProduto::class => [
             'list' => true,
             'read' => true,
             'create' => true,

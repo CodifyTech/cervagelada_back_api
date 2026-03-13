@@ -34,17 +34,17 @@ class ServiceGenerator
         );
 
         // Criar diretório se não existir
-        if (!File::exists($fullPath)) {
+        if (! File::exists($fullPath)) {
             File::makeDirectory($fullPath, 0755, true);
         }
 
         // Nome do arquivo seguindo padrão antigo
-        $serviceName = $modelName . 'Service';
-        $fileName = $serviceName . '.ts';
-        $filePath = $fullPath . '/' . $fileName;
+        $serviceName = $modelName.'Service';
+        $fileName = $serviceName.'.ts';
+        $filePath = $fullPath.'/'.$fileName;
 
         // Verificar se o arquivo já existe
-        if (File::exists($filePath) && !($config['force'] ?? false)) {
+        if (File::exists($filePath) && ! ($config['force'] ?? false)) {
             return false;
         }
 
@@ -91,13 +91,14 @@ class ServiceGenerator
         $methods = [];
         foreach ($foreignKeys as $fk) {
             $pluralName = Str::plural(strtolower($fk['model']));
-            $methodName = 'getAll' . Str::plural($fk['model']);
+            $methodName = 'getAll'.Str::plural($fk['model']);
 
             $methods[] = "  async {$methodName}() {";
-            $methods[] = "    return this.get('/" . Str::kebab($fk['domain']) . "/" . Str::kebab($pluralName) . "')";
-            $methods[] = "  }";
-            $methods[] = "";
+            $methods[] = "    return this.get('/".Str::kebab($fk['domain']).'/'.Str::kebab($pluralName)."')";
+            $methods[] = '  }';
+            $methods[] = '';
         }
+
         return $methods;
     }
 }

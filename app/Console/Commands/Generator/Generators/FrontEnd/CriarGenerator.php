@@ -33,16 +33,16 @@ class CriarGenerator
         );
 
         // Criar diretório se não existir
-        if (!File::exists($fullPath)) {
+        if (! File::exists($fullPath)) {
             File::makeDirectory($fullPath, 0755, true);
         }
 
         // Nome do arquivo seguindo padrão antigo
         $fileName = 'index.vue';
-        $filePath = $fullPath . '/' . $fileName;
+        $filePath = $fullPath.'/'.$fileName;
 
         // Verificar se o arquivo já existe
-        if (File::exists($filePath) && !($config['force'] ?? false)) {
+        if (File::exists($filePath) && ! ($config['force'] ?? false)) {
             return false;
         }
 
@@ -67,16 +67,16 @@ class CriarGenerator
         $domain = $config['domain'];
 
         // Construir store name
-        $storeName = 'use' . $modelName . 'Store';
+        $storeName = 'use'.$modelName.'Store';
 
         // Construir interface name
-        $interfaceName = "I" . $modelName;
+        $interfaceName = 'I'.$modelName;
 
         // Construir entity singular var
         $entitySingularVar = strtolower(Str::singular($domain));
 
         // Construir form name
-        $formName = Str::singular($domain) . 'Form';
+        $formName = Str::singular($domain).'Form';
 
         return [
             '{{store_name}}' => $storeName,

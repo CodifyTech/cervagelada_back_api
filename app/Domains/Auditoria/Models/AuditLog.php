@@ -2,10 +2,10 @@
 
 namespace App\Domains\Auditoria\Models;
 
+use App\Domains\Auth\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Domains\Auth\Models\User;
 
 /**
  * Audit log model - append-only, no updates or deletes allowed.
@@ -15,6 +15,7 @@ class AuditLog extends Model
     use HasUlids;
 
     protected $table = 'audit_logs';
+
     public $timestamps = false;
 
     protected $fillable = [

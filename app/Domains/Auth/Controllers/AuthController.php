@@ -3,10 +3,10 @@
 namespace App\Domains\Auth\Controllers;
 
 use App\Domains\Auth\Requests\ForgotPasswordRequest;
-use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Auth\Requests\LoginRequest;
 use App\Domains\Auth\Requests\RegisterRequest;
 use App\Domains\Auth\Requests\RegisterStoreRequest;
+use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Auth\Services\AuthService;
 use App\Domains\Shared\Controller\BaseController;
 
@@ -21,19 +21,14 @@ class AuthController extends BaseController
 
     /**
      * Get the authenticated User.
-     *
-     * @param LoginRequest $request
      */
     public function login(LoginRequest $request)
     {
         return $this->authService->login($request);
     }
 
-
     /**
      * Create the authenticated User.
-     *
-     * @param RegisterRequest $request
      */
     public function register(RegisterRequest $request)
     {
@@ -42,8 +37,6 @@ class AuthController extends BaseController
 
     /**
      * Create the authenticated User and Store (Tenant).
-     *
-     * @param RegisterStoreRequest $request
      */
     public function registerStore(RegisterStoreRequest $request)
     {
@@ -62,7 +55,6 @@ class AuthController extends BaseController
 
     /**
      * Get the authenticated User.
-     *
      */
     public function profile()
     {

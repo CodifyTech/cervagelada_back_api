@@ -37,7 +37,7 @@ class VerifyEmail extends Notification
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -54,7 +54,7 @@ class VerifyEmail extends Notification
      * Get the verify email notification mail message for the given URL.
      *
      * @param  string  $url
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     protected function buildMailMessage($url)
     {
@@ -79,7 +79,7 @@ class VerifyEmail extends Notification
 
         $email = $notifiable->getEmailForVerification();
 
-        return env('FRONT_END_URL') . "/admin/auth/verificar-email?email=$email";
+        return env('FRONT_END_URL')."/admin/auth/verificar-email?email=$email";
     }
 
     /**

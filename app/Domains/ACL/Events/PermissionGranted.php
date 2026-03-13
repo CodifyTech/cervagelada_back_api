@@ -12,6 +12,7 @@ class PermissionGranted
     use Dispatchable, SerializesModels;
 
     public Role $role;
+
     public Permission $permission;
 
     public function __construct(Role $role, Permission $permission)

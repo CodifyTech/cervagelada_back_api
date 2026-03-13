@@ -39,12 +39,12 @@ class RelatoriosService extends BaseService
     public function exportarCsv(string $tipo, array $filtros): StreamedResponse
     {
         $headers = $this->getCsvHeaders($tipo);
-        $filename = "relatorio-{$tipo}-" . now()->format('Y-m-d') . '.csv';
+        $filename = "relatorio-{$tipo}-".now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($tipo, $filtros, $headers) {
             $output = fopen('php://output', 'w');
             // UTF-8 BOM for Excel compatibility
-            fputs($output, "\xEF\xBB\xBF");
+            fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, $headers, ';');
 
             $stream = match ($tipo) {

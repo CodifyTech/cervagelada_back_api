@@ -3,25 +3,27 @@
 namespace App\Console\Commands;
 
 use App\Domains\Produto\Models\Produto;
+use App\Domains\Produto\Seeders\SkuCatalogSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class ImportSkusCommand extends Command
 {
     protected $signature = 'app:import-skus {file? : Path to JSON or CSV file with SKUs}';
+
     protected $description = 'Import base SKU catalog from a JSON or CSV file';
 
     public function handle(): int
     {
         $file = $this->argument('file');
 
-        if (!$file) {
+        if (! $file) {
             $this->info('No file specified. Running built-in seeder with sample SKUs...');
 
             return $this->importBuiltIn();
         }
 
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             $this->error("File not found: {$file}");
 
             return self::FAILURE;
@@ -41,7 +43,7 @@ class ImportSkusCommand extends Command
         $content = file_get_contents($file);
         $items = json_decode($content, true);
 
-        if (!is_array($items)) {
+        if (! is_array($items)) {
             $this->error('Invalid JSON structure. Expected an array of objects.');
 
             return self::FAILURE;
@@ -53,14 +55,14 @@ class ImportSkusCommand extends Command
     private function importCsv(string $file): int
     {
         $handle = fopen($file, 'r');
-        if (!$handle) {
+        if (! $handle) {
             $this->error("Cannot open file: {$file}");
 
             return self::FAILURE;
         }
 
         $headers = fgetcsv($handle);
-        if (!$headers) {
+        if (! $headers) {
             fclose($handle);
             $this->error('CSV file is empty or has no headers.');
 
@@ -93,7 +95,7 @@ class ImportSkusCommand extends Command
             foreach ($items as $item) {
                 $ean = $item['ean'] ?? null;
 
-                if (!$ean || !($item['nome'] ?? null)) {
+                if (! $ean || ! ($item['nome'] ?? null)) {
                     $skipped++;
                     $bar->advance();
 
@@ -140,7 +142,7 @@ class ImportSkusCommand extends Command
 
     private function importBuiltIn(): int
     {
-        $seeder = new \App\Domains\Produto\Seeders\SkuCatalogSeeder();
+        $seeder = new SkuCatalogSeeder;
         $seeder->setCommand($this);
         $seeder->run();
 

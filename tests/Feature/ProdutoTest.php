@@ -20,12 +20,12 @@ it('lista produtos autenticado', function () {
 
 it('cria produto com dados validos', function () {
     $payload = [
-        'nome'           => 'IPA Artesanal',
-        'descricao'      => 'Cerveja IPA artesanal da casa',
-        'marca'          => 'Cervejaria Teste',
+        'nome' => 'IPA Artesanal',
+        'descricao' => 'Cerveja IPA artesanal da casa',
+        'marca' => 'Cervejaria Teste',
         'teor_alcoolico' => 6.5,
-        'volume_ml'      => 500,
-        'ean'            => '7891234567890',
+        'volume_ml' => 500,
+        'ean' => '7891234567890',
     ];
 
     $response = $this->withToken($this->token)
@@ -44,14 +44,14 @@ it('retorna 422 ao criar produto sem nome', function () {
 
 it('atualiza produto existente', function () {
     $produto = Produto::create([
-        'nome'      => 'Produto Original',
+        'nome' => 'Produto Original',
         'descricao' => 'Descrição original',
-        'marca'     => 'Marca Teste',
+        'marca' => 'Marca Teste',
     ]);
 
     $response = $this->withToken($this->token)
         ->putJson("/api/produtos/{$produto->id}", [
-            'nome'  => 'Produto Atualizado',
+            'nome' => 'Produto Atualizado',
             'marca' => 'Marca Teste',
         ]);
 
@@ -61,9 +61,9 @@ it('atualiza produto existente', function () {
 
 it('busca produto por EAN', function () {
     Produto::create([
-        'nome'  => 'Produto EAN',
+        'nome' => 'Produto EAN',
         'marca' => 'Marca',
-        'ean'   => '7891111111111',
+        'ean' => '7891111111111',
     ]);
 
     $response = $this->withToken($this->token)

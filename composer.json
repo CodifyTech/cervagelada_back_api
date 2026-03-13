@@ -15,6 +15,7 @@
         "coduo/php-humanizer": "^5.0",
         "intervention/image": "*",
         "laravel/framework": "^12.0",
+        "laravel/pint": "^1.29",
         "laravel/telescope": "*",
         "laravel/tinker": "^2.10.1",
         "tymon/jwt-auth": "^2.2"
@@ -23,7 +24,6 @@
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.2.2",
-        "laravel/pint": "^1.13",
         "laravel/sail": "^1.41",
         "lucascudo/laravel-pt-br-localization": "^3.0",
         "mockery/mockery": "^1.6",

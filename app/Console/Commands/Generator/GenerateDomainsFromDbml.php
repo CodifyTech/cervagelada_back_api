@@ -21,7 +21,9 @@ class GenerateDomainsFromDbml extends Command
     protected $description = 'Analisa um arquivo DBML e gera domínios na ordem correta respeitando dependências de chaves estrangeiras';
 
     private array $tables = [];
+
     private array $dependencies = [];
+
     private array $orderedTables = [];
 
     public function handle(): int
@@ -30,20 +32,22 @@ class GenerateDomainsFromDbml extends Command
         $this->newLine();
 
         $filePath = $this->argument('file');
-        
-        if (!File::exists($filePath)) {
+
+        if (! File::exists($filePath)) {
             $this->error("❌ Arquivo não encontrado: {$filePath}");
+
             return CommandAlias::FAILURE;
         }
 
         $dbmlContent = File::get($filePath);
-        
+
         // Parse do DBML
         $this->info('📖 Analisando arquivo DBML...');
         $this->parseDbml($dbmlContent);
-        
+
         if (empty($this->tables)) {
             $this->error('❌ Nenhuma tabela encontrada no arquivo DBML!');
+
             return CommandAlias::FAILURE;
         }
 
@@ -56,12 +60,14 @@ class GenerateDomainsFromDbml extends Command
 
         if ($this->option('dry-run')) {
             $this->info('✅ Modo dry-run: nenhuma alteração foi feita.');
+
             return CommandAlias::SUCCESS;
         }
 
         // Confirmar execução
-        if (!$this->confirm('Deseja prosseguir com a criação dos domínios?', true)) {
+        if (! $this->confirm('Deseja prosseguir com a criação dos domínios?', true)) {
             $this->info('Operação cancelada.');
+
             return CommandAlias::SUCCESS;
         }
 
@@ -70,7 +76,7 @@ class GenerateDomainsFromDbml extends Command
 
         $this->newLine();
         $this->info('✅ Processo concluído!');
-        
+
         return CommandAlias::SUCCESS;
     }
 
@@ -85,7 +91,7 @@ class GenerateDomainsFromDbml extends Command
 
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             // Ignorar linhas vazias e comentários
             if (empty($line) || str_starts_with($line, '//')) {
                 continue;
@@ -97,9 +103,10 @@ class GenerateDomainsFromDbml extends Command
                 if ($currentTable !== null) {
                     $this->tables[$currentTable] = $currentFields;
                 }
-                
+
                 $currentTable = $matches[1];
                 $currentFields = [];
+
                 continue;
             }
 
@@ -110,6 +117,7 @@ class GenerateDomainsFromDbml extends Command
                     $currentTable = null;
                     $currentFields = [];
                 }
+
                 continue;
             }
 
@@ -145,11 +153,11 @@ class GenerateDomainsFromDbml extends Command
             $foreignField = $matches[3];
 
             // Registrar dependência
-            if (!isset($this->dependencies[$table])) {
+            if (! isset($this->dependencies[$table])) {
                 $this->dependencies[$table] = [];
             }
-            
-            if (!in_array($foreignTable, $this->dependencies[$table])) {
+
+            if (! in_array($foreignTable, $this->dependencies[$table])) {
                 $this->dependencies[$table][] = $foreignTable;
             }
 
@@ -158,19 +166,19 @@ class GenerateDomainsFromDbml extends Command
                 'type' => 'integer',
                 'foreign_key' => [
                     'table' => $foreignTable,
-                    'field' => $foreignField
-                ]
+                    'field' => $foreignField,
+                ],
             ];
         } else {
             // Campo normal
             if (preg_match('/(\w+)\s+(\w+)/', $line, $matches)) {
                 $fieldName = $matches[1];
                 $fieldType = $matches[2];
-                
+
                 $fields[] = [
                     'name' => $fieldName,
                     'type' => $fieldType,
-                    'foreign_key' => null
+                    'foreign_key' => null,
                 ];
             }
         }
@@ -186,7 +194,7 @@ class GenerateDomainsFromDbml extends Command
         $visiting = [];
 
         foreach ($this->tables as $table => $fields) {
-            if (!isset($visited[$table])) {
+            if (! isset($visited[$table])) {
                 $this->visitTable($table, $visited, $visiting);
             }
         }
@@ -199,6 +207,7 @@ class GenerateDomainsFromDbml extends Command
     {
         if (isset($visiting[$table])) {
             $this->warn("⚠️  Ciclo de dependência detectado envolvendo: {$table}");
+
             return;
         }
 
@@ -243,22 +252,22 @@ class GenerateDomainsFromDbml extends Command
         }
 
         $this->info('FASE 1: Domínios SEM chaves estrangeiras');
-        $this->line('─' . str_repeat('─', 50));
+        $this->line('─'.str_repeat('─', 50));
         foreach ($phase1 as $index => $table) {
             $domainName = $this->getDomainName($table);
             $this->line(sprintf('  %d. %s (%s)', $index + 1, $domainName, $table));
         }
 
-        if (!empty($phase2)) {
+        if (! empty($phase2)) {
             $this->newLine();
             $this->info('FASE 2: Domínios COM chaves estrangeiras');
-            $this->line('─' . str_repeat('─', 50));
+            $this->line('─'.str_repeat('─', 50));
             foreach ($phase2 as $index => $table) {
                 $domainName = $this->getDomainName($table);
                 $deps = implode(', ', $this->dependencies[$table] ?? []);
-                $this->line(sprintf('  %d. %s (%s) → depende de: %s', 
-                    count($phase1) + $index + 1, 
-                    $domainName, 
+                $this->line(sprintf('  %d. %s (%s) → depende de: %s',
+                    count($phase1) + $index + 1,
+                    $domainName,
                     $table,
                     $deps ?: 'nenhuma'
                 ));
@@ -280,16 +289,16 @@ class GenerateDomainsFromDbml extends Command
         foreach ($this->orderedTables as $index => $table) {
             $domainName = $this->getDomainName($table);
             $modelName = Str::studly(Str::singular($table));
-            
-            $this->info(sprintf('[%d/%d] Gerando domínio: %s', 
-                $index + 1, 
-                count($this->orderedTables), 
+
+            $this->info(sprintf('[%d/%d] Gerando domínio: %s',
+                $index + 1,
+                count($this->orderedTables),
                 $domainName
             ));
 
             // Construir schema
             $schema = $this->buildSchema($table);
-            
+
             // Construir foreign keys
             $foreignKeys = $this->buildForeignKeys($table);
 
@@ -329,10 +338,10 @@ class GenerateDomainsFromDbml extends Command
 
             // Se for chave estrangeira, usar integer
             if ($field['foreign_key']) {
-                $schemaParts[] = $field['name'] . '=integer,req';
+                $schemaParts[] = $field['name'].'=integer,req';
             } else {
                 $type = $this->mapDbmlTypeToSchema($field['type']);
-                $schemaParts[] = $field['name'] . '=' . $type;
+                $schemaParts[] = $field['name'].'='.$type;
             }
         }
 
@@ -357,7 +366,7 @@ class GenerateDomainsFromDbml extends Command
                     'domain' => $domainName,
                     'model' => $foreignModel,
                     'relation' => 'belongsTo',
-                    'required' => true // Foreign keys são obrigatórias por padrão
+                    'required' => true, // Foreign keys são obrigatórias por padrão
                 ];
             }
         }
@@ -392,11 +401,11 @@ class GenerateDomainsFromDbml extends Command
     {
         $prefix = $this->option('domain-prefix');
         $domainName = Str::studly(Str::singular($table));
-        
+
         if ($prefix) {
-            return $prefix . $domainName;
+            return $prefix.$domainName;
         }
-        
+
         return $domainName;
     }
 
@@ -423,10 +432,10 @@ class GenerateDomainsFromDbml extends Command
         }
 
         Artisan::call('generate:crud', $params);
-        
+
         // Exibir output se houver erros
         $output = Artisan::output();
-        if (!empty(trim($output))) {
+        if (! empty(trim($output))) {
             $this->line($output);
         }
     }

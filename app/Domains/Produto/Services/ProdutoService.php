@@ -2,8 +2,12 @@
 
 namespace App\Domains\Produto\Services;
 
+use App\Domains\Loja\Models\Loja;
 use App\Domains\Produto\Models\Produto;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Shared\Traits\S3FileOperations;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class ProdutoService extends BaseService
 {
@@ -18,7 +22,7 @@ class ProdutoService extends BaseService
 
         // If user belongs to a store, filter products by that store
         if ($user && $user->loja_id) {
-            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            $loja = Loja::find($user->loja_id);
             if ($loja) {
                 // Return products linked to the store, ordered by pivot creation time
                 $query = $loja->produtos()
@@ -37,9 +41,10 @@ class ProdutoService extends BaseService
                         $item->preco = $item->pivot->preco;
                         $item->preco_promocional = $item->pivot->preco_promocional;
                         $item->estoque = $item->pivot->estoque;
-                        $item->destaque = (bool)$item->pivot->destaque;
-                        $item->ativo = (bool)$item->pivot->ativo;
+                        $item->destaque = (bool) $item->pivot->destaque;
+                        $item->ativo = (bool) $item->pivot->ativo;
                     }
+
                     return $item;
                 });
 
@@ -61,7 +66,7 @@ class ProdutoService extends BaseService
     {
         $user = auth()->user();
         if ($user && $user->loja_id) {
-            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            $loja = Loja::find($user->loja_id);
             if ($loja) {
                 return $this->createOrUpdateForStore($data, $loja);
             }
@@ -74,10 +79,11 @@ class ProdutoService extends BaseService
     {
         $user = auth()->user();
         if ($user && $user->loja_id) {
-            $loja = \App\Domains\Loja\Models\Loja::find($user->loja_id);
+            $loja = Loja::find($user->loja_id);
             if ($loja) {
                 // Ensure the data has the product id for createOrUpdateForStore
                 $data['produto_id'] = $id;
+
                 return $this->createOrUpdateForStore($data, $loja);
             }
         }
@@ -99,16 +105,16 @@ class ProdutoService extends BaseService
             $produto->preco = $lojaProduct->preco;
             $produto->preco_promocional = $lojaProduct->preco_promocional;
             $produto->estoque = $lojaProduct->estoque;
-            $produto->destaque = (bool)$lojaProduct->destaque;
-            $produto->ativo = (bool)$lojaProduct->ativo;
+            $produto->destaque = (bool) $lojaProduct->destaque;
+            $produto->ativo = (bool) $lojaProduct->ativo;
         }
 
         return $produto;
     }
 
-    use \App\Domains\Shared\Traits\S3FileOperations;
+    use S3FileOperations;
 
-    public function createOrUpdateForStore(array $data, \App\Domains\Loja\Models\Loja $loja)
+    public function createOrUpdateForStore(array $data, Loja $loja)
     {
         \DB::beginTransaction();
         try {
@@ -117,11 +123,11 @@ class ProdutoService extends BaseService
 
             if ($produtoId) {
                 $produto = $this->produto::find($produtoId);
-            } elseif (!empty($data['ean'])) {
+            } elseif (! empty($data['ean'])) {
                 $produto = $this->produto::where('ean', $data['ean'])->first();
             }
 
-            if (!$produto) {
+            if (! $produto) {
                 $productData = [
                     'nome' => $data['nome'] ?? null,
                     'descricao' => $data['descricao'] ?? null,
@@ -138,7 +144,7 @@ class ProdutoService extends BaseService
                 $produto = $this->produto::create($productData);
             }
 
-            if (isset($data['url_imagem']) && $data['url_imagem'] instanceof \Illuminate\Http\UploadedFile) {
+            if (isset($data['url_imagem']) && $data['url_imagem'] instanceof UploadedFile) {
                 $fileName = $this->putS3File($data['url_imagem'], 'produtos');
                 if ($fileName) {
                     $produto->url_imagem = $fileName;
@@ -147,7 +153,7 @@ class ProdutoService extends BaseService
             }
 
             $pivotData = [
-                'id' => (string) \Illuminate\Support\Str::ulid(),
+                'id' => (string) Str::ulid(),
                 'preco' => $data['preco'] ?? 0,
                 'preco_promocional' => $data['preco_promocional'] ?? null,
                 'estoque' => $data['estoque'] ?? 0,
@@ -162,6 +168,7 @@ class ProdutoService extends BaseService
             }
 
             \DB::commit();
+
             return $produto->load(['lojas' => function ($q) use ($loja) {
                 $q->where('lojas.id', $loja->id);
             }]);

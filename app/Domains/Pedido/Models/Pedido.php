@@ -2,18 +2,19 @@
 
 namespace App\Domains\Pedido\Models;
 
+use App\Domains\Auth\Models\User;
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\Endereco\Models\Endereco;
+use App\Domains\ItemPedido\Models\ItemPedido;
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Enums\OrderStatus;
+use App\Domains\Shared\Models\BaseModel;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Domains\Shared\Models\BaseModel;
-use App\Domains\Loja\Models\Loja;
-use App\Domains\ItemPedido\Models\ItemPedido;
-use App\Domains\Avaliacao\Models\Avaliacao;
-use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
-use App\Domains\Pagamento\Models\Pagamento;
-use App\Domains\Pedido\Enums\OrderStatus;
 
 class Pedido extends BaseModel
 {
@@ -31,15 +32,14 @@ class Pedido extends BaseModel
         'pin_tentativas' => 'integer',
     ];
 
-
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Auth\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function entregador(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Auth\Models\User::class, 'entregador_id');
+        return $this->belongsTo(User::class, 'entregador_id');
     }
 
     public function loja(): BelongsTo
@@ -49,21 +49,19 @@ class Pedido extends BaseModel
 
     public function endereco(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Endereco\Models\Endereco::class);
+        return $this->belongsTo(Endereco::class);
     }
+
     /**
      * Get the itempedidos for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function itemPedidos(): HasMany
     {
         return $this->hasMany(ItemPedido::class);
     }
+
     /**
      * Get the avaliacoes for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function avaliacoes(): HasMany
     {
@@ -72,8 +70,6 @@ class Pedido extends BaseModel
 
     /**
      * Get the transacoesfinanceiras for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function transacoesFinanceiras(): HasMany
     {

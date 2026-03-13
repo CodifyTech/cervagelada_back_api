@@ -3,6 +3,7 @@
 namespace App\Domains\Pedido\Listeners;
 
 use App\Domains\Auditoria\Services\AuditService;
+use App\Domains\Auth\Models\User;
 use App\Domains\Pedido\Events\NewOrderReceived;
 use App\Domains\Pedido\Notifications\NewOrderNotification;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class SendNewOrderNotification
 {
     public function __construct(
-        private readonly AuditService $auditService = new AuditService(),
+        private readonly AuditService $auditService = new AuditService,
     ) {}
 
     public function handle(NewOrderReceived $event): void
@@ -18,16 +19,18 @@ class SendNewOrderNotification
         $pedido = $event->pedido;
         $loja = $pedido->loja;
 
-        if (!$loja) {
+        if (! $loja) {
             Log::warning("[SendNewOrderNotification] Loja not found for pedido {$pedido->id}");
+
             return;
         }
 
         // Find the store owner (user with loja_id matching)
-        $owner = \App\Domains\Auth\Models\User::where('loja_id', $loja->id)->first();
+        $owner = User::where('loja_id', $loja->id)->first();
 
-        if (!$owner) {
+        if (! $owner) {
             Log::warning("[SendNewOrderNotification] Owner not found for loja {$loja->id}");
+
             return;
         }
 

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Domains\ACL\Controllers\RoleController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:api', 'verified'])->group(function () {
     /*

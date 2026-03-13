@@ -3,9 +3,9 @@
 namespace App\Domains\Relatorios\Models;
 
 use App\Domains\Shared\Models\BaseModel;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
-use Carbon\Carbon;
 
 class RelatoriosModel extends BaseModel
 {
@@ -68,10 +68,10 @@ class RelatoriosModel extends BaseModel
             ->groupBy('produtos.id', 'produtos.nome', 'produtos.marca')
             ->orderByDesc('total_vendido');
 
-        if (!empty($filtros['de'])) {
+        if (! empty($filtros['de'])) {
             $query->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
         }
-        if (!empty($filtros['ate'])) {
+        if (! empty($filtros['ate'])) {
             $query->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
         }
 
@@ -103,16 +103,16 @@ class RelatoriosModel extends BaseModel
             ->leftJoin('pedidos', function ($join) use ($filtros) {
                 $join->on('pedidos.loja_id', '=', 'lojas.id')
                     ->where('pedidos.status', '!=', 'cancelado');
-                if (!empty($filtros['de'])) {
+                if (! empty($filtros['de'])) {
                     $join->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
                 }
-                if (!empty($filtros['ate'])) {
+                if (! empty($filtros['ate'])) {
                     $join->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
                 }
             })
             ->groupBy('lojas.id', 'lojas.nome_fantasia', 'lojas.tipo_loja', 'lojas.cidade', 'lojas.estado', 'lojas.ativo', 'lojas.created_at', 'users.name');
 
-        if (!empty($filtros['regiao'])) {
+        if (! empty($filtros['regiao'])) {
             $query->where('lojas.estado', $filtros['regiao']);
         }
 
@@ -146,10 +146,10 @@ class RelatoriosModel extends BaseModel
             ->groupByRaw('DATE(created_at)')
             ->orderByDesc('data');
 
-        if (!empty($filtros['de'])) {
+        if (! empty($filtros['de'])) {
             $query->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
         }
-        if (!empty($filtros['ate'])) {
+        if (! empty($filtros['ate'])) {
             $query->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
         }
 
@@ -163,8 +163,8 @@ class RelatoriosModel extends BaseModel
                 COUNT(*) as total_pedidos,
                 AVG(CASE WHEN status != "cancelado" THEN total ELSE NULL END) as ticket_medio_geral
             ')
-            ->when(!empty($filtros['de']), fn($q) => $q->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay()))
-            ->when(!empty($filtros['ate']), fn($q) => $q->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay()))
+            ->when(! empty($filtros['de']), fn ($q) => $q->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay()))
+            ->when(! empty($filtros['ate']), fn ($q) => $q->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay()))
             ->first();
 
         return [
@@ -226,10 +226,10 @@ class RelatoriosModel extends BaseModel
                 ->groupBy('produtos.id', 'produtos.nome', 'produtos.marca')
                 ->orderByDesc('total_vendido');
 
-            if (!empty($filtros['de'])) {
+            if (! empty($filtros['de'])) {
                 $query->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
             }
-            if (!empty($filtros['ate'])) {
+            if (! empty($filtros['ate'])) {
                 $query->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
             }
 
@@ -256,10 +256,10 @@ class RelatoriosModel extends BaseModel
                 ->groupByRaw('DATE(created_at)')
                 ->orderByDesc('data');
 
-            if (!empty($filtros['de'])) {
+            if (! empty($filtros['de'])) {
                 $query->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
             }
-            if (!empty($filtros['ate'])) {
+            if (! empty($filtros['ate'])) {
                 $query->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
             }
 
@@ -274,19 +274,19 @@ class RelatoriosModel extends BaseModel
      */
     private function aplicarFiltrosPedidos($query, array $filtros): void
     {
-        if (!empty($filtros['de'])) {
+        if (! empty($filtros['de'])) {
             $query->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
         }
-        if (!empty($filtros['ate'])) {
+        if (! empty($filtros['ate'])) {
             $query->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
         }
-        if (!empty($filtros['cidade'])) {
-            $query->where('enderecos.cidade', 'like', '%' . $filtros['cidade'] . '%');
+        if (! empty($filtros['cidade'])) {
+            $query->where('enderecos.cidade', 'like', '%'.$filtros['cidade'].'%');
         }
-        if (!empty($filtros['status'])) {
+        if (! empty($filtros['status'])) {
             $query->where('pedidos.status', $filtros['status']);
         }
-        if (!empty($filtros['loja_id'])) {
+        if (! empty($filtros['loja_id'])) {
             $query->where('pedidos.loja_id', $filtros['loja_id']);
         }
     }

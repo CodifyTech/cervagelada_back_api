@@ -2,10 +2,9 @@
 
 namespace App\Domains\Noticias\Seeders;
 
+use App\Domains\Noticias\Models\Noticias;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\Noticias\Models\Noticias;
-
 
 class NoticiasSeeder extends Seeder
 {
@@ -13,8 +12,6 @@ class NoticiasSeeder extends Seeder
 
     /**
      * Run the database seeds for Noticias.
-     *
-     * @return void
      */
     public function run(): void
     {

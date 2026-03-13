@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command as CommandAlias;
 class RollbackWebInterface extends Command
 {
     protected $signature = 'rollback:web-interface {--port=8080} {--host=localhost}';
+
     protected $description = 'Inicia interface web para gerenciar rollbacks';
 
     private RollbackLogger $logger;
@@ -25,7 +26,7 @@ class RollbackWebInterface extends Command
         $host = $this->option('host');
         $port = $this->option('port');
 
-        $this->info("🌐 Iniciando interface web de rollback...");
+        $this->info('🌐 Iniciando interface web de rollback...');
         $this->info("📍 Acesse: http://{$host}:{$port}/rollback");
 
         // Registrar rotas temporárias
@@ -59,11 +60,13 @@ class RollbackWebInterface extends Command
 
         Route::delete('/rollback/api/session/{sessionId}', function ($sessionId) {
             $result = $this->logger->removeSession($sessionId);
+
             return response()->json(['success' => $result]);
         });
 
         Route::get('/rollback/api/session/{sessionId}', function ($sessionId) {
             $session = $this->logger->getSession($sessionId);
+
             return response()->json($session);
         });
     }
@@ -230,7 +233,7 @@ HTML;
 HTML;
         }
 
-        $HTML .= <<<HTML
+        $HTML .= <<<'HTML'
                     </tbody>
                 </table>
             </div>
@@ -275,34 +278,34 @@ HTML;
     <script>
         async function viewSession(sessionId) {
             try {
-                const response = await axios.get(`/rollback/api/session/\${sessionId}`);
+                const response = await axios.get(`/rollback/api/session/${sessionId}`);
                 const session = response.data;
 
                 let details = `
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div><strong>ID:</strong> \${session.id}</div>
-                        <div><strong>Domínio:</strong> \${session.domain}</div>
-                        <div><strong>Ação:</strong> \${session.action}</div>
-                        <div><strong>Status:</strong> \${session.status}</div>
-                        <div><strong>Data:</strong> \${new Date(session.timestamp).toLocaleString()}</div>
-                        <div><strong>Usuário:</strong> \${session.user || 'N/A'}</div>
+                        <div><strong>ID:</strong> ${session.id}</div>
+                        <div><strong>Domínio:</strong> ${session.domain}</div>
+                        <div><strong>Ação:</strong> ${session.action}</div>
+                        <div><strong>Status:</strong> ${session.status}</div>
+                        <div><strong>Data:</strong> ${new Date(session.timestamp).toLocaleString()}</div>
+                        <div><strong>Usuário:</strong> ${session.user || 'N/A'}</div>
                     </div>
                 `;
 
                 if (session.created && session.created.length > 0) {
                     details += `
-                        <h4 class="font-bold mb-2">Arquivos Criados (\${session.created.length}):</h4>
+                        <h4 class="font-bold mb-2">Arquivos Criados (${session.created.length}):</h4>
                         <ul class="text-sm mb-4 max-h-32 overflow-y-auto">
-                            \${session.created.map(file => `<li class="text-green-600">+ \${file}</li>`).join('')}
+                            ${session.created.map(file => `<li class="text-green-600">+ ${file}</li>`).join('')}
                         </ul>
                     `;
                 }
 
                 if (session.modified && Object.keys(session.modified).length > 0) {
                     details += `
-                        <h4 class="font-bold mb-2">Arquivos Modificados (\${Object.keys(session.modified).length}):</h4>
+                        <h4 class="font-bold mb-2">Arquivos Modificados (${Object.keys(session.modified).length}):</h4>
                         <ul class="text-sm mb-4 max-h-32 overflow-y-auto">
-                            \${Object.keys(session.modified).map(file => `<li class="text-yellow-600">~ \${file}</li>`).join('')}
+                            ${Object.keys(session.modified).map(file => `<li class="text-yellow-600">~ ${file}</li>`).join('')}
                         </ul>
                     `;
                 }
@@ -322,7 +325,7 @@ HTML;
             if (!confirm('Tem certeza que deseja fazer rollback desta sessão?')) return;
 
             try {
-                const response = await axios.post(`/rollback/api/execute/\${sessionId}`);
+                const response = await axios.post(`/rollback/api/execute/${sessionId}`);
                 alert('Rollback executado com sucesso!');
                 refreshData();
             } catch (error) {
@@ -334,7 +337,7 @@ HTML;
             if (!confirm('Tem certeza que deseja deletar esta sessão?')) return;
 
             try {
-                await axios.delete(`/rollback/api/session/\${sessionId}`);
+                await axios.delete(`/rollback/api/session/${sessionId}`);
                 refreshData();
             } catch (error) {
                 alert('Erro ao deletar sessão');
@@ -374,7 +377,7 @@ HTML;
         try {
             $session = $this->logger->getSession($sessionId);
 
-            if (!$session) {
+            if (! $session) {
                 return response()->json(['error' => 'Session not found'], 404);
             }
 
@@ -418,9 +421,9 @@ HTML;
     {
         $command = "php -S {$host}:{$port} -t public";
 
-        $this->info("🚀 Servidor iniciado!");
+        $this->info('🚀 Servidor iniciado!');
         $this->info("🔗 Acesse: http://{$host}:{$port}/rollback");
-        $this->info("⏹️ Pressione Ctrl+C para parar");
+        $this->info('⏹️ Pressione Ctrl+C para parar');
 
         // Executar servidor
         passthru($command);

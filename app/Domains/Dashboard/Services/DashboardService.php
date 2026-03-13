@@ -2,8 +2,8 @@
 
 namespace App\Domains\Dashboard\Services;
 
-use App\Domains\Shared\Services\BaseService;
 use App\Domains\Dashboard\Models\DashboardModel;
+use App\Domains\Shared\Services\BaseService;
 
 class DashboardService extends BaseService
 {
@@ -87,7 +87,6 @@ class DashboardService extends BaseService
     /**
      * Resolves the loja_id for the currently authenticated user.
      *
-     * @return string
      * @throws \Exception
      */
     protected function resolveLojaId(): string
@@ -95,7 +94,7 @@ class DashboardService extends BaseService
         $user = auth()->user();
         $lojaId = $user->loja_id ?? null;
 
-        if (!$lojaId) {
+        if (! $lojaId) {
             throw new \Exception('Loja não encontrada para o usuário autenticado.', 403);
         }
 

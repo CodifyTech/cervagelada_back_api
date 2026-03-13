@@ -2,18 +2,13 @@
 
 namespace App\Domains\Loja\Models;
 
+use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Domains\Shared\Models\BaseModel;
-
 
 class HorarioLoja extends BaseModel
 {
     use HasFactory;
-
 
     /**
      * The table associated with the model.

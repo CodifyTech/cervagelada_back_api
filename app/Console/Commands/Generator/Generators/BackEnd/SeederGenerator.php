@@ -17,25 +17,25 @@ class SeederGenerator
     /**
      * Gera um seeder para o modelo especificado
      *
-     * @param array $config Configuração do seeder
+     * @param  array  $config  Configuração do seeder
      * @return bool Resultado da operação
      */
     public function generate(array $config): bool
     {
         $modelName = $config['model'] ?? $config['baseModel'] ?? null;
-        if (!$modelName) {
+        if (! $modelName) {
             throw new \InvalidArgumentException('Configuração do SeederGenerator requer a chave "model" ou "baseModel".');
         }
         $domain = $config['domain'];
         $foreignKeys = $config['foreignKeys'] ?? [];
-        $seederName = $modelName . 'Seeder';
+        $seederName = $modelName.'Seeder';
 
         // Gerar conteúdo do seeder
         $seederContent = $this->generateSeederContent($domain, $seederName, $modelName, $foreignKeys);
 
         // Criar diretório se não existir
         $seederDir = app_path("Domains\\{$domain}\\Seeders");
-        if (!File::exists($seederDir)) {
+        if (! File::exists($seederDir)) {
             File::makeDirectory($seederDir, 0755, true);
         }
 
@@ -52,10 +52,10 @@ class SeederGenerator
     /**
      * Gera o conteúdo do seeder
      *
-     * @param string $domain Nome do domínio
-     * @param string $seederName Nome do seeder
-     * @param string $modelName Nome do modelo
-     * @param array $foreignKeys Chaves estrangeiras
+     * @param  string  $domain  Nome do domínio
+     * @param  string  $seederName  Nome do seeder
+     * @param  string  $modelName  Nome do modelo
+     * @param  array  $foreignKeys  Chaves estrangeiras
      * @return string Conteúdo do seeder
      */
     private function generateSeederContent(string $domain, string $seederName, string $modelName, array $foreignKeys = []): string
@@ -64,7 +64,7 @@ class SeederGenerator
         $additionalImports = '';
         $additionalSeeders = '';
 
-        if (!empty($foreignKeys)) {
+        if (! empty($foreignKeys)) {
             foreach ($foreignKeys as $fk) {
                 $fkDomain = $fk['domain'] ?? $domain; // Usar o mesmo domínio se não especificado
                 $fkModel = $fk['model'];
@@ -88,7 +88,7 @@ class SeederGenerator
                     '{{domainName}}' => $domain,
                     '{{modelName}}' => $modelName,
                     '{{additionalImports}}' => $additionalImports,
-                    '{{additionalSeeders}}' => $additionalSeeders
+                    '{{additionalSeeders}}' => $additionalSeeders,
                 ]
             );
         } catch (\Exception $e) {
@@ -102,11 +102,11 @@ class SeederGenerator
     /**
      * Gera template básico do seeder quando o stub não está disponível
      *
-     * @param string $domain Nome do domínio
-     * @param string $seederName Nome do seeder
-     * @param string $modelName Nome do modelo
-     * @param string $additionalImports Imports adicionais
-     * @param string $additionalSeeders Seeders adicionais
+     * @param  string  $domain  Nome do domínio
+     * @param  string  $seederName  Nome do seeder
+     * @param  string  $modelName  Nome do modelo
+     * @param  string  $additionalImports  Imports adicionais
+     * @param  string  $additionalSeeders  Seeders adicionais
      * @return string Conteúdo do seeder
      */
     private function generateBasicSeederTemplate(string $domain, string $seederName, string $modelName, string $additionalImports = '', string $additionalSeeders = ''): string
@@ -143,15 +143,14 @@ class {$seederName} extends Seeder
     /**
      * Registra o seeder no DatabaseSeeder principal
      *
-     * @param string $domain Nome do domínio
-     * @param string $seederName Nome do seeder
-     * @return void
+     * @param  string  $domain  Nome do domínio
+     * @param  string  $seederName  Nome do seeder
      */
     private function registerSeederInDatabaseSeeder(string $domain, string $seederName): void
     {
         $databaseSeederPath = database_path('seeders/DatabaseSeeder.php');
 
-        if (!File::exists($databaseSeederPath)) {
+        if (! File::exists($databaseSeederPath)) {
             return;
         }
 
@@ -176,12 +175,12 @@ class {$seederName} extends Seeder
             $newLines[] = $line;
 
             // Adicionar use statement após o último use existente
-            if (!$useAdded && preg_match('/^use\s+.*;\s*$/', trim($line))) {
+            if (! $useAdded && preg_match('/^use\s+.*;\s*$/', trim($line))) {
                 // Verifica se é a última linha de use olhando a próxima linha
                 $nextLineIndex = $lineNumber + 1;
                 if (
-                    !isset($lines[$nextLineIndex]) ||
-                    !preg_match('/^use\s+.*;\s*$/', trim($lines[$nextLineIndex]))
+                    ! isset($lines[$nextLineIndex]) ||
+                    ! preg_match('/^use\s+.*;\s*$/', trim($lines[$nextLineIndex]))
                 ) {
                     $newLines[] = "use {$seederClass};";
                     $useAdded = true;
@@ -189,12 +188,12 @@ class {$seederName} extends Seeder
             }
 
             // Adicionar chamada no método run após a última chamada existente
-            if (!$callAdded && preg_match('/\$this->call\(.*\);/', trim($line))) {
+            if (! $callAdded && preg_match('/\$this->call\(.*\);/', trim($line))) {
                 // Verifica se é a última linha de call olhando a próxima linha
                 $nextLineIndex = $lineNumber + 1;
                 if (
-                    !isset($lines[$nextLineIndex]) ||
-                    !preg_match('/\$this->call\(.*\);/', trim($lines[$nextLineIndex]))
+                    ! isset($lines[$nextLineIndex]) ||
+                    ! preg_match('/\$this->call\(.*\);/', trim($lines[$nextLineIndex]))
                 ) {
                     $newLines[] = "        \$this->call({$seederName}::class);";
                     $callAdded = true;
@@ -203,7 +202,7 @@ class {$seederName} extends Seeder
         }
 
         // Se não conseguiu adicionar o use statement (não havia outros uses), adiciona após a declaração da classe
-        if (!$useAdded) {
+        if (! $useAdded) {
             $newContent = [];
             foreach ($newLines as $line) {
                 $newContent[] = $line;
@@ -215,7 +214,7 @@ class {$seederName} extends Seeder
         }
 
         // Se não conseguiu adicionar a chamada (não havia outras calls), adiciona no início do método run
-        if (!$callAdded) {
+        if (! $callAdded) {
             $newContent = [];
             foreach ($newLines as $line) {
                 $newContent[] = $line;

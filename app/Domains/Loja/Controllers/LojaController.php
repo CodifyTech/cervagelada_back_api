@@ -2,11 +2,10 @@
 
 namespace App\Domains\Loja\Controllers;
 
+use App\Domains\Loja\Requests\LojaRequest;
+use App\Domains\Loja\Services\LojaService;
 use App\Domains\Shared\Controller\BaseController;
 use Illuminate\Http\Request;
-
-use App\Domains\Loja\Services\LojaService;
-use App\Domains\Loja\Requests\LojaRequest;
 
 class LojaController extends BaseController
 {
@@ -15,8 +14,8 @@ class LojaController extends BaseController
         $this->setACL('loja', [
             'list' => ['loja.index'],
             'create' => ['loja.store'],
-            'edit'=> ['loja.update'],
-            'delete' => ['loja.destroy']
+            'edit' => ['loja.update'],
+            'delete' => ['loja.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -30,6 +29,7 @@ class LojaController extends BaseController
     {
         try {
             $loja = $this->service->createWithHorarios($request->all());
+
             return response()->json($loja, 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erro ao criar loja.', 'error' => $e->getMessage()], 500);
@@ -43,6 +43,7 @@ class LojaController extends BaseController
     {
         try {
             $loja = $this->service->updateWithHorarios($id, $request->all());
+
             return response()->json($loja);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erro ao atualizar loja.', 'error' => $e->getMessage()], 500);

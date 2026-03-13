@@ -3,8 +3,8 @@
 namespace App\Domains\Dashboard\Models;
 
 use App\Domains\Shared\Models\BaseModel;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardModel extends BaseModel
 {
@@ -114,7 +114,7 @@ class DashboardModel extends BaseModel
                 'valor' => $statsAtual['ticket_medio'],
                 'variacao' => $this->calculateVariacao($statsAtual['ticket_medio'], $statsPassado['ticket_medio']),
                 'descricao' => 'vs. mês anterior',
-            ]
+            ],
         ];
     }
 

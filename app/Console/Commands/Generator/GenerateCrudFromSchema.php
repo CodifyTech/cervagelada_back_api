@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command as CommandAlias;
 class GenerateCrudFromSchema extends Command
 {
     protected $signature = 'generate:from-schema {schema?} {--file=} {--domain=Admin} {--force} {--skip-frontend} {--skip-backend}';
+
     protected $description = 'Gera CRUDs a partir de um schema simplificado';
 
     public function handle(): int
@@ -21,6 +22,7 @@ class GenerateCrudFromSchema extends Command
         $schema = $this->getSchema();
         if (empty($schema)) {
             $this->error('Schema não fornecido!');
+
             return CommandAlias::FAILURE;
         }
 
@@ -28,6 +30,7 @@ class GenerateCrudFromSchema extends Command
         $tables = $this->parseSchema($schema);
         if (empty($tables)) {
             $this->error('Nenhuma tabela definida no schema!');
+
             return CommandAlias::FAILURE;
         }
 
@@ -61,6 +64,7 @@ class GenerateCrudFromSchema extends Command
                 return File::get($filePath);
             } else {
                 $this->error("Arquivo não encontrado: $filePath");
+
                 return '';
             }
         }
@@ -139,7 +143,7 @@ class GenerateCrudFromSchema extends Command
 
                 $fields[$fieldName] = [
                     'type' => $fieldType,
-                    'options' => $options
+                    'options' => $options,
                 ];
             }
         }
@@ -165,8 +169,8 @@ class GenerateCrudFromSchema extends Command
             'domain' => $domain,
             'name' => $modelName,
             'model' => $modelName,
-            'migration' => 'create_' . $tableName . '_table',
-            'service' => $modelName . 'Service',
+            'migration' => 'create_'.$tableName.'_table',
+            'service' => $modelName.'Service',
             'schema' => $schema,
             'foreignKeys' => $foreignKeys,
             'generateTests' => false,
@@ -198,10 +202,10 @@ class GenerateCrudFromSchema extends Command
             $type = $fieldInfo['type'];
             $options = $fieldInfo['options'];
 
-            $fieldSchema = $fieldName . '=' . $type;
+            $fieldSchema = $fieldName.'='.$type;
 
             if (isset($options['size'])) {
-                $fieldSchema .= ',' . $options['size'];
+                $fieldSchema .= ','.$options['size'];
             }
 
             if (isset($options['required']) && $options['required']) {
@@ -232,7 +236,7 @@ class GenerateCrudFromSchema extends Command
                     'domain' => $this->option('domain'),
                     'model' => $relatedModel,
                     'relation' => 'belongsTo',
-                    'required' => isset($fieldInfo['options']['required']) && $fieldInfo['options']['required']
+                    'required' => isset($fieldInfo['options']['required']) && $fieldInfo['options']['required'],
                 ];
 
                 // Também é possível adicionar hasMany na relação inversa

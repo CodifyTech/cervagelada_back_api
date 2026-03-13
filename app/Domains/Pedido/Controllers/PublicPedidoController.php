@@ -2,7 +2,9 @@
 
 namespace App\Domains\Pedido\Controllers;
 
+use App\Domains\Endereco\Models\Endereco;
 use App\Domains\Pagamento\Services\PagamentoService;
+use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Pedido\Services\DeliveryFeeService;
 use App\Domains\Pedido\Services\PedidoService;
 use App\Http\Controllers\Controller;
@@ -31,7 +33,7 @@ class PublicPedidoController extends Controller
         ]);
 
         // Verify the address belongs to the authenticated user
-        $endereco = \App\Domains\Endereco\Models\Endereco::where('user_id', auth()->id())
+        $endereco = Endereco::where('user_id', auth()->id())
             ->findOrFail($data['endereco_id']);
 
         // Calculate delivery fee
@@ -100,7 +102,7 @@ class PublicPedidoController extends Controller
         $taxaEntrega = 0;
 
         if ($request->endereco_id) {
-            $endereco = \App\Domains\Endereco\Models\Endereco::where('user_id', auth()->id())
+            $endereco = Endereco::where('user_id', auth()->id())
                 ->find($request->endereco_id);
 
             if ($endereco) {
@@ -118,7 +120,7 @@ class PublicPedidoController extends Controller
      */
     public function meusPedidos(): JsonResponse
     {
-        $pedidos = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto', 'pagamento'])
+        $pedidos = Pedido::with(['loja', 'itemPedidos.produto', 'pagamento'])
             ->where('user_id', auth()->id())
             ->orderByDesc('created_at')
             ->paginate(15);
@@ -132,14 +134,14 @@ class PublicPedidoController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $pedido = \App\Domains\Pedido\Models\Pedido::with(['loja', 'itemPedidos.produto', 'endereco', 'pagamento'])
+        $pedido = Pedido::with(['loja', 'itemPedidos.produto', 'endereco', 'pagamento'])
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
         $data = $pedido->toArray();
 
         // Only expose PIN when order is in delivery
-        if ($pedido->status === 'em_rota' && !$pedido->pin_validado_em) {
+        if ($pedido->status === 'em_rota' && ! $pedido->pin_validado_em) {
             $data['pin_entrega'] = $pedido->pin_entrega;
         } else {
             unset($data['pin_entrega']);
@@ -154,11 +156,11 @@ class PublicPedidoController extends Controller
      */
     public function paymentStatus(string $id): JsonResponse
     {
-        $pedido = \App\Domains\Pedido\Models\Pedido::with('pagamento')
+        $pedido = Pedido::with('pagamento')
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
-        if (!$pedido->pagamento) {
+        if (! $pedido->pagamento) {
             return response()->json(['message' => 'Pagamento não encontrado'], 404);
         }
 

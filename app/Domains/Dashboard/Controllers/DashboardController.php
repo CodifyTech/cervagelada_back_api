@@ -2,10 +2,10 @@
 
 namespace App\Domains\Dashboard\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Domains\Dashboard\Services\DashboardService;
+use App\Domains\Shared\Controller\BaseController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DashboardController extends BaseController
 {
@@ -33,6 +33,7 @@ class DashboardController extends BaseController
     public function vendasMensais(Request $request): JsonResponse
     {
         $ano = $request->get('ano', date('Y'));
+
         return response()->json($this->service->getVendasMensais($ano));
     }
 
@@ -42,6 +43,7 @@ class DashboardController extends BaseController
     public function pedidosPorMes(Request $request): JsonResponse
     {
         $ano = $request->get('ano', date('Y'));
+
         return response()->json($this->service->getPedidosPorMes($ano));
     }
 
@@ -59,6 +61,7 @@ class DashboardController extends BaseController
     public function topProdutos(Request $request): JsonResponse
     {
         $limit = $request->get('limit', 5);
+
         return response()->json($this->service->getTopProdutos($limit));
     }
 
@@ -68,6 +71,7 @@ class DashboardController extends BaseController
     public function pedidosRecentes(Request $request): JsonResponse
     {
         $limit = $request->get('limit', 5);
+
         return response()->json($this->service->getPedidosRecentes($limit));
     }
 
@@ -86,6 +90,7 @@ class DashboardController extends BaseController
     {
         $ano = $request->get('ano', date('Y'));
         $limit = $request->get('limit', 5);
+
         return response()->json($this->service->getDashboard($ano, $limit));
     }
 }

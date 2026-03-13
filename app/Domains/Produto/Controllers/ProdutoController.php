@@ -2,13 +2,12 @@
 
 namespace App\Domains\Produto\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-
-use App\Domains\Produto\Services\ProdutoService;
-use App\Domains\Produto\Requests\ProdutoRequest;
 use App\Domains\Produto\Models\Produto;
+use App\Domains\Produto\Requests\ProdutoRequest;
+use App\Domains\Produto\Services\ProdutoService;
+use App\Domains\Shared\Controller\BaseController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProdutoController extends BaseController
 {
@@ -17,8 +16,8 @@ class ProdutoController extends BaseController
         $this->setACL('produto', [
             'list' => ['produto.index'],
             'create' => ['produto.store'],
-            'edit'=> ['produto.update'],
-            'delete' => ['produto.destroy']
+            'edit' => ['produto.update'],
+            'delete' => ['produto.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -47,13 +46,13 @@ class ProdutoController extends BaseController
         if ($produto) {
             return response()->json([
                 'exists' => true,
-                'data' => $produto
+                'data' => $produto,
             ]);
         }
 
         return response()->json([
             'exists' => false,
-            'data' => (object)[]
+            'data' => (object) [],
         ]);
     }
 
@@ -64,7 +63,7 @@ class ProdutoController extends BaseController
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('busca')) {
-            $query->where('nome', 'like', '%' . $request->input('busca') . '%');
+            $query->where('nome', 'like', '%'.$request->input('busca').'%');
         }
 
         return response()->json($query->paginate($request->input('per_page', 20)));

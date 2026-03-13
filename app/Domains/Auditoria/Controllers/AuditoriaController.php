@@ -4,6 +4,7 @@ namespace App\Domains\Auditoria\Controllers;
 
 use App\Domains\Auditoria\Models\AuditLog;
 use App\Domains\Shared\Controller\BaseController;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -36,10 +37,10 @@ class AuditoriaController extends BaseController
             $query->where('entity_type', $request->input('entity_type'));
         }
         if ($request->filled('de')) {
-            $query->where('created_at', '>=', \Carbon\Carbon::parse($request->input('de'))->startOfDay());
+            $query->where('created_at', '>=', Carbon::parse($request->input('de'))->startOfDay());
         }
         if ($request->filled('ate')) {
-            $query->where('created_at', '<=', \Carbon\Carbon::parse($request->input('ate'))->endOfDay());
+            $query->where('created_at', '<=', Carbon::parse($request->input('ate'))->endOfDay());
         }
 
         $perPage = min((int) $request->input('per_page', 20), 100);

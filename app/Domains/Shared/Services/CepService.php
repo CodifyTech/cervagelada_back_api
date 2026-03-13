@@ -46,7 +46,7 @@ class CepService
     {
         $token = config('services.mapbox.token');
 
-        if (!$token) {
+        if (! $token) {
             return ['latitude' => null, 'longitude' => null];
         }
 

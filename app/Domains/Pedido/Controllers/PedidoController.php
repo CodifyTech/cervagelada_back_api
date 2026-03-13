@@ -2,13 +2,12 @@
 
 namespace App\Domains\Pedido\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
 use App\Domains\Pedido\Enums\OrderStatus;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-
-use App\Domains\Pedido\Services\PedidoService;
 use App\Domains\Pedido\Requests\PedidoRequest;
+use App\Domains\Pedido\Services\PedidoService;
+use App\Domains\Shared\Controller\BaseController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PedidoController extends BaseController
 {
@@ -17,8 +16,8 @@ class PedidoController extends BaseController
         $this->setACL('pedido', [
             'list' => ['pedido.index'],
             'create' => ['pedido.store'],
-            'edit'=> ['pedido.update'],
-            'delete' => ['pedido.destroy']
+            'edit' => ['pedido.update'],
+            'delete' => ['pedido.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -50,7 +49,7 @@ class PedidoController extends BaseController
     public function atualizarStatus(Request $request, string $id): JsonResponse
     {
         $request->validate([
-            'status' => ['required', 'in:' . OrderStatus::valuesString()],
+            'status' => ['required', 'in:'.OrderStatus::valuesString()],
         ]);
 
         $targetStatus = OrderStatus::from($request->input('status'));
@@ -74,6 +73,7 @@ class PedidoController extends BaseController
             return response()->json($this->service->update($request->only('status'), $id));
         } catch (\Exception $e) {
             $code = $e->getCode() ?: 422;
+
             return response()->json(['message' => $e->getMessage()], $code);
         }
     }
@@ -89,9 +89,11 @@ class PedidoController extends BaseController
 
         try {
             $pedido = $this->service->validarPin($id, $request->input('pin'));
+
             return response()->json($pedido);
         } catch (\Exception $e) {
             $code = $e->getCode() ?: 422;
+
             return response()->json(['message' => $e->getMessage()], $code);
         }
     }

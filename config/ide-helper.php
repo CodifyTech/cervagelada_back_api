@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Shared\Models\BaseModel;
+use Spatie\Macroable\Macroable;
 
 return [
 
@@ -124,8 +125,8 @@ return [
     'include_helpers' => true,
 
     'helper_files' => [
-        base_path() . '/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
-        base_path() . '/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php',
+        base_path().'/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
+        base_path().'/vendor/laravel/framework/src/Illuminate/Foundation/helpers.php',
     ],
 
     /*
@@ -349,7 +350,7 @@ return [
     */
     'macroable_traits' => [
         Filament\Support\Concerns\Macroable::class,
-        Spatie\Macroable\Macroable::class,
+        Macroable::class,
     ],
 
 ];

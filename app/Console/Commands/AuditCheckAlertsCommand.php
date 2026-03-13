@@ -3,15 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Domains\Auditoria\Models\AuditLog;
+use App\Domains\Auth\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Domains\Auth\Models\User;
+use Illuminate\Support\Str;
 
 class AuditCheckAlertsCommand extends Command
 {
     protected $signature = 'audit:check-alerts';
+
     protected $description = 'Check operational thresholds and fire alerts for critical events';
 
     public function handle(): int
@@ -43,7 +45,7 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($suspects as $suspect) {
-            if (!$this->alreadyAlerted("brute_force_{$suspect->ip_address}", $cooldown)) {
+            if (! $this->alreadyAlerted("brute_force_{$suspect->ip_address}", $cooldown)) {
                 $message = "⚠️ Possível ataque de força bruta: {$suspect->attempts} tentativas de login falhadas do IP {$suspect->ip_address}";
                 $this->notifyAdmins('brute_force', $message, [
                     'ip_address' => $suspect->ip_address,
@@ -74,7 +76,7 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($stalledOrders as $order) {
-            if (!$this->alreadyAlerted("stalled_order_{$order->id}", $cooldown)) {
+            if (! $this->alreadyAlerted("stalled_order_{$order->id}", $cooldown)) {
                 $hoursAgo = Carbon::parse($order->updated_at)->diffForHumans();
                 $message = "⏰ Pedido #{$order->id} em status 'em_entrega' desde {$hoursAgo} sem atualização.";
                 $this->notifyAdmins('stalled_order', $message, [
@@ -102,7 +104,7 @@ class AuditCheckAlertsCommand extends Command
             ->get();
 
         foreach ($refused as $payment) {
-            if (!$this->alreadyAlerted("refused_payment_{$payment->id}", $cooldown)) {
+            if (! $this->alreadyAlerted("refused_payment_{$payment->id}", $cooldown)) {
                 $message = "💳 Pagamento recusado para pedido #{$payment->pedido_id}.";
                 $this->notifyAdmins('payment_refused', $message, [
                     'pagamento_id' => $payment->id,
@@ -126,7 +128,7 @@ class AuditCheckAlertsCommand extends Command
             ->where('created_at', '>=', $window)
             ->count();
 
-        if ($failureCount >= $threshold && !$this->alreadyAlerted('webhook_failures', $cooldown)) {
+        if ($failureCount >= $threshold && ! $this->alreadyAlerted('webhook_failures', $cooldown)) {
             $message = "🔔 {$failureCount} falhas de webhook Asaas nos últimos {$windowMin} minutos — possível problema de integração.";
             $this->notifyAdmins('webhook_failures', $message, [
                 'failure_count' => $failureCount,
@@ -153,7 +155,7 @@ class AuditCheckAlertsCommand extends Command
             ->where('created_at', '>=', $window)
             ->count();
 
-        if ($errorCount >= $threshold && !$this->alreadyAlerted('server_errors_500', $cooldown)) {
+        if ($errorCount >= $threshold && ! $this->alreadyAlerted('server_errors_500', $cooldown)) {
             $message = "🔴 {$errorCount} erros 500 nos últimos {$windowMin} minutos — verificar logs do servidor.";
             $this->notifyAdmins('server_errors_500', $message, [
                 'error_count' => $errorCount,
@@ -186,7 +188,7 @@ class AuditCheckAlertsCommand extends Command
 
             foreach ($admins as $admin) {
                 $admin->notifications()->create([
-                    'id' => \Illuminate\Support\Str::uuid()->toString(),
+                    'id' => Str::uuid()->toString(),
                     'type' => 'App\\Notifications\\OperationalAlert',
                     'notifiable_type' => User::class,
                     'notifiable_id' => $admin->id,
@@ -198,7 +200,7 @@ class AuditCheckAlertsCommand extends Command
 
             Log::channel($this->alertChannel())->info("[AuditAlert] {$type}: {$message}");
         } catch (\Throwable $e) {
-            Log::error('[AuditAlert] Failed to send notification: ' . $e->getMessage());
+            Log::error('[AuditAlert] Failed to send notification: '.$e->getMessage());
         }
     }
 

@@ -2,16 +2,17 @@
 
 namespace App\Domains\Pedido\Services;
 
-use App\Domains\Pedido\Models\Pedido;
-use App\Domains\Pedido\Enums\OrderStatus;
-use App\Domains\Shared\Services\BaseService;
 use App\Domains\Auditoria\Services\AuditService;
+use App\Domains\Pedido\Enums\OrderStatus;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Shared\Services\BaseService;
+use Illuminate\Support\Str;
 
 class PedidoService extends BaseService
 {
     public function __construct(
         private readonly Pedido $pedido,
-        private AuditService $auditService = new AuditService()
+        private AuditService $auditService = new AuditService
     ) {
         $this->setModel($this->pedido);
     }
@@ -19,8 +20,8 @@ class PedidoService extends BaseService
     /**
      * Stores a new Pedido with its items.
      *
-     * @param  array  $data
      * @return Pedido
+     *
      * @throws \Exception
      */
     public function store(array $data)
@@ -30,12 +31,12 @@ class PedidoService extends BaseService
             unset($data['itens']);
 
             // Set user_id if not provided
-            if (!isset($data['user_id']) && auth()->check()) {
+            if (! isset($data['user_id']) && auth()->check()) {
                 $data['user_id'] = auth()->id();
             }
 
             // Fallback status
-            if (!isset($data['status'])) {
+            if (! isset($data['status'])) {
                 $data['status'] = OrderStatus::AGUARDANDO_PAGAMENTO->value;
             }
 
@@ -52,7 +53,7 @@ class PedidoService extends BaseService
                     ->where('produto_id', $produtoId)
                     ->first();
 
-                if (!$lojaProduto) {
+                if (! $lojaProduto) {
                     throw new \Exception("O produto #{$produtoId} não está disponível nesta loja.");
                 }
 
@@ -67,7 +68,7 @@ class PedidoService extends BaseService
                 $subtotal += $precoTotal;
 
                 $itemsToCreate[] = [
-                    'id' => \Illuminate\Support\Str::ulid(),
+                    'id' => Str::ulid(),
                     'produto_id' => $produtoId,
                     'quantidade_solicitada' => $quantidade,
                     'quantidade_final' => $quantidade,
@@ -104,8 +105,6 @@ class PedidoService extends BaseService
     /**
      * Updates an existing Pedido and handles status transitions.
      *
-     * @param  array  $data
-     * @param  string  $id
      * @return Pedido
      */
     public function update(array $data, string $id)
@@ -117,7 +116,7 @@ class PedidoService extends BaseService
             $newStatus = $newStatusValue instanceof OrderStatus ? $newStatusValue : OrderStatus::from($newStatusValue);
 
             // Validate state transition
-            if ($oldStatus !== $newStatus && !$oldStatus->canTransitionTo($newStatus)) {
+            if ($oldStatus !== $newStatus && ! $oldStatus->canTransitionTo($newStatus)) {
                 throw new \Exception(
                     "Transição inválida: '{$oldStatus->value}' → '{$newStatus->value}' não é permitida.",
                     422
@@ -147,7 +146,6 @@ class PedidoService extends BaseService
     /**
      * Returns a single Pedido with all relations needed for the detail screen.
      *
-     * @param  string  $id
      * @return Pedido
      */
     public function show(string $id)
@@ -163,29 +161,26 @@ class PedidoService extends BaseService
     /**
      * Returns paginated orders for the authenticated user's store.
      * Supports filtering by status, date range, and customer name search.
-     *
-     * @param  array  $options
-     * @return array
      */
     public function listarLoja(array $options = []): array
     {
         $query = Pedido::with(['user', 'itemPedidos', 'pagamento']);
 
         // Filter by status
-        if (!empty($options['status'])) {
+        if (! empty($options['status'])) {
             $query->where('status', $options['status']);
         }
 
         // Filter by date range
-        if (!empty($options['data_inicio'])) {
+        if (! empty($options['data_inicio'])) {
             $query->whereDate('created_at', '>=', $options['data_inicio']);
         }
-        if (!empty($options['data_fim'])) {
+        if (! empty($options['data_fim'])) {
             $query->whereDate('created_at', '<=', $options['data_fim']);
         }
 
         // Search by customer name
-        if (!empty($options['search'])) {
+        if (! empty($options['search'])) {
             $search = $options['search'];
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%");
@@ -198,19 +193,17 @@ class PedidoService extends BaseService
         $data = $query->paginate($perPage);
 
         return [
-            'data'         => $data->items(),
-            'total'        => $data->total(),
-            'page'         => $data->currentPage(),
+            'data' => $data->items(),
+            'total' => $data->total(),
+            'page' => $data->currentPage(),
             'current_page' => $data->currentPage(),
-            'last_page'    => $data->lastPage(),
+            'last_page' => $data->lastPage(),
         ];
     }
 
     /**
      * Returns order status counts (for dashboard summary cards) for the
      * authenticated user's store.
-     *
-     * @return array
      */
     public function resumoLoja(): array
     {
@@ -284,6 +277,4 @@ class PedidoService extends BaseService
 
         return $pin;
     }
-
-
 }

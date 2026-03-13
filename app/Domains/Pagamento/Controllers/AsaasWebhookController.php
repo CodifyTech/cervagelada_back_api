@@ -2,9 +2,9 @@
 
 namespace App\Domains\Pagamento\Controllers;
 
+use App\Domains\Auditoria\Services\AuditService;
 use App\Domains\Pagamento\Models\Pagamento;
 use App\Domains\Pagamento\Services\PagamentoService;
-use App\Domains\Auditoria\Services\AuditService;
 use App\Domains\Pedido\Enums\OrderStatus;
 use App\Domains\Pedido\Events\NewOrderReceived;
 use App\Http\Controllers\Controller;
@@ -16,7 +16,7 @@ class AsaasWebhookController extends Controller
 {
     public function __construct(
         private readonly PagamentoService $pagamentoService,
-        private readonly AuditService $auditService = new AuditService(),
+        private readonly AuditService $auditService = new AuditService,
     ) {}
 
     /**
@@ -46,13 +46,13 @@ class AsaasWebhookController extends Controller
             'charge_id' => $chargeId,
         ]);
 
-        if (!$chargeId) {
+        if (! $chargeId) {
             return response()->json(['message' => 'No charge ID'], 200);
         }
 
         $pagamento = Pagamento::where('asaas_charge_id', $chargeId)->first();
 
-        if (!$pagamento) {
+        if (! $pagamento) {
             Log::warning('Asaas webhook: pagamento not found', ['charge_id' => $chargeId]);
 
             return response()->json(['message' => 'Not found'], 200);
@@ -156,7 +156,7 @@ class AsaasWebhookController extends Controller
      */
     private function onPaymentRefunded($pedido): void
     {
-        if (!in_array($pedido->status, [OrderStatus::CANCELADO, OrderStatus::ENTREGUE])) {
+        if (! in_array($pedido->status, [OrderStatus::CANCELADO, OrderStatus::ENTREGUE])) {
             $pedido->update(['status' => OrderStatus::CANCELADO->value]);
         }
     }

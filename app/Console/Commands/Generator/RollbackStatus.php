@@ -7,12 +7,13 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
-use function Laravel\Prompts\select;
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\select;
 
 class RollbackStatus extends Command
 {
     protected $signature = 'rollback:status {--detailed} {--session=} {--domain=}';
+
     protected $description = 'Mostra o status atual do sistema de rollback';
 
     private RollbackLogger $logger;
@@ -33,6 +34,7 @@ class RollbackStatus extends Command
         if (empty($sessions)) {
             $this->warn('⚠️ Nenhuma sessão de rollback encontrada.');
             $this->info('💡 Execute um comando de geração primeiro para criar dados de rollback.');
+
             return CommandAlias::SUCCESS;
         }
 
@@ -77,9 +79,9 @@ class RollbackStatus extends Command
             ]
         );
 
-        if (!empty($stats['domains'])) {
+        if (! empty($stats['domains'])) {
             $this->line('');
-            $this->info('🏗️ Domínios Afetados: ' . implode(', ', $stats['domains']));
+            $this->info('🏗️ Domínios Afetados: '.implode(', ', $stats['domains']));
         }
 
         if ($stats['oldest_session']) {
@@ -96,8 +98,9 @@ class RollbackStatus extends Command
     {
         $session = $this->logger->getSession($sessionId);
 
-        if (!$session) {
+        if (! $session) {
             $this->error("❌ Sessão '{$sessionId}' não encontrada.");
+
             return CommandAlias::FAILURE;
         }
 
@@ -119,43 +122,43 @@ class RollbackStatus extends Command
         );
 
         // Metadata
-        if (!empty($session['metadata'])) {
+        if (! empty($session['metadata'])) {
             $this->line('');
             $this->info('🔧 Metadados:');
             foreach ($session['metadata'] as $key => $value) {
-                $this->line("  • {$key}: " . (is_bool($value) ? ($value ? 'Sim' : 'Não') : $value));
+                $this->line("  • {$key}: ".(is_bool($value) ? ($value ? 'Sim' : 'Não') : $value));
             }
         }        // Arquivos criados
-        if (!empty($session['created'])) {
+        if (! empty($session['created'])) {
             $this->line('');
             $createdCount = count($session['created']);
             $this->info("📁 Arquivos Criados ({$createdCount}):");
             foreach (array_slice($session['created'], 0, 10) as $file) {
-                $this->line("  ✓ " . str_replace(base_path() . DIRECTORY_SEPARATOR, '', $file));
+                $this->line('  ✓ '.str_replace(base_path().DIRECTORY_SEPARATOR, '', $file));
             }
             if (count($session['created']) > 10) {
-                $this->line("  ... e mais " . (count($session['created']) - 10) . " arquivos");
+                $this->line('  ... e mais '.(count($session['created']) - 10).' arquivos');
             }
         }
 
         // Arquivos modificados
-        if (!empty($session['modified'])) {
+        if (! empty($session['modified'])) {
             $this->line('');
-            $this->info("📝 Arquivos Modificados (" . count($session['modified']) . "):");
+            $this->info('📝 Arquivos Modificados ('.count($session['modified']).'):');
             foreach (array_slice(array_keys($session['modified']), 0, 10) as $file) {
-                $this->line("  ~ " . str_replace(base_path() . DIRECTORY_SEPARATOR, '', $file));
+                $this->line('  ~ '.str_replace(base_path().DIRECTORY_SEPARATOR, '', $file));
             }
             if (count($session['modified']) > 10) {
-                $this->line("  ... e mais " . (count($session['modified']) - 10) . " arquivos");
+                $this->line('  ... e mais '.(count($session['modified']) - 10).' arquivos');
             }
         }
 
         // Diretórios criados
-        if (!empty($session['directories'])) {
+        if (! empty($session['directories'])) {
             $this->line('');
-            $this->info("📂 Diretórios Criados (" . count($session['directories']) . "):");
+            $this->info('📂 Diretórios Criados ('.count($session['directories']).'):');
             foreach ($session['directories'] as $dir) {
-                $this->line("  📁 " . str_replace(base_path() . DIRECTORY_SEPARATOR, '', $dir));
+                $this->line('  📁 '.str_replace(base_path().DIRECTORY_SEPARATOR, '', $dir));
             }
         }
 
@@ -168,6 +171,7 @@ class RollbackStatus extends Command
 
         if (empty($sessions)) {
             $this->warn("⚠️ Nenhuma sessão encontrada para o domínio '{$domain}'.");
+
             return CommandAlias::SUCCESS;
         }
 
@@ -177,7 +181,7 @@ class RollbackStatus extends Command
         $tableData = [];
         foreach ($sessions as $session) {
             $tableData[] = [
-                substr($session['id'], 0, 8) . '...',
+                substr($session['id'], 0, 8).'...',
                 $session['action'],
                 $this->formatStatus($session['status']),
                 Carbon::parse($session['timestamp'])->format('d/m H:i'),
@@ -204,7 +208,7 @@ class RollbackStatus extends Command
         $tableData = [];
         foreach ($sessions as $session) {
             $tableData[] = [
-                substr($session['id'], 0, 8) . '...',
+                substr($session['id'], 0, 8).'...',
                 $session['domain'],
                 $session['action'],
                 $this->formatStatus($session['status']),
@@ -223,10 +227,9 @@ class RollbackStatus extends Command
 
         // Opção para ver detalhes de uma sessão específica
         if (confirm('Deseja ver detalhes de alguma sessão específica?', false)) {
-            $sessionIds = array_map(fn($s) => $s['id'], $sessions);
+            $sessionIds = array_map(fn ($s) => $s['id'], $sessions);
             $sessionOptions = array_combine($sessionIds, array_map(
-                fn($s) =>
-                substr($s['id'], 0, 8) . '... - ' . $s['domain'] . ' (' . $s['action'] . ')',
+                fn ($s) => substr($s['id'], 0, 8).'... - '.$s['domain'].' ('.$s['action'].')',
                 $sessions
             ));
 
@@ -255,7 +258,7 @@ class RollbackStatus extends Command
         foreach ($recentSessions as $session) {
             $totalFiles = count($session['created'] ?? []) + count($session['modified'] ?? []);
             $tableData[] = [
-                substr($session['id'], 0, 8) . '...',
+                substr($session['id'], 0, 8).'...',
                 $session['domain'],
                 $session['action'],
                 $this->formatStatus($session['status']),

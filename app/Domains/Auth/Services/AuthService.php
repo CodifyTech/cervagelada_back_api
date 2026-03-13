@@ -2,25 +2,25 @@
 
 namespace App\Domains\Auth\Services;
 
-use Str;
-use App\Domains\Auth\Models\User;
-use Illuminate\Http\JsonResponse;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use App\Domains\Auth\Requests\LoginRequest;
-use App\Domains\Shared\Services\BaseService;
-use App\Domains\Auth\Requests\RegisterRequest;
-use Illuminate\Validation\ValidationException;
-use App\Domains\Auth\Requests\ResetPasswordRequest;
-use App\Domains\Auth\Requests\ForgotPasswordRequest;
-use App\Domains\Auth\Requests\RegisterStoreRequest;
-use App\Domains\Loja\Models\Loja;
 use App\Domains\Auditoria\Services\AuditService;
+use App\Domains\Auth\Models\User;
+use App\Domains\Auth\Requests\ForgotPasswordRequest;
+use App\Domains\Auth\Requests\LoginRequest;
+use App\Domains\Auth\Requests\RegisterRequest;
+use App\Domains\Auth\Requests\RegisterStoreRequest;
+use App\Domains\Auth\Requests\ResetPasswordRequest;
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Shared\Services\BaseService;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
+use Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService extends BaseService
 {
@@ -28,7 +28,7 @@ class AuthService extends BaseService
 
     public function __construct(
         private User $user,
-        private AuditService $auditService = new AuditService()
+        private AuditService $auditService = new AuditService
     ) {}
 
     /**
@@ -96,7 +96,7 @@ class AuthService extends BaseService
                 'nome_fantasia', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km',
                 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo',
                 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento',
-                'bairro', 'cidade', 'estado'
+                'bairro', 'cidade', 'estado',
             ]));
 
             if ($request->has('horarios')) {
@@ -178,7 +178,7 @@ class AuthService extends BaseService
 
     public function profile(): JsonResponse
     {
-        return response()->json(auth()->user());
+        return response()->json(auth()->user()->withoutGlobalScopes()->get());
     }
 
     public function updateProfile(): JsonResponse
@@ -186,7 +186,7 @@ class AuthService extends BaseService
         $user = auth()->user();
         $data = request()->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$user->id,
             'telefone' => 'nullable|string|max:20',
         ]);
 
@@ -198,13 +198,12 @@ class AuthService extends BaseService
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function refresh()
     {
         return $this->respondWithToken(Auth::refresh());
     }
-
 
     public function logout()
     {
@@ -216,23 +215,22 @@ class AuthService extends BaseService
             }
         } catch (\Exception $e) {
             // Se o token já expirou ou é inválido, ainda consideramos logout bem-sucedido
-            Log::info('Logout realizado com token expirado/inválido: ' . $e->getMessage());
+            Log::info('Logout realizado com token expirado/inválido: '.$e->getMessage());
         }
     }
 
     /**
      * Get the token array structure.
      *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @param  string  $token
+     * @return JsonResponse
      */
     protected function respondWithToken($token)
     {
         return [
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => $this->getTTLInSeconds()
+            'expires_in' => $this->getTTLInSeconds(),
         ];
     }
 
@@ -240,14 +238,14 @@ class AuthService extends BaseService
     {
         $token = Auth::attempt($request->only('email', 'password'));
 
-        if (!$token) {
+        if (! $token) {
             $this->auditService->logLoginFailed($request->email);
             throw ValidationException::withMessages([
                 'email' => ['As credenciais fornecidas estão incorretas.'],
             ]);
         }
 
-        if (!Auth::user()->ativo) {
+        if (! Auth::user()->ativo) {
             throw ValidationException::withMessages([
                 'email' => ['O seu usuário não está ativo. Por favor, entre em contato com o suporte para solicitar a ativação da sua conta.'],
             ]);

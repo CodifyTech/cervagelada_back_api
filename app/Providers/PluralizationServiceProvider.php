@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Pluralizer;
+use Illuminate\Support\ServiceProvider;
 
 class PluralizationServiceProvider extends ServiceProvider
 {

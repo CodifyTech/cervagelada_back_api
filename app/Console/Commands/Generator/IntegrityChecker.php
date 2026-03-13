@@ -12,6 +12,7 @@ use function Laravel\Prompts\select;
 class IntegrityChecker extends Command
 {
     protected $signature = 'rollback:integrity {--frontend-only} {--backend-only} {--detailed} {--fix}';
+
     protected $description = 'Verifica a integridade do projeto após operações de rollback';
 
     private IntegrityValidator $validator;
@@ -30,7 +31,8 @@ class IntegrityChecker extends Command
         $issues = $this->performValidation($scope);
 
         if (empty($issues)) {
-            $this->info("✅ Projeto íntegro! Nenhum problema detectado.");
+            $this->info('✅ Projeto íntegro! Nenhum problema detectado.');
+
             return CommandAlias::SUCCESS;
         }
 
@@ -56,16 +58,17 @@ class IntegrityChecker extends Command
             return 'backend';
         }
 
-        if ($this->hasOption('detailed') && !$this->option('detailed')) {
+        if ($this->hasOption('detailed') && ! $this->option('detailed')) {
             $scope = select(
                 label: 'Escolha o escopo da verificação:',
                 options: [
                     'complete' => '🔄 Verificação Completa',
                     'frontend' => '🎨 Apenas Frontend',
                     'backend' => '🔧 Apenas Backend',
-                    'integration' => '🔗 Apenas Integração'
+                    'integration' => '🔗 Apenas Integração',
                 ]
             );
+
             return $scope;
         }
 
@@ -77,7 +80,7 @@ class IntegrityChecker extends Command
      */
     private function performValidation(string $scope): array
     {
-        $this->info("📊 Executando verificação: " . $this->getScopeLabel($scope));
+        $this->info('📊 Executando verificação: '.$this->getScopeLabel($scope));
 
         switch ($scope) {
             case 'frontend':
@@ -101,7 +104,7 @@ class IntegrityChecker extends Command
             'frontend' => 'Frontend',
             'backend' => 'Backend',
             'integration' => 'Integração',
-            'complete' => 'Completa'
+            'complete' => 'Completa',
         ];
 
         return $labels[$scope] ?? 'Completa';
@@ -112,14 +115,14 @@ class IntegrityChecker extends Command
      */
     private function displayIssues(array $issues): void
     {
-        $this->error("⚠️  Problemas de integridade detectados: " . count($issues));
+        $this->error('⚠️  Problemas de integridade detectados: '.count($issues));
         $this->newLine();
 
         // Categorizar problemas
         $categories = $this->categorizeIssues($issues);
 
         foreach ($categories as $category => $categoryIssues) {
-            if (!empty($categoryIssues)) {
+            if (! empty($categoryIssues)) {
                 $this->warn("📂 {$category}:");
                 foreach ($categoryIssues as $issue) {
                     $this->line("  ❌ $issue");
@@ -145,7 +148,7 @@ class IntegrityChecker extends Command
             'Backend' => [],
             'Database' => [],
             'Integração' => [],
-            'Outros' => []
+            'Outros' => [],
         ];
 
         foreach ($issues as $issue) {
@@ -187,7 +190,7 @@ class IntegrityChecker extends Command
      */
     private function attemptAutoFix(array &$issues): void
     {
-        $this->info("🔧 Tentando correções automáticas...");
+        $this->info('🔧 Tentando correções automáticas...');
 
         $fixedIssues = [];
 
@@ -196,20 +199,20 @@ class IntegrityChecker extends Command
             if ($fixed) {
                 $fixedIssues[] = $issue;
                 unset($issues[$index]);
-                $this->info("  ✅ Corrigido: " . substr($issue, 0, 60) . "...");
+                $this->info('  ✅ Corrigido: '.substr($issue, 0, 60).'...');
             }
         }
 
         $issues = array_values($issues); // Re-index array
 
-        if (!empty($fixedIssues)) {
-            $this->info("🎉 Correções aplicadas: " . count($fixedIssues));
+        if (! empty($fixedIssues)) {
+            $this->info('🎉 Correções aplicadas: '.count($fixedIssues));
         } else {
-            $this->warn("⚠️  Nenhuma correção automática disponível para os problemas encontrados.");
+            $this->warn('⚠️  Nenhuma correção automática disponível para os problemas encontrados.');
         }
 
         // Sugerir ações manuais
-        if (!empty($issues)) {
+        if (! empty($issues)) {
             $this->suggestManualActions($issues);
         }
     }
@@ -244,9 +247,9 @@ class IntegrityChecker extends Command
         // Extrair nome do diretório da mensagem de erro
         if (preg_match('/diretório ausente:\s*(.+)/', $issue, $matches)) {
             $directory = trim($matches[1]);
-            $fullPath = $this->getFrontendPath() . '/' . $directory;
+            $fullPath = $this->getFrontendPath().'/'.$directory;
 
-            if (!is_dir($fullPath)) {
+            if (! is_dir($fullPath)) {
                 return mkdir($fullPath, 0755, true);
             }
         }
@@ -269,13 +272,13 @@ class IntegrityChecker extends Command
      */
     private function suggestManualActions(array $issues): void
     {
-        $this->warn("💡 Ações manuais recomendadas:");
+        $this->warn('💡 Ações manuais recomendadas:');
 
         $suggestions = [
             "1. Execute 'npm install' no frontend para restaurar dependências",
             "2. Execute 'php artisan migrate' para aplicar migrations pendentes",
             "3. Execute 'composer dump-autoload' para recarregar classes",
-            "4. Verifique manualmente os arquivos relatados como problemáticos",
+            '4. Verifique manualmente os arquivos relatados como problemáticos',
             "5. Execute os testes para garantir funcionalidade: 'php artisan test'",
             "6. Execute build do frontend: 'npm run build'",
         ];
@@ -295,7 +298,7 @@ class IntegrityChecker extends Command
             base_path('../vue-frontend'),
             base_path('../nuxt-frontend'),
             base_path('resources/frontend'),
-            base_path('frontend')
+            base_path('frontend'),
         ];
 
         foreach ($possiblePaths as $path) {

@@ -30,7 +30,7 @@ class RolesPermissionSeeder extends Seeder
         Role::all()->map(function ($role) {
             $roleEnum = RoleEnum::tryFrom($role->slug);
 
-            if (!$roleEnum) {
+            if (! $roleEnum) {
                 return;
             }
 

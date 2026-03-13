@@ -2,18 +2,18 @@
 
 namespace App\Domains\Destaque\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use App\Domains\Destaque\Services\DestaqueService;
 use App\Domains\Destaque\Requests\DestaqueRequest;
+use App\Domains\Destaque\Services\DestaqueService;
+use App\Domains\Shared\Controller\BaseController;
 
 class DestaqueController extends BaseController
 {
     public function __construct(private readonly DestaqueService $service)
     {
         $this->setACL('destaque', [
-            'list'   => ['destaque.index'],
+            'list' => ['destaque.index'],
             'create' => ['destaque.store'],
-            'edit'   => ['destaque.update'],
+            'edit' => ['destaque.update'],
             'delete' => ['destaque.destroy'],
         ]);
         parent::__construct();

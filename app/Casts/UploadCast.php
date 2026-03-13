@@ -112,7 +112,7 @@ class UploadCast implements CastsAttributes
 
             // Gerar o nome do arquivo
             $extension = is_object($value) ? $value->getClientOriginalExtension() : pathinfo($value, PATHINFO_EXTENSION);
-            $tempFileName = $fileName . '.' . $extension;
+            $tempFileName = $fileName.'.'.$extension;
 
             Log::info("[UploadCast] Nome temporário do arquivo: {$tempFileName}");
 
@@ -141,7 +141,7 @@ class UploadCast implements CastsAttributes
                                 Log::info("[UploadCast] Atualizando modelo {$modelTable}/{$modelId} com fileHash: {$fileHash}");
                                 $savedModel->forceFill([$key => $fileHash]);
                                 $saveResult = $savedModel->save(['timestamps' => false]);
-                                Log::info('[UploadCast] Resultado da atualização: ' . ($saveResult ? 'sucesso' : 'falha'));
+                                Log::info('[UploadCast] Resultado da atualização: '.($saveResult ? 'sucesso' : 'falha'));
                             });
 
                             // Remover cache após salvar
@@ -156,7 +156,7 @@ class UploadCast implements CastsAttributes
                             Log::info("[UploadCast] Atualizando modelo existente {$modelTable}/{$modelId} com fileHash: {$fileHash}");
                             $model->forceFill([$key => $fileHash]);
                             $saveResult = $model->save(['timestamps' => false]);
-                            Log::info('[UploadCast] Resultado da atualização: ' . ($saveResult ? 'sucesso' : 'falha'));
+                            Log::info('[UploadCast] Resultado da atualização: '.($saveResult ? 'sucesso' : 'falha'));
                         });
 
                         // Remover o cache
@@ -171,8 +171,8 @@ class UploadCast implements CastsAttributes
             } catch (Exception $e) {
                 // Em caso de erro, remover o cache
                 Cache::forget($cacheKey);
-                Log::error("[UploadCast] Erro durante upload para {$modelTable}/{$modelId}: " . $e->getMessage());
-                Log::error('[UploadCast] Stack trace: ' . $e->getTraceAsString());
+                Log::error("[UploadCast] Erro durante upload para {$modelTable}/{$modelId}: ".$e->getMessage());
+                Log::error('[UploadCast] Stack trace: '.$e->getTraceAsString());
                 throw $e;
             }
 

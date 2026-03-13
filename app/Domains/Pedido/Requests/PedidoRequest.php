@@ -13,7 +13,7 @@ class PedidoRequest extends BaseFormRequest
             'subtotal' => ['nullable', 'numeric'],
             'taxa_entrega' => ['nullable', 'numeric'],
             'total' => ['nullable', 'numeric'],
-            'status' => ['required', 'in:' . OrderStatus::valuesString()],
+            'status' => ['required', 'in:'.OrderStatus::valuesString()],
             'codigo_rastreamento' => ['nullable', 'string', 'max:100'],
             'tempo_estimado_min' => ['nullable', 'integer'],
             'tempo_estimado_max' => ['nullable', 'integer'],

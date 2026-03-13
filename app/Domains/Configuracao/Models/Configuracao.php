@@ -16,9 +16,9 @@ class Configuracao extends BaseModel
     public function getValorAttribute($value): mixed
     {
         return match ($this->tipo) {
-            'json'    => json_decode($value, true),
+            'json' => json_decode($value, true),
             'boolean' => (bool) $value,
-            default   => $value,
+            default => $value,
         };
     }
 

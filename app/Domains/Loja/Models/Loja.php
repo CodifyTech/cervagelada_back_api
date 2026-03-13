@@ -2,18 +2,19 @@
 
 namespace App\Domains\Loja\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Domains\Shared\Models\BaseModel;
-use App\Domains\Promocao\Models\Promocao;
-use App\Domains\Pedido\Models\Pedido;
-use App\Domains\Avaliacao\Models\Avaliacao;
-use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 use App\Casts\UploadCast;
+use App\Domains\Auth\Models\User;
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Produto\Models\LojaProduto;
+use App\Domains\Produto\Models\Produto;
+use App\Domains\Promocao\Models\Promocao;
+use App\Domains\Shared\Models\BaseModel;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Loja extends BaseModel
 {
@@ -44,10 +45,10 @@ class Loja extends BaseModel
      */
     public function scopePorRaio(Builder $query, float $lat, float $lng): Builder
     {
-        $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
+        $haversine = '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
 
         if (is_null($query->getQuery()->columns)) {
-            $query->select($this->getTable() . '.*');
+            $query->select($this->getTable().'.*');
         }
 
         return $query
@@ -62,8 +63,8 @@ class Loja extends BaseModel
      */
     public function produtos(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Produto\Models\Produto::class, 'loja_produtos', 'loja_id', 'produto_id')
-            ->using(\App\Domains\Produto\Models\LojaProduto::class)
+        return $this->belongsToMany(Produto::class, 'loja_produtos', 'loja_id', 'produto_id')
+            ->using(LojaProduto::class)
             ->withPivot(['id', 'preco', 'preco_promocional', 'estoque', 'destaque', 'ativo'])
             ->withTimestamps();
     }
@@ -78,35 +79,30 @@ class Loja extends BaseModel
 
     /**
      * Get the promocoes for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function promocoes(): HasMany
     {
         return $this->hasMany(Promocao::class);
     }
+
     /**
      * Get the pedidos for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function pedidos(): HasMany
     {
         return $this->hasMany(Pedido::class);
     }
+
     /**
      * Get the avaliacoes for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function avaliacoes(): HasMany
     {
         return $this->hasMany(Avaliacao::class);
     }
+
     /**
      * Get the transacoesfinanceiras for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function transacoesFinanceiras(): HasMany
     {
@@ -118,7 +114,7 @@ class Loja extends BaseModel
      */
     public function entregadores(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Auth\Models\User::class, 'entregador_loja', 'loja_id', 'user_id')
+        return $this->belongsToMany(User::class, 'entregador_loja', 'loja_id', 'user_id')
             ->withPivot(['id', 'ativo'])
             ->withTimestamps();
     }

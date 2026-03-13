@@ -17,6 +17,7 @@ class PublicConfiguracaoController extends Controller
     public function byGrupo(string $grupo): JsonResponse
     {
         $data = $this->service->byGrupo($grupo);
+
         return response()->json($data);
     }
 
@@ -31,6 +32,7 @@ class PublicConfiguracaoController extends Controller
         foreach ($groups as $grupo) {
             $result[$grupo] = $this->service->byGrupo($grupo);
         }
+
         return response()->json($result);
     }
 }

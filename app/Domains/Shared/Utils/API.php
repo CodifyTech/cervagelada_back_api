@@ -35,7 +35,7 @@ abstract class API
      */
     public function setToken(string $token): void
     {
-        $this->headers['Authorization'] = 'Bearer ' . $token;
+        $this->headers['Authorization'] = 'Bearer '.$token;
     }
 
     public function setAuthorizationBasic(string $username, string $password): void
@@ -123,6 +123,6 @@ abstract class API
      */
     private function buildUrl(string $endpoint): string
     {
-        return rtrim($this->baseUrl, '/') . '/' . ltrim($endpoint, '/');
+        return rtrim($this->baseUrl, '/').'/'.ltrim($endpoint, '/');
     }
 }

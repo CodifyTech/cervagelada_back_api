@@ -2,11 +2,9 @@
 
 namespace App\Domains\Avaliacao\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-
-use App\Domains\Avaliacao\Services\AvaliacaoService;
 use App\Domains\Avaliacao\Requests\AvaliacaoRequest;
+use App\Domains\Avaliacao\Services\AvaliacaoService;
+use App\Domains\Shared\Controller\BaseController;
 
 class AvaliacaoController extends BaseController
 {
@@ -15,8 +13,8 @@ class AvaliacaoController extends BaseController
         $this->setACL('avaliacao', [
             'list' => ['avaliacao.index'],
             'create' => ['avaliacao.store'],
-            'edit'=> ['avaliacao.update'],
-            'delete' => ['avaliacao.destroy']
+            'edit' => ['avaliacao.update'],
+            'delete' => ['avaliacao.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);

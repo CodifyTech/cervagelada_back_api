@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'prefix' => 'dashboard'
+    'prefix' => 'dashboard',
 ], function () {
     Route::get('metricas', [DashboardController::class, 'metricas']);
     Route::get('metricas-admin', [DashboardController::class, 'metricasAdmin']);

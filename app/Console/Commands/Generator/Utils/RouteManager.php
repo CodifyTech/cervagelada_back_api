@@ -27,7 +27,7 @@ class RouteManager
             $this->ensureRoutesStructure();
 
             // Gera o arquivo de rotas para o domínio
-            $routeFilePath = base_path(self::ROUTES_BASE_PATH . '/domains/' . Str::kebab($domainName) . '.php');
+            $routeFilePath = base_path(self::ROUTES_BASE_PATH.'/domains/'.Str::kebab($domainName).'.php');
 
             // Se o arquivo não existe, cria novo
             if (! File::exists($routeFilePath)) {
@@ -43,11 +43,12 @@ class RouteManager
             return true;
         } catch (\Exception $e) {
             // Log do erro para debug
-            Log::error('Erro ao gerar rotas para domínio: ' . $domainName, [
+            Log::error('Erro ao gerar rotas para domínio: '.$domainName, [
                 'model' => $modelName,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return false;
         }
     }
@@ -62,7 +63,7 @@ class RouteManager
     {
         try {
             // Gera o caminho do arquivo de rotas
-            $routeFilePath = base_path(self::ROUTES_BASE_PATH . '/domains/' . Str::kebab($domainName) . '.php');
+            $routeFilePath = base_path(self::ROUTES_BASE_PATH.'/domains/'.Str::kebab($domainName).'.php');
 
             if (! File::exists($routeFilePath)) {
                 return true; // Arquivo não existe, nada para remover
@@ -91,7 +92,7 @@ class RouteManager
     protected function ensureRoutesStructure(): void
     {
         $routesPath = base_path(self::ROUTES_BASE_PATH);
-        $domainsPath = $routesPath . '/domains';
+        $domainsPath = $routesPath.'/domains';
 
         // Cria diretório routes se não existir
         if (! File::exists($routesPath)) {
@@ -120,13 +121,13 @@ class RouteManager
         $controllerName = "{$modelName}Controller";
         $foreignKeys = $options['foreignKeys'] ?? [];
 
-        $middlewareString = "'" . implode("', '", $middleware) . "'";
+        $middlewareString = "'".implode("', '", $middleware)."'";
 
         // Gerar rotas FK se existirem
         $fkRoutes = '';
         if (! empty($foreignKeys)) {
             foreach ($foreignKeys as $fk) {
-                $fkRoutes .= "\n    " . $this->createFKRoutes($domainName, $modelName, $fk['model'], $controllerName);
+                $fkRoutes .= "\n    ".$this->createFKRoutes($domainName, $modelName, $fk['model'], $controllerName);
             }
         }
 
@@ -146,12 +147,12 @@ use Illuminate\\Support\\Facades\\Route;
 
 Route::group([
     'middleware' => [{$middlewareString}],
-    'as' => '" . Str::kebab($modelName) . "'
+    'as' => '".Str::kebab($modelName)."'
 ], function () {
 
     // {$modelName} Routes
-    Route::apiResource('" . Str::kebab(Str::plural($modelName)) . "', {$controllerName}::class);
-    Route::post('" . Str::kebab(Str::plural($modelName)) . "/search', [{$controllerName}::class, 'search']);
+    Route::apiResource('".Str::kebab(Str::plural($modelName))."', {$controllerName}::class);
+    Route::post('".Str::kebab(Str::plural($modelName))."/search', [{$controllerName}::class, 'search']);
     {$fkRoutes}
 });
 ";
@@ -175,7 +176,7 @@ Route::group([
         $foreignKeys = $options['foreignKeys'] ?? [];
 
         // Verificar se as rotas do modelo já existem
-        $routePattern = "Route::apiResource('" . Str::kebab(Str::plural($modelName)) . "', {$controllerName}::class)";
+        $routePattern = "Route::apiResource('".Str::kebab(Str::plural($modelName))."', {$controllerName}::class)";
         if (str_contains($content, $routePattern)) {
             // Rotas já existem, não adicionar novamente
             return;
@@ -195,17 +196,17 @@ Route::group([
         $fkRoutes = '';
         if (! empty($foreignKeys)) {
             foreach ($foreignKeys as $fk) {
-                $fkRoutes .= "\n    " . $this->createFKRoutes($domainName, $modelName, $fk['model'], $controllerName);
+                $fkRoutes .= "\n    ".$this->createFKRoutes($domainName, $modelName, $fk['model'], $controllerName);
             }
         }
 
         // Adiciona as rotas antes do fechamento do grupo
         $newRoutes = "
     // {$modelName} Routes
-    Route::apiResource('" . Str::kebab(Str::plural($modelName)) . "', {$controllerName}::class);{$fkRoutes}
+    Route::apiResource('".Str::kebab(Str::plural($modelName))."', {$controllerName}::class);{$fkRoutes}
     ";
 
-        $content = str_replace('});', $newRoutes . '});', $content);
+        $content = str_replace('});', $newRoutes.'});', $content);
 
         File::put($filePath, $content);
     }
@@ -224,7 +225,7 @@ Route::group([
         }
 
         $content = File::get($apiRoutesPath);
-        $domainRoute = "require __DIR__.'/domains/" . Str::kebab($domainName) . ".php';";
+        $domainRoute = "require __DIR__.'/domains/".Str::kebab($domainName).".php';";
 
         // Verifica se a inclusão já existe
         if (str_contains($content, $domainRoute)) {
@@ -232,7 +233,7 @@ Route::group([
         }
 
         // Adiciona no final do arquivo
-        $content = rtrim($content) . "\n\n// {$domainName} Domain Routes\n{$domainRoute}\n";
+        $content = rtrim($content)."\n\n// {$domainName} Domain Routes\n{$domainRoute}\n";
 
         File::put($apiRoutesPath, $content);
     }
@@ -251,7 +252,7 @@ Route::group([
         }
 
         $content = File::get($apiRoutesPath);
-        $domainRoute = "require __DIR__.'/domains/" . Str::kebab($domainName) . ".php';";
+        $domainRoute = "require __DIR__.'/domains/".Str::kebab($domainName).".php';";
 
         // Remove a linha de inclusão e o comentário
         $pattern = "/\n\/\/ {$domainName} Domain Routes\n{$domainRoute}/";
@@ -289,7 +290,7 @@ Route::group([
      */
     public function domainRoutesExist(string $domainName): bool
     {
-        $routeFilePath = base_path(self::ROUTES_BASE_PATH . '/domains/' . Str::kebab($domainName) . '.php');
+        $routeFilePath = base_path(self::ROUTES_BASE_PATH.'/domains/'.Str::kebab($domainName).'.php');
 
         return File::exists($routeFilePath);
     }
@@ -301,7 +302,7 @@ Route::group([
      */
     public function listDomainRoutes(): array
     {
-        $domainsPath = base_path(self::ROUTES_BASE_PATH . '/domains');
+        $domainsPath = base_path(self::ROUTES_BASE_PATH.'/domains');
 
         if (! File::exists($domainsPath)) {
             return [];
@@ -327,7 +328,7 @@ Route::group([
      */
     public function generateRoutesWithMiddleware(string $domainName, array $middlewares): string
     {
-        $middlewareString = "'" . implode("', '", $middlewares) . "'";
+        $middlewareString = "'".implode("', '", $middlewares)."'";
         $prefix = Str::kebab($domainName);
 
         return "
@@ -355,24 +356,24 @@ Route::group([
         $permissionRoutes = "
     // Permission-based routes for {$modelName}
     Route::middleware('can:view,{$modelName}')->group(function () {
-        Route::get('" . Str::kebab(Str::plural($modelName)) . "', [{$controllerName}::class, 'index']);
-        Route::get('" . Str::kebab(Str::plural($modelName)) . "/{id}', [{$controllerName}::class, 'show']);
+        Route::get('".Str::kebab(Str::plural($modelName))."', [{$controllerName}::class, 'index']);
+        Route::get('".Str::kebab(Str::plural($modelName))."/{id}', [{$controllerName}::class, 'show']);
     });
 
     Route::middleware('can:create,{$modelName}')->group(function () {
-        Route::post('" . Str::kebab(Str::plural($modelName)) . "', [{$controllerName}::class, 'store']);
+        Route::post('".Str::kebab(Str::plural($modelName))."', [{$controllerName}::class, 'store']);
     });
 
     Route::middleware('can:update,{$modelName}')->group(function () {
-        Route::put('" . Str::kebab(Str::plural($modelName)) . "/{id}', [{$controllerName}::class, 'update']);
+        Route::put('".Str::kebab(Str::plural($modelName))."/{id}', [{$controllerName}::class, 'update']);
     });
 
     Route::middleware('can:delete,{$modelName}')->group(function () {
-        Route::delete('" . Str::kebab(Str::plural($modelName)) . "/{id}', [{$controllerName}::class, 'destroy']);
+        Route::delete('".Str::kebab(Str::plural($modelName))."/{id}', [{$controllerName}::class, 'destroy']);
     });
     ";
 
-        $content = str_replace('});', $permissionRoutes . '});', $content);
+        $content = str_replace('});', $permissionRoutes.'});', $content);
 
         File::put($filePath, $content);
     }
@@ -386,7 +387,7 @@ Route::group([
     {
         $domainName = $config['domain'];
         $modelName = $config['model'];
-        $routeFilePath = base_path(self::ROUTES_BASE_PATH . '/domains/' . Str::kebab($domainName) . '.php');
+        $routeFilePath = base_path(self::ROUTES_BASE_PATH.'/domains/'.Str::kebab($domainName).'.php');
 
         if (! File::exists($routeFilePath)) {
             // Se o arquivo não existe, cria um novo

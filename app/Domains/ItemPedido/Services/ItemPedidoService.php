@@ -3,6 +3,7 @@
 namespace App\Domains\ItemPedido\Services;
 
 use App\Domains\ItemPedido\Models\ItemPedido;
+use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
 
 class ItemPedidoService extends BaseService
@@ -13,8 +14,10 @@ class ItemPedidoService extends BaseService
     }
 
     // 👉 methods
-    public function listarPedido($options) {
-		$data = \App\Domains\Pedido\Models\Pedido::query()->paginate($options['per_page'] ?? 15);
-		return $data->items();
-	}
+    public function listarPedido($options)
+    {
+        $data = Pedido::query()->paginate($options['per_page'] ?? 15);
+
+        return $data->items();
+    }
 }

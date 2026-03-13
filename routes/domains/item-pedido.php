@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'item-pedido'
+    'as' => 'item-pedido',
 ], function () {
 
     // ItemPedido Routes
     Route::apiResource('item-pedidos', ItemPedidoController::class);
     Route::post('item-pedidos/search', [ItemPedidoController::class, 'search']);
-    
+
     Route::get('item-pedidos/listar/pedido', [ItemPedidoController::class, 'listarPedido']);
 });

@@ -2,19 +2,15 @@
 
 namespace App\Domains\Loja\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Domains\Loja\Models\Loja;
-use App\Domains\Produto\Models\Produto;
-use Illuminate\Support\Facades\DB;
 use App\Domains\Loja\Requests\LojaProdutoRequest;
 use App\Domains\Produto\Services\ProdutoService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class LojaProdutoController extends Controller
 {
-    public function __construct(private readonly ProdutoService $produtoService)
-    {
-    }
+    public function __construct(private readonly ProdutoService $produtoService) {}
 
     /**
      * List products of a store.
@@ -53,7 +49,7 @@ class LojaProdutoController extends Controller
         $lojaModel = Loja::findOrFail($loja);
 
         // Check verification: "edit only if linked"
-        if (!$lojaModel->produtos()->where('produto_id', $produto)->exists()) {
+        if (! $lojaModel->produtos()->where('produto_id', $produto)->exists()) {
             return response()->json(['message' => 'Produto não vinculado a esta loja.'], 404);
         }
 

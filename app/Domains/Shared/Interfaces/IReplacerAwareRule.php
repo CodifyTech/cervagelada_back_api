@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Domains\Shared\Interfaces;
 
 interface ReplacerAwareRule

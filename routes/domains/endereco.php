@@ -14,12 +14,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'endereco'
+    'as' => 'endereco',
 ], function () {
 
     // Endereco Routes
     Route::apiResource('enderecos', EnderecoController::class);
     Route::post('enderecos/search', [EnderecoController::class, 'search']);
-    
+
     Route::get('enderecos/listar/user', [EnderecoController::class, 'listarUser']);
 });

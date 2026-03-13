@@ -1,54 +1,54 @@
 <?php
 
 // Public routes (no admin auth required)
-require __DIR__ . '/public.php';
+require __DIR__.'/public.php';
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
-require __DIR__ . '/roles.php';
+require __DIR__.'/roles.php';
 
-require __DIR__ . '/permissions.php';
+require __DIR__.'/permissions.php';
 
-require __DIR__ . '/domains/users.php';
+require __DIR__.'/domains/users.php';
 
 // Endereco Domain Routes
-require __DIR__ . '/domains/endereco.php';
+require __DIR__.'/domains/endereco.php';
 
 // Loja Domain Routes
-require __DIR__ . '/domains/loja.php';
+require __DIR__.'/domains/loja.php';
 
 // Produto Domain Routes
-require __DIR__ . '/domains/produto.php';
+require __DIR__.'/domains/produto.php';
 
 // Noticias Domain Routes
-require __DIR__ . '/domains/noticias.php';
+require __DIR__.'/domains/noticias.php';
 
 // Promocao Domain Routes
-require __DIR__ . '/domains/promocao.php';
+require __DIR__.'/domains/promocao.php';
 
 // Pedido Domain Routes
-require __DIR__ . '/domains/pedido.php';
+require __DIR__.'/domains/pedido.php';
 
 // ItemPedido Domain Routes
-require __DIR__ . '/domains/item-pedido.php';
+require __DIR__.'/domains/item-pedido.php';
 
 // Avaliacao Domain Routes
-require __DIR__ . '/domains/avaliacao.php';
+require __DIR__.'/domains/avaliacao.php';
 
 // TransacoesFinanceiras Domain Routes
-require __DIR__ . '/domains/transacoes-financeiras.php';
+require __DIR__.'/domains/transacoes-financeiras.php';
 
 // Dashboard Domain Routes
-require __DIR__ . '/domains/dashboard.php';
+require __DIR__.'/domains/dashboard.php';
 
 // Relatorios Domain Routes
-require __DIR__ . '/domains/relatorios.php';
+require __DIR__.'/domains/relatorios.php';
 
 // Auditoria Domain Routes
-require __DIR__ . '/domains/auditoria.php';
+require __DIR__.'/domains/auditoria.php';
 
 // Destaque Domain Routes
-require __DIR__ . '/domains/destaque.php';
+require __DIR__.'/domains/destaque.php';
 
 // Configuracao Domain Routes
-require __DIR__ . '/domains/configuracao.php';
+require __DIR__.'/domains/configuracao.php';

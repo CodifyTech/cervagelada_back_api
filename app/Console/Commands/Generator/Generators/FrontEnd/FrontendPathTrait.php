@@ -27,18 +27,18 @@ trait FrontendPathTrait
             $remainingPath = preg_replace('/^(\.\.\/)+/', '', $projectDir);
 
             // Se ainda houver caminho restante, adicionar
-            if (!empty($remainingPath)) {
-                $frontEndPath = $currentPath . str_replace('/', DIRECTORY_SEPARATOR, $remainingPath);
+            if (! empty($remainingPath)) {
+                $frontEndPath = $currentPath.str_replace('/', DIRECTORY_SEPARATOR, $remainingPath);
             } else {
                 $frontEndPath = $currentPath;
             }
         } else {
             // Caminho absoluto ou relativo simples
-            $frontEndPath = $basePath . DIRECTORY_SEPARATOR . $projectDir;
+            $frontEndPath = $basePath.DIRECTORY_SEPARATOR.$projectDir;
         }
 
         // Verificar se o diretório existe
-        if (!is_dir($frontEndPath)) {
+        if (! is_dir($frontEndPath)) {
             throw new \Exception("Frontend directory not found: {$frontEndPath}");
         }
 

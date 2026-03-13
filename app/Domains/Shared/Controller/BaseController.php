@@ -2,11 +2,11 @@
 
 namespace App\Domains\Shared\Controller;
 
+use App\Domains\Shared\Exceptions\BaseControllerException;
 use App\Domains\Shared\Interfaces\IController;
 use App\Domains\Shared\Traits\Dependencies;
 use App\Domains\Shared\Traits\HasACL;
 use App\Http\Controllers\Controller;
-use App\Domains\Shared\Exceptions\BaseControllerException;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

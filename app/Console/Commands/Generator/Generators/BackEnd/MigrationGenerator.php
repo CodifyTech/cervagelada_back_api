@@ -28,7 +28,7 @@ class MigrationGenerator
         $migrationContent = $this->templateManager->processStub(
             'BackEnd/migration.stub',
             [
-                '{{className}}' => 'Create' . Str::studly($tableName) . 'Table',
+                '{{className}}' => 'Create'.Str::studly($tableName).'Table',
                 '{{tableName}}' => $tableName,
                 '{{fields}}' => $fields,
             ]
@@ -36,7 +36,7 @@ class MigrationGenerator
 
         // Criar diretório se não existir
         $migrationsDir = app_path("Domains/{$domain}/Migrations");
-        if (!File::exists($migrationsDir)) {
+        if (! File::exists($migrationsDir)) {
             File::makeDirectory($migrationsDir, 0755, true);
         }
 
@@ -64,7 +64,7 @@ class MigrationGenerator
             @[$field, $params] = explode('=', $column);
             @[$type, $option1, $option2, $required] = explode(',', $params ?? '');
 
-            if (!$field || !$type) {
+            if (! $field || ! $type) {
                 continue;
             }
 
@@ -85,32 +85,32 @@ class MigrationGenerator
         }
 
         // Processar chaves estrangeiras
-        if (!empty($config['foreignKeys'])) {
+        if (! empty($config['foreignKeys'])) {
             foreach ($config['foreignKeys'] as $fk) {
-                if (!isset($fk['model']) || !isset($fk['relation'])) {
+                if (! isset($fk['model']) || ! isset($fk['relation'])) {
                     continue;
                 }
 
-                if (!isset($fk['required'])) {
+                if (! isset($fk['required'])) {
                     $fk['required'] = true; // Default to required if not specified
                 }
 
                 if ($fk['relation'] === 'belongsTo' || $fk['relation'] === 'hasMany' || $fk['relation'] === 'hasOne') {
-                    $foreignKey = Str::snake($fk['model']) . '_id';
+                    $foreignKey = Str::snake($fk['model']).'_id';
                     $line = "\$table->foreignUlid('{$foreignKey}')";
 
                     // Só adiciona nullable se NÃO for obrigatório
-                    if (!$fk['required']) {
-                        $line .= "->nullable()";
+                    if (! $fk['required']) {
+                        $line .= '->nullable()';
                     }
 
-                    $line .= "->constrained('" . Str::snake(Str::plural($fk['model'])) . "')";
+                    $line .= "->constrained('".Str::snake(Str::plural($fk['model']))."')";
 
                     // Define comportamento de delete baseado na obrigatoriedade
                     if ($fk['required']) {
                         $line .= "->onDelete('cascade');";
                     } else {
-                        $line .= "->nullOnDelete();";
+                        $line .= '->nullOnDelete();';
                     }
 
                     $fields[] = $line;
@@ -119,7 +119,7 @@ class MigrationGenerator
         }
 
         // Adicionar timestamps
-        $fields[] = "\$table->timestamps();";
+        $fields[] = '$table->timestamps();';
 
         return implode("\n            ", $fields);
     }
@@ -184,10 +184,10 @@ class MigrationGenerator
         }
 
         // Só adiciona ->nullable() se o campo NÃO for obrigatório
-        if (!$required) {
-            $result .= "->nullable()";
+        if (! $required) {
+            $result .= '->nullable()';
         }
 
-        return $result . ';';
+        return $result.';';
     }
 }

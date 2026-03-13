@@ -33,7 +33,7 @@ class UserRequest extends BaseFormRequest
     public function update(): array
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->request->get('id')],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$this->request->get('id')],
             'role.slug' => ['required', 'exists:\Domains\ACL\Models\Role,slug'],
             'password' => ['nullable', 'confirmed', Password::defaults()],
         ];

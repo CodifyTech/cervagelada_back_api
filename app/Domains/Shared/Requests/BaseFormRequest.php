@@ -11,8 +11,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -21,8 +19,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
@@ -43,8 +39,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the get request.
-     *
-     * @return array
      */
     public function view(): array
     {
@@ -55,8 +49,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the post request.
-     *
-     * @return array
      */
     public function store(): array
     {
@@ -67,8 +59,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the put/patch request.
-     *
-     * @return array
      */
     public function update(): array
     {
@@ -79,8 +69,6 @@ class BaseFormRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the delete request.
-     *
-     * @return array
      */
     public function destroy(): array
     {

@@ -3,10 +3,9 @@
 namespace App\Domains\TransacoesFinanceiras\Controllers;
 
 use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-
-use App\Domains\TransacoesFinanceiras\Services\TransacoesFinanceirasService;
 use App\Domains\TransacoesFinanceiras\Requests\TransacoesFinanceirasRequest;
+use App\Domains\TransacoesFinanceiras\Services\TransacoesFinanceirasService;
+use Illuminate\Http\Request;
 
 class TransacoesFinanceirasController extends BaseController
 {
@@ -15,8 +14,8 @@ class TransacoesFinanceirasController extends BaseController
         $this->setACL('transacoes-financeiras', [
             'list' => ['transacoes-financeiras.index'],
             'create' => ['transacoes-financeiras.store'],
-            'edit'=> ['transacoes-financeiras.update'],
-            'delete' => ['transacoes-financeiras.destroy']
+            'edit' => ['transacoes-financeiras.update'],
+            'delete' => ['transacoes-financeiras.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -24,13 +23,17 @@ class TransacoesFinanceirasController extends BaseController
     }
 
     // 👉 methods
-    public function listarLoja(Request $request) {
-		$options = $request->all();
-		return $this->service->listarLoja($options);
-	}
+    public function listarLoja(Request $request)
+    {
+        $options = $request->all();
 
-	public function listarPedido(Request $request) {
-		$options = $request->all();
-		return $this->service->listarPedido($options);
-	}
+        return $this->service->listarLoja($options);
+    }
+
+    public function listarPedido(Request $request)
+    {
+        $options = $request->all();
+
+        return $this->service->listarPedido($options);
+    }
 }

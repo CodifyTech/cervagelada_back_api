@@ -1,11 +1,18 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\MigrationServiceProvider;
+use App\Providers\PluralizationServiceProvider;
+use App\Providers\ResetPasswordProvider;
+use App\Providers\TelescopeServiceProvider;
+use Tymon\JWTAuth\Providers\LaravelServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\MigrationServiceProvider::class,
-    App\Providers\PluralizationServiceProvider::class,
-    App\Providers\ResetPasswordProvider::class,
-    //App\Providers\SeedersServiceProvider::class,
-    App\Providers\TelescopeServiceProvider::class,
-    Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+    AppServiceProvider::class,
+    MigrationServiceProvider::class,
+    PluralizationServiceProvider::class,
+    ResetPasswordProvider::class,
+    // App\Providers\SeedersServiceProvider::class,
+    TelescopeServiceProvider::class,
+    LaravelServiceProvider::class,
 ];

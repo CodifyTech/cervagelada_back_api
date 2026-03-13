@@ -2,10 +2,10 @@
 
 namespace App\Domains\Shared\Services;
 
+use App\Domains\Shared\Helpers\SortHelper;
 use App\Domains\Shared\Interfaces\IService;
 use App\Domains\Shared\Traits\Dependencies;
 use App\Domains\Shared\Utils\IntHelper;
-use App\Domains\Shared\Helpers\SortHelper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 

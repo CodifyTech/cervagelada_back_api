@@ -8,7 +8,7 @@ use App\Domains\Shared\Controller\BaseController;
 
 class PermissionController extends BaseController
 {
-    function __construct(private readonly PermissionService $permissionService)
+    public function __construct(private readonly PermissionService $permissionService)
     {
         $this->setACL('permission', 'admin');
 
@@ -27,6 +27,7 @@ class PermissionController extends BaseController
                 'slug' => $action,
             ];
         }
+
         return $this->permissionService->storeAll($permissions);
     }
 
@@ -42,6 +43,7 @@ class PermissionController extends BaseController
                 ];
             }
         }
+
         return $this->permissionService->updateAll($permissions, $data['name']);
     }
 

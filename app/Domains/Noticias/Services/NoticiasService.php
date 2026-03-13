@@ -13,5 +13,5 @@ class NoticiasService extends BaseService
     }
 
     // 👉 methods
-    
+
 }

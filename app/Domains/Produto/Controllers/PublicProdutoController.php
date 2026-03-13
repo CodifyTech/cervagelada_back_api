@@ -33,19 +33,19 @@ class PublicProdutoController extends Controller
             ->porRaio($lat, $lng)
             ->with(['produtos' => fn ($q) => $q
                 ->where('produtos.id', $id)
-                ->wherePivot('ativo', true)
+                ->wherePivot('ativo', true),
             ])
             ->first();
 
-        if (!$loja) {
+        if (! $loja) {
             return response()->json([
                 'message' => 'Nenhuma loja próxima possui este produto disponível.',
-                'loja'    => null,
+                'loja' => null,
             ], 200);
         }
 
         return response()->json([
-            'loja'  => $loja,
+            'loja' => $loja,
             'preco' => $loja->produtos->first()?->pivot?->preco,
         ]);
     }

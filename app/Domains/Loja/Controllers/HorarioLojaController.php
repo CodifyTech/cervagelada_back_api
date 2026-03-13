@@ -2,11 +2,9 @@
 
 namespace App\Domains\Loja\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-
-use App\Domains\Loja\Services\HorarioLojaService;
 use App\Domains\Loja\Requests\HorarioLojaRequest;
+use App\Domains\Loja\Services\HorarioLojaService;
+use App\Domains\Shared\Controller\BaseController;
 
 class HorarioLojaController extends BaseController
 {
@@ -15,8 +13,8 @@ class HorarioLojaController extends BaseController
         $this->setACL('loja', [
             'list' => ['loja.index'],
             'create' => ['loja.store'],
-            'edit'=> ['loja.update'],
-            'delete' => ['loja.destroy']
+            'edit' => ['loja.update'],
+            'delete' => ['loja.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -24,5 +22,5 @@ class HorarioLojaController extends BaseController
     }
 
     // 👉 methods
-    
+
 }

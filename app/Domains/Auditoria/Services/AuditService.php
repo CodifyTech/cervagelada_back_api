@@ -13,9 +13,6 @@ class AuditService
      *
      * @param  string  $action  e.g. 'login', 'pedido.status_changed', 'user.created'
      * @param  string|null  $entityType  e.g. 'pedido', 'user', 'loja'
-     * @param  string|null  $entityId
-     * @param  array|null  $oldValues
-     * @param  array|null  $newValues
      * @param  array  $metadata  Extra context
      */
     public function log(
@@ -48,7 +45,7 @@ class AuditService
             ]);
         } catch (\Throwable $e) {
             // Audit logging should never break application flow
-            Log::error('[AuditService] Failed to write audit log: ' . $e->getMessage(), [
+            Log::error('[AuditService] Failed to write audit log: '.$e->getMessage(), [
                 'action' => $action,
                 'entity_type' => $entityType,
                 'entity_id' => $entityId,

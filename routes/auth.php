@@ -1,9 +1,9 @@
 <?php
 
+use App\Domains\Auth\Controllers\AuthController;
 use App\Domains\Auth\Controllers\EmailVerificationNotificationController;
 use App\Domains\Auth\Controllers\EmailVerificationPromptController;
 use App\Domains\Auth\Controllers\VerifyEmailController;
-use App\Domains\Auth\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth', 'as' => 'auth', 'controller' => AuthController::class], function () {

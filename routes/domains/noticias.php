@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'noticias'
+    'as' => 'noticias',
 ], function () {
 
     // Noticias Routes
     Route::apiResource('noticias', NoticiasController::class);
     Route::post('noticias/search', [NoticiasController::class, 'search']);
-    
+
 });

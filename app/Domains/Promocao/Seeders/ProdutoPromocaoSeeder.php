@@ -2,10 +2,9 @@
 
 namespace App\Domains\Promocao\Seeders;
 
+use App\Domains\Promocao\Models\ProdutoPromocao;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\Promocao\Models\ProdutoPromocao;
-
 
 class ProdutoPromocaoSeeder extends Seeder
 {
@@ -13,8 +12,6 @@ class ProdutoPromocaoSeeder extends Seeder
 
     /**
      * Run the database seeds for ProdutoPromocao.
-     *
-     * @return void
      */
     public function run(): void
     {

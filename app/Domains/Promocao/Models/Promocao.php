@@ -2,18 +2,16 @@
 
 namespace App\Domains\Promocao\Models;
 
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Produto\Models\Produto;
+use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Domains\Shared\Models\BaseModel;
-use App\Domains\Loja\Models\Loja;
 
 class Promocao extends BaseModel
 {
     use HasFactory;
-
 
     /**
      * The table associated with the model.
@@ -29,11 +27,8 @@ class Promocao extends BaseModel
      */
     protected $fillable = ['titulo', 'descricao', 'data_inicio', 'data_fim', 'ativo', 'loja_id'];
 
-
     /**
      * Get the Loja that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function loja(): BelongsTo
     {
@@ -45,8 +40,8 @@ class Promocao extends BaseModel
      */
     public function produtos(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Produto\Models\Produto::class, 'produto_promocoes', 'promocao_id', 'produto_id')
-                    ->withPivot(['id', 'preco_promocional'])
-                    ->withTimestamps();
+        return $this->belongsToMany(Produto::class, 'produto_promocoes', 'promocao_id', 'produto_id')
+            ->withPivot(['id', 'preco_promocional'])
+            ->withTimestamps();
     }
 }

@@ -11,10 +11,10 @@ class SummaryBuilder
         // Informações gerais
         $summary[] = "Domínio: {$config['domain']}";
         $summary[] = "Model: {$config['model']}";
-        $summary[] = "";
+        $summary[] = '';
 
         // Schema
-        $summary[] = "Schema:";
+        $summary[] = 'Schema:';
         $columns = explode(';', rtrim($config['schema'], ';'));
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column);
@@ -27,17 +27,17 @@ class SummaryBuilder
             }
 
             if (isset($required) && strtolower($required) === 'req') {
-                $fieldDescription .= ", obrigatório";
+                $fieldDescription .= ', obrigatório';
             }
 
-            $fieldDescription .= ")";
+            $fieldDescription .= ')';
             $summary[] = $fieldDescription;
         }
 
         // Relações
-        if (!empty($config['foreignKeys'])) {
-            $summary[] = "";
-            $summary[] = "Relações:";
+        if (! empty($config['foreignKeys'])) {
+            $summary[] = '';
+            $summary[] = 'Relações:';
 
             foreach ($config['foreignKeys'] as $fk) {
                 $localKey = $fk['localKey'] ?? 'N/A';
@@ -49,10 +49,10 @@ class SummaryBuilder
         }
 
         // Extras
-        $summary[] = "";
-        $summary[] = "Extras:";
-        $summary[] = "  - Testes: " . (($config['generateTests'] ?? false) ? 'Sim' : 'Não');
-        $summary[] = "  - Documentação: " . (($config['generateDocs'] ?? false) ? 'Sim' : 'Não');
+        $summary[] = '';
+        $summary[] = 'Extras:';
+        $summary[] = '  - Testes: '.(($config['generateTests'] ?? false) ? 'Sim' : 'Não');
+        $summary[] = '  - Documentação: '.(($config['generateDocs'] ?? false) ? 'Sim' : 'Não');
 
         return implode("\n", $summary);
     }

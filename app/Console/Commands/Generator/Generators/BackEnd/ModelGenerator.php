@@ -36,7 +36,7 @@ class ModelGenerator
 
         $casts = $this->buildCasts($config['schema']);
         // Não geramos mais relacionamentos aqui, o ModelRelationsManager fará isso
-        $relationships = "";
+        $relationships = '';
 
         // Gerar conteúdo do modelo
         $modelContent = $this->templateManager->processStub(
@@ -55,7 +55,7 @@ class ModelGenerator
 
         // Criar diretório se não existir
         $modelDir = app_path("Domains/{$domain}/Models");
-        if (!File::exists($modelDir)) {
+        if (! File::exists($modelDir)) {
             File::makeDirectory($modelDir, 0755, true);
         }
 
@@ -71,11 +71,11 @@ class ModelGenerator
         $fillable = [];
 
         // Extrair campos do schema
-        if (!empty($config['schema'])) {
+        if (! empty($config['schema'])) {
             $columns = explode(';', rtrim($config['schema'], ';'));
             foreach ($columns as $column) {
                 @[$field, $params] = explode('=', $column);
-                if ($field && $field !== 'id' && !Str::endsWith($field, '_at')) {
+                if ($field && $field !== 'id' && ! Str::endsWith($field, '_at')) {
                     $fillable[] = "'{$field}'";
                 }
             }
@@ -85,13 +85,14 @@ class ModelGenerator
         if (isset($config['foreignKeys'])) {
             foreach ($config['foreignKeys'] as $fk) {
                 // Verifica se o modelo já está no fillable
-                if (!isset($fk['model'])) {
+                if (! isset($fk['model'])) {
                     warning("Não foi possível criar a chave estrangeira para o modelo: {$config['model']}, pois a model não foi especificada.");
+
                     continue;
                 }
 
-                $foreignKeyField = Str::snake($fk['model']) . '_id';
-                if (!in_array("'{$foreignKeyField}'", $fillable)) {
+                $foreignKeyField = Str::snake($fk['model']).'_id';
+                if (! in_array("'{$foreignKeyField}'", $fillable)) {
                     $fillable[] = "'{$foreignKeyField}'";
                 }
             }
@@ -101,7 +102,7 @@ class ModelGenerator
             return '[]';
         }
 
-        return '[' . implode(', ', $fillable) . ']';
+        return '['.implode(', ', $fillable).']';
     }
 
     private function buildCasts(string $schema): string
@@ -129,8 +130,8 @@ class ModelGenerator
         }
 
         return empty($casts) ? '' :
-            "\n    protected \$casts = [\n        " .
-            implode(",\n        ", $casts) .
+            "\n    protected \$casts = [\n        ".
+            implode(",\n        ", $casts).
             "\n    ];\n";
     }
 }

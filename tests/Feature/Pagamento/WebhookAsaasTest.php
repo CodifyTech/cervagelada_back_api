@@ -1,8 +1,11 @@
 <?php
 
 use App\Domains\Auth\Models\User;
+use App\Domains\Endereco\Models\Endereco;
+use App\Domains\Loja\Models\Loja;
 use App\Domains\Pagamento\Models\Pagamento;
 use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Produto\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -43,7 +46,7 @@ function criarPagamentoComPedido(string $chargeId = 'pay_test_123', string $stat
  */
 function criarLojaComProduto(): array
 {
-    $loja = \App\Domains\Loja\Models\Loja::create([
+    $loja = Loja::create([
         'nome_fantasia' => 'Loja Pagamento Test',
         'tipo_loja' => 'distribuidora',
         'ativo' => true,
@@ -63,7 +66,7 @@ function criarLojaComProduto(): array
         'estado' => 'SP',
     ]);
 
-    $produto = \App\Domains\Produto\Models\Produto::create([
+    $produto = Produto::create([
         'nome' => 'Cerveja Teste',
         'descricao' => 'Cerveja para teste',
     ]);
@@ -238,7 +241,7 @@ it('cria cobranca pix com mock do Asaas', function () {
     $token = auth('api')->login($user);
     $loja = criarLojaComProduto();
 
-    $endereco = \App\Domains\Endereco\Models\Endereco::create([
+    $endereco = Endereco::create([
         'user_id' => $user->id,
         'apelido' => 'Casa',
         'cep' => '01001000',

@@ -27,10 +27,10 @@ class NewOrderNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Novo pedido recebido!')
-            ->greeting('Olá, ' . ($notifiable->name ?? 'Lojista') . '!')
+            ->greeting('Olá, '.($notifiable->name ?? 'Lojista').'!')
             ->line('Você recebeu um novo pedido com pagamento confirmado.')
             ->line("Valor total: R$ {$total}")
-            ->line('Itens: ' . $this->pedido->itemPedidos->count() . ' produto(s)')
+            ->line('Itens: '.$this->pedido->itemPedidos->count().' produto(s)')
             ->action('Ver Pedido', url('/pedidos'))
             ->line('Acesse o painel para aceitar e preparar o pedido.');
     }
@@ -41,7 +41,7 @@ class NewOrderNotification extends Notification implements ShouldQueue
             'pedido_id' => $this->pedido->id,
             'total' => $this->pedido->total,
             'itens_count' => $this->pedido->itemPedidos->count(),
-            'message' => 'Novo pedido recebido - R$ ' . number_format($this->pedido->total, 2, ',', '.'),
+            'message' => 'Novo pedido recebido - R$ '.number_format($this->pedido->total, 2, ',', '.'),
         ];
     }
 }

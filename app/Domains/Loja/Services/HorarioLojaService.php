@@ -13,5 +13,5 @@ class HorarioLojaService extends BaseService
     }
 
     // 👉 methods
-    
+
 }

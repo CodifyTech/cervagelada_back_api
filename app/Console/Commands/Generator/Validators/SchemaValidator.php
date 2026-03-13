@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @Autor: Lucas Brito
  * @Data: 2025-11-07 20:44:02
@@ -22,18 +23,18 @@ class SchemaValidator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column, 2);
 
-            if (!$field || !$params) {
+            if (! $field || ! $params) {
                 return 'Schema inválido. Use o formato: campo=tipo,opção,req';
             }
 
             $paramParts = explode(',', $params);
             $type = $paramParts[0] ?? '';
 
-            if (!$type) {
+            if (! $type) {
                 return 'Schema inválido. Use o formato: campo=tipo,opção,req';
             }
 
-            if (!$this->isValidType($type)) {
+            if (! $this->isValidType($type)) {
                 return "O tipo '$type' não é válido";
             }
 
@@ -55,7 +56,7 @@ class SchemaValidator
                         break;
                     }
                 }
-                if (!$hasEnumValues) {
+                if (! $hasEnumValues) {
                     return "Enum '{$field}' deve especificar valores no formato: tipo=enum,req,VALOR1|VALOR2";
                 }
             }
@@ -63,7 +64,7 @@ class SchemaValidator
             // Validar parâmetro de obrigatoriedade
             foreach ($paramParts as $part) {
                 $trimmedPart = trim($part);
-                if ($trimmedPart && !str_contains($trimmedPart, '|') && strtolower($trimmedPart) !== 'req' && strtolower($trimmedPart) !== strtolower($type)) {
+                if ($trimmedPart && ! str_contains($trimmedPart, '|') && strtolower($trimmedPart) !== 'req' && strtolower($trimmedPart) !== strtolower($type)) {
                     // Se não é 'req', não é o tipo e não contém '|', pode ser uma opção válida
                     // Permitir opções como 'unique', 'nullable', etc.
                     continue;
@@ -88,7 +89,7 @@ class SchemaValidator
             'text',
             'json',
             'enum',
-            'uuid'
+            'uuid',
         ];
 
         return in_array(strtolower($type), $validTypes);

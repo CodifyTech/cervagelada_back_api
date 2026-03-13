@@ -9,14 +9,12 @@ class AuthDomainDatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
     public function run(): void
     {
         $this->call([
             RolesPermissionSeeder::class,
-            UsersSeeder::class
+            UsersSeeder::class,
         ]);
     }
 }

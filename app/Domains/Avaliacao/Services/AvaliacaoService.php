@@ -3,6 +3,7 @@
 namespace App\Domains\Avaliacao\Services;
 
 use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
 
 class AvaliacaoService extends BaseService
@@ -15,13 +16,13 @@ class AvaliacaoService extends BaseService
     /**
      * Stores a new Avaliacao.
      *
-     * @param  array  $data
      * @return Avaliacao
+     *
      * @throws \Exception
      */
     public function store(array $data)
     {
-        $pedido = \App\Domains\Pedido\Models\Pedido::findOrFail($data['pedido_id']);
+        $pedido = Pedido::findOrFail($data['pedido_id']);
 
         // Check if order is delivered
         if ($pedido->status !== 'entregue') {
@@ -29,7 +30,7 @@ class AvaliacaoService extends BaseService
         }
 
         // Set user_id if not provided
-        if (!isset($data['user_id'])) {
+        if (! isset($data['user_id'])) {
             $data['user_id'] = auth()->id() ?? $pedido->user_id;
         }
 
@@ -39,7 +40,7 @@ class AvaliacaoService extends BaseService
         }
 
         // Set loja_id if not provided
-        if (!isset($data['loja_id'])) {
+        if (! isset($data['loja_id'])) {
             $data['loja_id'] = $pedido->loja_id;
         }
 

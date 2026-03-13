@@ -2,10 +2,9 @@
 
 namespace App\Domains\Produto\Seeders;
 
+use App\Domains\Produto\Models\Produto;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\Produto\Models\Produto;
-
 
 class ProdutoSeeder extends Seeder
 {
@@ -13,8 +12,6 @@ class ProdutoSeeder extends Seeder
 
     /**
      * Run the database seeds for Produto.
-     *
-     * @return void
      */
     public function run(): void
     {

@@ -2,18 +2,15 @@
 
 namespace App\Domains\ItemPedido\Models;
 
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Produto\Models\Produto;
+use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Domains\Shared\Models\BaseModel;
-use App\Domains\Pedido\Models\Pedido;
 
 class ItemPedido extends BaseModel
 {
     use HasFactory;
-
 
     /**
      * The table associated with the model.
@@ -29,11 +26,8 @@ class ItemPedido extends BaseModel
      */
     protected $fillable = ['quantidade_solicitada', 'quantidade_final', 'preco_unitario', 'preco_total', 'ajuste_preco', 'observacoes', 'pedido_id', 'produto_id'];
 
-
     /**
      * Get the Pedido that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function pedido(): BelongsTo
     {
@@ -42,11 +36,9 @@ class ItemPedido extends BaseModel
 
     /**
      * Get the Produto that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function produto(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Produto\Models\Produto::class);
+        return $this->belongsTo(Produto::class);
     }
 }

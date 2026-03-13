@@ -5,38 +5,49 @@ namespace App\Domains\Auth\Models;
 use App\Casts\UploadCast;
 use App\Domains\ACL\Models\Role;
 use App\Domains\ACL\Traits\HasRoles;
-use App\Domains\Shared\Traits\TenantScope;
 use App\Domains\Auth\Notifications\ResetPasswordNotification;
 use App\Domains\Auth\Notifications\VerifyEmail;
+use App\Domains\Avaliacao\Models\Avaliacao;
+use App\Domains\Endereco\Models\Endereco;
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Pedido\Models\Pedido;
+use App\Domains\Shared\Traits\TenantScope;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use App\Domains\Endereco\Models\Endereco;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Domains\Avaliacao\Models\Avaliacao;
-use Illuminate\Database\Eloquent\Relations\HasMany;/**
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+
+/**
  * @property string $id
  * @property string $name
  * @property string $email
- * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $foto
  * @property int $termos
  * @property int $ativo
  * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Domains\ACL\Models\Role> $belongsToManyRoles
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Role> $belongsToManyRoles
  * @property-read int|null $belongs_to_many_roles_count
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read mixed $role
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
@@ -51,8 +62,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;/**
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereTermos($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Role> $roles
+ *
+ * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements JWTSubject
@@ -115,7 +128,7 @@ class User extends Authenticatable implements JWTSubject
 
     public string $fileDir = 'users';
 
-    //region Attributes
+    // region Attributes
     public function role(): Attribute
     {
         return Attribute::make(
@@ -132,6 +145,7 @@ class User extends Authenticatable implements JWTSubject
             },
         );
     }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      */
@@ -147,17 +161,19 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-    //endregion
-    //region Relations
+
+    // endregion
+    // region Relations
     public function roles()
     {
         return $this->belongsToMany(Role::class);
     }
-    //endregion
-    //region Methods
+
+    // endregion
+    // region Methods
     public function sendPasswordResetNotification($token): void
     {
-        $url = env('FRONT_END_URL') . '/admin/auth/redefinir-senha?email=' . $this->email . '&token=' . $token;
+        $url = env('FRONT_END_URL').'/admin/auth/redefinir-senha?email='.$this->email.'&token='.$token;
         $this->notify(new ResetPasswordNotification($url));
     }
 
@@ -165,12 +181,10 @@ class User extends Authenticatable implements JWTSubject
     {
         $this->notify(new VerifyEmail);
     }
-    //endregion
+    // endregion
 
     /**
      * Get the Endereco that owns this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function endereco(): BelongsTo
     {
@@ -182,15 +196,15 @@ class User extends Authenticatable implements JWTSubject
      */
     public function loja(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Loja\Models\Loja::class);
+        return $this->belongsTo(Loja::class);
     }
 
     /**
      * Lojas onde o entregador atua (multi-loja).
      */
-    public function lojasEntregador(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function lojasEntregador(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Loja\Models\Loja::class, 'entregador_loja', 'user_id', 'loja_id')
+        return $this->belongsToMany(Loja::class, 'entregador_loja', 'user_id', 'loja_id')
             ->withPivot(['id', 'ativo'])
             ->withTimestamps();
     }
@@ -200,13 +214,11 @@ class User extends Authenticatable implements JWTSubject
      */
     public function pedidosEntrega(): HasMany
     {
-        return $this->hasMany(\App\Domains\Pedido\Models\Pedido::class, 'entregador_id');
+        return $this->hasMany(Pedido::class, 'entregador_id');
     }
 
     /**
      * Get the avaliacoes for this record.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function avaliacoes(): HasMany
     {

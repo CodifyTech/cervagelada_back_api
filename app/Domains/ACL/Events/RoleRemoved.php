@@ -12,6 +12,7 @@ class RoleRemoved
     use Dispatchable, SerializesModels;
 
     public User $user;
+
     public Role $role;
 
     public function __construct(User $user, Role $role)

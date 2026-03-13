@@ -2,8 +2,10 @@
 
 namespace App\Domains\TransacoesFinanceiras\Services;
 
-use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
+use App\Domains\Loja\Models\Loja;
+use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
 
 class TransacoesFinanceirasService extends BaseService
 {
@@ -13,13 +15,17 @@ class TransacoesFinanceirasService extends BaseService
     }
 
     // 👉 methods
-    public function listarLoja($options) {
-		$data = \App\Domains\Loja\Models\Loja::query()->paginate($options['per_page'] ?? 15);
-		return $data->items();
-	}
+    public function listarLoja($options)
+    {
+        $data = Loja::query()->paginate($options['per_page'] ?? 15);
 
-	public function listarPedido($options) {
-		$data = \App\Domains\Pedido\Models\Pedido::query()->paginate($options['per_page'] ?? 15);
-		return $data->items();
-	}
+        return $data->items();
+    }
+
+    public function listarPedido($options)
+    {
+        $data = Pedido::query()->paginate($options['per_page'] ?? 15);
+
+        return $data->items();
+    }
 }

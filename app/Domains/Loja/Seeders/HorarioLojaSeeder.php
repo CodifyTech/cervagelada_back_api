@@ -2,10 +2,9 @@
 
 namespace App\Domains\Loja\Seeders;
 
+use App\Domains\Loja\Models\HorarioLoja;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\Loja\Models\HorarioLoja;
-
 
 class HorarioLojaSeeder extends Seeder
 {
@@ -13,8 +12,6 @@ class HorarioLojaSeeder extends Seeder
 
     /**
      * Run the database seeds for HorarioLoja.
-     *
-     * @return void
      */
     public function run(): void
     {

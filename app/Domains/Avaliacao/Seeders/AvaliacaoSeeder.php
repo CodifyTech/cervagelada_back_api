@@ -2,13 +2,10 @@
 
 namespace App\Domains\Avaliacao\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Domains\Avaliacao\Models\Avaliacao;
 use App\Domains\Pedido\Models\Pedido;
-use App\Domains\Auth\Models\User;
-use App\Domains\Loja\Models\Loja;
-
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class AvaliacaoSeeder extends Seeder
 {
@@ -16,8 +13,6 @@ class AvaliacaoSeeder extends Seeder
 
     /**
      * Run the database seeds for Avaliacao.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -43,13 +38,15 @@ class AvaliacaoSeeder extends Seeder
 
         foreach ($pedidosEntregues as $pedido) {
             // ~70% chance of leaving a review per delivered order
-            if (rand(1, 10) > 7) continue;
+            if (rand(1, 10) > 7) {
+                continue;
+            }
 
             Avaliacao::create([
-                'pedido_id'  => $pedido->id,
-                'user_id'    => $pedido->user_id,
-                'loja_id'    => $pedido->loja_id,
-                'avaliacao'  => rand(3, 5),
+                'pedido_id' => $pedido->id,
+                'user_id' => $pedido->user_id,
+                'loja_id' => $pedido->loja_id,
+                'avaliacao' => rand(3, 5),
                 'comentario' => $comentarios[array_rand($comentarios)],
                 'created_at' => $pedido->created_at,
                 'updated_at' => $pedido->created_at,

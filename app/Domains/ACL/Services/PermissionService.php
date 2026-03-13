@@ -22,7 +22,7 @@ class PermissionService extends BaseService
                 [
                     'name',
                     DB::raw(
-                        (DB::getDriverName() === 'pgsql' ? 'STRING_AGG(slug, \',\')' : 'GROUP_CONCAT(slug)') . ' as slugs',
+                        (DB::getDriverName() === 'pgsql' ? 'STRING_AGG(slug, \',\')' : 'GROUP_CONCAT(slug)').' as slugs',
                     ),
                 ],
             )

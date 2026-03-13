@@ -2,11 +2,10 @@
 
 namespace App\Domains\Promocao\Controllers;
 
+use App\Domains\Promocao\Requests\PromocaoRequest;
+use App\Domains\Promocao\Services\PromocaoService;
 use App\Domains\Shared\Controller\BaseController;
 use Illuminate\Http\Request;
-
-use App\Domains\Promocao\Services\PromocaoService;
-use App\Domains\Promocao\Requests\PromocaoRequest;
 
 class PromocaoController extends BaseController
 {
@@ -15,8 +14,8 @@ class PromocaoController extends BaseController
         $this->setACL('promocao', [
             'list' => ['promocao.index'],
             'create' => ['promocao.store'],
-            'edit'=> ['promocao.update'],
-            'delete' => ['promocao.destroy']
+            'edit' => ['promocao.update'],
+            'delete' => ['promocao.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -24,8 +23,10 @@ class PromocaoController extends BaseController
     }
 
     // 👉 methods
-    public function listarLoja(Request $request) {
-		$options = $request->all();
-		return $this->service->listarLoja($options);
-	}
+    public function listarLoja(Request $request)
+    {
+        $options = $request->all();
+
+        return $this->service->listarLoja($options);
+    }
 }

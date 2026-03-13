@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'transacoes-financeiras'
+    'as' => 'transacoes-financeiras',
 ], function () {
 
     // TransacoesFinanceiras Routes
     Route::apiResource('transacoes-financeiras', TransacoesFinanceirasController::class);
     Route::post('transacoes-financeiras/search', [TransacoesFinanceirasController::class, 'search']);
-    
+
     Route::get('transacoes-financeiras/listar/loja', [TransacoesFinanceirasController::class, 'listarLoja']);
     Route::get('transacoes-financeiras/listar/pedido', [TransacoesFinanceirasController::class, 'listarPedido']);
 });

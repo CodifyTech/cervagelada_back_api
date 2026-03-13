@@ -2,8 +2,10 @@
 
 namespace App\Domains\Promocao\Services;
 
+use App\Domains\Loja\Models\Loja;
 use App\Domains\Promocao\Models\Promocao;
 use App\Domains\Shared\Services\BaseService;
+use Illuminate\Support\Str;
 
 class PromocaoService extends BaseService
 {
@@ -17,10 +19,12 @@ class PromocaoService extends BaseService
         $user = auth()->user();
         if ($user && $user->loja_id) {
             $options['loja_id'] = $user->loja_id;
+
             return parent::index($options, function ($query) use ($user) {
                 $query->where('loja_id', $user->loja_id);
             });
         }
+
         return parent::index($options, $builderCallback);
     }
 
@@ -35,11 +39,12 @@ class PromocaoService extends BaseService
         try {
             $promocao = parent::store($data);
 
-            if (!empty($data['produtos'])) {
+            if (! empty($data['produtos'])) {
                 $this->syncProdutos($promocao, $data['produtos']);
             }
 
             \DB::commit();
+
             return $promocao->load('produtos');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -58,6 +63,7 @@ class PromocaoService extends BaseService
             }
 
             \DB::commit();
+
             return $promocao->load('produtos');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -73,7 +79,7 @@ class PromocaoService extends BaseService
         $data['produtos'] = $promocao->produtos->map(function ($produto) {
             return [
                 'produto_id' => $produto->id,
-                'preco_promocional' => $produto->pivot->preco_promocional
+                'preco_promocional' => $produto->pivot->preco_promocional,
             ];
         })->toArray();
 
@@ -85,8 +91,8 @@ class PromocaoService extends BaseService
         $syncData = [];
         foreach ($produtos as $p) {
             $syncData[$p['produto_id']] = [
-                'id' => (string) \Illuminate\Support\Str::ulid(),
-                'preco_promocional' => $p['preco_promocional']
+                'id' => (string) Str::ulid(),
+                'preco_promocional' => $p['preco_promocional'],
             ];
         }
         $promocao->produtos()->sync($syncData);
@@ -95,7 +101,8 @@ class PromocaoService extends BaseService
     // 👉 methods
     public function listarLoja($options)
     {
-        $data = \App\Domains\Loja\Models\Loja::query()->paginate($options['per_page'] ?? 15);
+        $data = Loja::query()->paginate($options['per_page'] ?? 15);
+
         return $data->items();
     }
 }

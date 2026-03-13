@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands\Generator\Generators\BackEnd;
 
-use App\Console\Commands\Generator\Utils\TemplateManager;
 use App\Console\Commands\Generator\Utils\RouteManager;
+use App\Console\Commands\Generator\Utils\TemplateManager;
 use Illuminate\Support\Facades\File;
 
 class ServiceGenerator
 {
     private TemplateManager $templateManager;
+
     private RouteManager $routeManager;
 
     public function __construct(TemplateManager $templateManager, RouteManager $routeManager)
@@ -43,7 +44,7 @@ class ServiceGenerator
         $serviceDir = app_path("Domains/{$domain}/Services");
 
         // Criar diretório se não existir
-        if (!File::exists($serviceDir)) {
+        if (! File::exists($serviceDir)) {
             File::makeDirectory($serviceDir, 0755, true);
         }
 
@@ -57,7 +58,7 @@ class ServiceGenerator
     /**
      * Gera métodos FK para o service.
      *
-     * @param array $config Configuração do gerador
+     * @param  array  $config  Configuração do gerador
      * @return string Código dos métodos FK
      */
     private function generateFKMethods(array $config): string

@@ -2,11 +2,9 @@
 
 namespace App\Domains\Noticias\Controllers;
 
-use App\Domains\Shared\Controller\BaseController;
-use Illuminate\Http\Request;
-
-use App\Domains\Noticias\Services\NoticiasService;
 use App\Domains\Noticias\Requests\NoticiasRequest;
+use App\Domains\Noticias\Services\NoticiasService;
+use App\Domains\Shared\Controller\BaseController;
 
 class NoticiasController extends BaseController
 {
@@ -15,8 +13,8 @@ class NoticiasController extends BaseController
         $this->setACL('noticias', [
             'list' => ['noticias.index'],
             'create' => ['noticias.store'],
-            'edit'=> ['noticias.update'],
-            'delete' => ['noticias.destroy']
+            'edit' => ['noticias.update'],
+            'delete' => ['noticias.destroy'],
         ]);
         parent::__construct();
         $this->setService($this->service);
@@ -24,5 +22,5 @@ class NoticiasController extends BaseController
     }
 
     // 👉 methods
-    
+
 }

@@ -16,7 +16,7 @@ trait HasPermissions
 
     protected function cachedPermissions()
     {
-        if (!$this->exists || !$this->id) {
+        if (! $this->exists || ! $this->id) {
             return collect();
         }
 

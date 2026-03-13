@@ -4,6 +4,7 @@ namespace App\Domains\Shared\Helpers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class SortHelper
@@ -37,12 +38,12 @@ class SortHelper
                     );
                     $joins[] = $relatedTable;
                 }
-            } elseif ($relationObj instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+            } elseif ($relationObj instanceof BelongsToMany) {
                 $pivotTable = $relationObj->getTable();
-                $parentKey = $model->getTable() . '.' . $model->getKeyName();
-                $foreignPivotKey = $pivotTable . '.' . $relationObj->getForeignPivotKeyName();
-                $relatedPivotKey = $pivotTable . '.' . $relationObj->getRelatedPivotKeyName();
-                $relatedKey = $relatedTable . '.' . $relationObj->getRelatedKeyName();
+                $parentKey = $model->getTable().'.'.$model->getKeyName();
+                $foreignPivotKey = $pivotTable.'.'.$relationObj->getForeignPivotKeyName();
+                $relatedPivotKey = $pivotTable.'.'.$relationObj->getRelatedPivotKeyName();
+                $relatedKey = $relatedTable.'.'.$relationObj->getRelatedKeyName();
 
                 if (! in_array($pivotTable, $joins)) {
                     $query->leftJoin(
@@ -80,7 +81,8 @@ class SortHelper
                 } catch (\Exception $e) {
                     // Caso a relação não seja suportada, ignoramos e continuamos
                     // Registramos o erro para debug, mas não interrompemos o fluxo
-                    \Log::warning("Relação não suportada: {$relationName}. " . $e->getMessage());
+                    \Log::warning("Relação não suportada: {$relationName}. ".$e->getMessage());
+
                     continue;
                 }
             }

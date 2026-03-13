@@ -11,30 +11,28 @@ class CheckPermission
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure $next
-     * @param string $requirement
+     * @param  string  $requirement
      * @return mixed
      */
     public function handle(Request $request, Closure $next, $requirement)
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             abort(403, 'Unauthorized');
         }
 
         // Separa a entrada usando o pipe como delimitador
         [$role, $permission] = array_pad(explode('|', $requirement), 2, null);
 
-        if (!empty($role)) {
+        if (! empty($role)) {
             if ($user->hasRole($role)) {
                 return $next($request);
             }
         }
 
         // Verifica se é uma permissão
-        if (!empty($permission)) {
+        if (! empty($permission)) {
             if ($user->hasPermission($permission)) {
                 return $next($request);
             }

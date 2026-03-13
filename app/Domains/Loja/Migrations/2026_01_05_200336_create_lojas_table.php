@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('latitude');
             $table->string('longitude');
 
-
             $table->integer('raio_entrega_km');
             $table->integer('tempo_entrega_min');
             $table->integer('tempo_entrega_max');

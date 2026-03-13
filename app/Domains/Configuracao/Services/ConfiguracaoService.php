@@ -19,6 +19,7 @@ class ConfiguracaoService extends BaseService
     {
         return Cache::remember("config:{$chave}", self::CACHE_TTL, function () use ($chave, $default) {
             $config = Configuracao::where('chave', $chave)->first();
+
             return $config ? $config->valor : $default;
         });
     }

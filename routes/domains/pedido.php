@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'pedido'
+    'as' => 'pedido',
 ], function () {
 
     // Static routes MUST come before apiResource to avoid the {pedido} wildcard capturing them

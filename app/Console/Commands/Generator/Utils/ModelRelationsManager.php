@@ -10,9 +10,9 @@ class ModelRelationsManager
     /**
      * Cria relacionamentos bidirecionais entre modelos.
      *
-     * @param array $foreignKeys Array de chaves estrangeiras configuradas
-     * @param string $domainName Nome do domínio atual
-     * @param string $modelName Nome do modelo atual
+     * @param  array  $foreignKeys  Array de chaves estrangeiras configuradas
+     * @param  string  $domainName  Nome do domínio atual
+     * @param  string  $modelName  Nome do modelo atual
      */
     public function createRelationships(array $foreignKeys, string $domainName, string $modelName): void
     {
@@ -50,7 +50,7 @@ class ModelRelationsManager
                     $foreign['domain'], // Domínio do modelo relacionado
                     'belongsTo'         // belongsTo
                 );
-            } else if ($foreign['relation'] === 'hasOne') {
+            } elseif ($foreign['relation'] === 'hasOne') {
                 // Se o modelo atual tem uma relação hasOne,
                 // o outro modelo tem um belongsTo
 
@@ -111,7 +111,7 @@ class ModelRelationsManager
     {
         $modelPath = app_path("Domains/{$domainName}/Models/{$modelName}.php");
 
-        if (!File::exists($modelPath)) {
+        if (! File::exists($modelPath)) {
             // Modelo não existe, não podemos adicionar a relação
             return;
         }
@@ -131,7 +131,7 @@ class ModelRelationsManager
         $modelContent = $this->addRelationMethod($modelContent, $checkTo, $modelRelation, $relationship, $methodName);
 
         // Só salva se houve alteração
-        if ($modelContent !== $content . "}") {
+        if ($modelContent !== $content.'}') {
             File::put($modelPath, $modelContent);
         }
     }
@@ -145,7 +145,7 @@ class ModelRelationsManager
         $class = '';
 
         // Padrões mais específicos para verificar imports existentes
-        $modelImportPattern = '/use\s+App\\\\Domains\\\\' . preg_quote($domainRelation, '/') . '\\\\Models\\\\' . preg_quote($relatedModel, '/') . '\s*;/';
+        $modelImportPattern = '/use\s+App\\\\Domains\\\\'.preg_quote($domainRelation, '/').'\\\\Models\\\\'.preg_quote($relatedModel, '/').'\s*;/';
 
         // Mapear relacionamentos para os nomes corretos das classes do Eloquent
         $relationshipClassMap = [
@@ -153,11 +153,11 @@ class ModelRelationsManager
             'hasMany' => 'HasMany',
             'hasOne' => 'HasOne',
             'hasManyThrough' => 'HasManyThrough',
-            'belongsToMany' => 'BelongsToMany'
+            'belongsToMany' => 'BelongsToMany',
         ];
 
         $relationshipClass = $relationshipClassMap[$relationship] ?? ucfirst($relationship);
-        $relationImportPattern = '/use\s+Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\' . preg_quote($relationshipClass, '/') . '\s*;/';
+        $relationImportPattern = '/use\s+Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\'.preg_quote($relationshipClass, '/').'\s*;/';
 
         // Verificar se os imports já existem
         if (preg_match($modelImportPattern, $content)) {
@@ -173,9 +173,9 @@ class ModelRelationsManager
 
         // Padrões mais flexíveis para detectar métodos existentes
         $methodPatterns = [
-            '/public\s+function\s+' . preg_quote($methodNameCheck, '/') . '\s*\(\s*\)\s*:\s*' . preg_quote($relationshipClass, '/') . '/',
-            '/public\s+function\s+' . preg_quote($methodNameCheck, '/') . '\s*\(\s*\)\s*:\s*' . preg_quote(strtolower($relationshipClass), '/') . '/',
-            '/public\s+function\s+' . preg_quote($methodNameCheck, '/') . '\s*\(\s*\)/',
+            '/public\s+function\s+'.preg_quote($methodNameCheck, '/').'\s*\(\s*\)\s*:\s*'.preg_quote($relationshipClass, '/').'/',
+            '/public\s+function\s+'.preg_quote($methodNameCheck, '/').'\s*\(\s*\)\s*:\s*'.preg_quote(strtolower($relationshipClass), '/').'/',
+            '/public\s+function\s+'.preg_quote($methodNameCheck, '/').'\s*\(\s*\)/',
         ];
 
         foreach ($methodPatterns as $pattern) {
@@ -196,13 +196,13 @@ class ModelRelationsManager
     /**
      * Atualiza o conteúdo do modelo adicionando os imports necessários
      *
-     * @param string $modelContent Conteúdo atual do arquivo do modelo
-     * @param string $modelRelation Nome do modelo relacionado
-     * @param string $domainRelation Nome do domínio do modelo relacionado
-     * @param bool $importAdded Se o import da classe do modelo já existe
-     * @param bool $importRelationsUsing Se o import da classe de relacionamento já existe
-     * @param string $relationship Tipo de relacionamento (hasMany, hasOne, belongsTo)
-     * @param string $class Linha da definição da classe
+     * @param  string  $modelContent  Conteúdo atual do arquivo do modelo
+     * @param  string  $modelRelation  Nome do modelo relacionado
+     * @param  string  $domainRelation  Nome do domínio do modelo relacionado
+     * @param  bool  $importAdded  Se o import da classe do modelo já existe
+     * @param  bool  $importRelationsUsing  Se o import da classe de relacionamento já existe
+     * @param  string  $relationship  Tipo de relacionamento (hasMany, hasOne, belongsTo)
+     * @param  string  $class  Linha da definição da classe
      * @return string Conteúdo modificado do arquivo
      */
     protected function updateModelContent(string $modelContent, string $modelRelation, string $domainRelation, bool $importAdded, bool $importRelationsUsing, string $relationship, string $class): string
@@ -239,16 +239,16 @@ class ModelRelationsManager
             'hasMany' => 'HasMany',
             'hasOne' => 'HasOne',
             'hasManyThrough' => 'HasManyThrough',
-            'belongsToMany' => 'BelongsToMany'
+            'belongsToMany' => 'BelongsToMany',
         ];
 
         $relationshipClass = $relationshipClassMap[$relationship] ?? ucfirst($relationship);
 
-        if (!$importAdded) {
+        if (! $importAdded) {
             $useStatements[] = "use App\\Domains\\{$domainRelation}\\Models\\{$modelRelation};";
         }
 
-        if (!$importRelationsUsing) {
+        if (! $importRelationsUsing) {
             $useStatements[] = "use Illuminate\\Database\\Eloquent\\Relations\\{$relationshipClass};";
         }
 
@@ -261,7 +261,7 @@ class ModelRelationsManager
             $beforeImports = array_slice($lines, 0, $lastUsePosition + 1);
             $afterImports = array_slice($lines, $lastUsePosition + 1);
 
-            return implode("\n", $beforeImports) . "\n" . implode("\n", $useStatements) . implode("\n", $afterImports);
+            return implode("\n", $beforeImports)."\n".implode("\n", $useStatements).implode("\n", $afterImports);
         }
 
         // Se não encontramos imports mas encontramos o namespace, adicionamos depois do namespace
@@ -269,7 +269,7 @@ class ModelRelationsManager
             $beforeNamespace = array_slice($lines, 0, $namespacePosition + 1);
             $afterNamespace = array_slice($lines, $namespacePosition + 1);
 
-            return implode("\n", $beforeNamespace) . "\n\n" . implode("\n", $useStatements) . "\n" . implode("\n", $afterNamespace);
+            return implode("\n", $beforeNamespace)."\n\n".implode("\n", $useStatements)."\n".implode("\n", $afterNamespace);
         }
 
         // Se não encontramos nem namespace nem imports, adicionamos antes da classe
@@ -277,18 +277,18 @@ class ModelRelationsManager
             $beforeClass = array_slice($lines, 0, $classPosition);
             $afterClass = array_slice($lines, $classPosition);
 
-            return implode("\n", $beforeClass) . implode("\n", $useStatements) . "\n\n" . implode("\n", $afterClass);
+            return implode("\n", $beforeClass).implode("\n", $useStatements)."\n\n".implode("\n", $afterClass);
         }
 
         // Último recurso: adicionar no início do arquivo
-        return implode("\n", $useStatements) . "\n\n" . $modelContent;
+        return implode("\n", $useStatements)."\n\n".$modelContent;
     }
 
     protected function addRelationMethod(string $modelContent, bool $relationChecked, string $relatedModel, string $relationMethod, string $methodName): string
     {
         if ($relationChecked) {
             // O método já existe, apenas devolvemos o conteúdo com a chave fechando
-            return $modelContent . "\n}";
+            return $modelContent."\n}";
         }
 
         // Mapear relacionamentos para os nomes corretos das classes do Eloquent
@@ -297,7 +297,7 @@ class ModelRelationsManager
             'hasMany' => 'HasMany',
             'hasOne' => 'HasOne',
             'hasManyThrough' => 'HasManyThrough',
-            'belongsToMany' => 'BelongsToMany'
+            'belongsToMany' => 'BelongsToMany',
         ];
 
         $relationshipClass = $relationshipClassMap[$relationMethod] ?? ucfirst($relationMethod);
@@ -310,7 +310,7 @@ class ModelRelationsManager
             // Para relações belongsTo, a chave estrangeira é o modelo relacionado em snake_case + _id
             $template = "\n    /**\n     * Get the {$relatedModel} that owns this record.\n     *\n     * @return \\Illuminate\\Database\\Eloquent\\Relations\\{$relationshipClass}\n     */\n    public function %s(): %s\n    {\n        return \$this->%s(%s::class);\n    }\n";
             $relation = sprintf($template, $methodName, $relationshipClass, $relationMethod, $relatedModel);
-        } else if ($relationMethod === 'hasMany') {
+        } elseif ($relationMethod === 'hasMany') {
             // Para relações hasMany, a chave estrangeira é o modelo atual em snake_case + _id
             $template = "\n    /**\n     * Get the %s for this record.\n     *\n     * @return \\Illuminate\\Database\\Eloquent\\Relations\\{$relationshipClass}\n     */\n    public function %s(): %s\n    {\n        return \$this->%s(%s::class);\n    }\n";
             $relation = sprintf(
@@ -321,7 +321,7 @@ class ModelRelationsManager
                 $relationMethod,
                 $relatedModel
             );
-        } else if ($relationMethod === 'hasOne') {
+        } elseif ($relationMethod === 'hasOne') {
             // Para relações hasOne, a chave estrangeira é o modelo atual em snake_case + _id
             $template = "\n    /**\n     * Get the %s associated with this record.\n     *\n     * @return \\Illuminate\\Database\\Eloquent\\Relations\\{$relationshipClass}\n     */\n    public function %s(): %s\n    {\n        return \$this->%s(%s::class);\n    }\n";
             $relation = sprintf(
@@ -345,6 +345,6 @@ class ModelRelationsManager
         }
 
         // Adiciona o relacionamento e fecha a classe
-        return $modelContent . $relation . "}";
+        return $modelContent.$relation.'}';
     }
 }

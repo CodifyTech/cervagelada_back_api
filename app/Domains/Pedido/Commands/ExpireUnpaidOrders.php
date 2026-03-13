@@ -26,10 +26,11 @@ class ExpireUnpaidOrders extends Command
 
         if ($orders->isEmpty()) {
             $this->info('No unpaid orders to expire.');
+
             return self::SUCCESS;
         }
 
-        $auditService = new AuditService();
+        $auditService = new AuditService;
         $expired = 0;
 
         foreach ($orders as $pedido) {

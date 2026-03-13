@@ -2,8 +2,8 @@
 
 namespace App\Domains\Shared\Traits;
 
-use Illuminate\Support\Facades\Request;
 use App\Domains\ACL\Services\AccessManagerService;
+use Illuminate\Support\Facades\Request;
 
 trait HasACL
 {
@@ -11,12 +11,16 @@ trait HasACL
     {
         $route = Request::route();
 
-        if (!$route) return;
+        if (! $route) {
+            return;
+        }
 
         $routeName = $route->getName();      // Ex: "permissionario.index"
         $actionMethod = $route->getActionMethod(); // Ex: "index"
 
-        if (!$routeName || !$actionMethod) return;
+        if (! $routeName || ! $actionMethod) {
+            return;
+        }
 
         [$subject] = explode('.', $routeName);
         $this->authorized($subject, $actionMethod);
@@ -27,7 +31,7 @@ trait HasACL
         $acl = $this->getACL();
 
         if (
-            !isset($acl['subject'], $acl['rules']) ||
+            ! isset($acl['subject'], $acl['rules']) ||
             $acl['subject'] !== $subject
         ) {
             return;
@@ -40,10 +44,10 @@ trait HasACL
             $permissions = (array) $acl['rules'][$action];
 
             // Converter para formato com espaço: "permission read"
-            $permList = array_map(fn($p) => str_replace('.', ' ', $p), $permissions);
-            $permString = 'admin|' . implode('|', $permList);
+            $permList = array_map(fn ($p) => str_replace('.', ' ', $p), $permissions);
+            $permString = 'admin|'.implode('|', $permList);
 
-            if (!$accessService->hasAccess($permString)) {
+            if (! $accessService->hasAccess($permString)) {
                 abort(403, 'Você não tem permissão para acessar este recurso.');
             }
         }
@@ -52,7 +56,7 @@ trait HasACL
         if (is_string($acl['rules'])) {
             $perm = str_replace('.', ' ', $acl['rules']);
 
-            if (!$accessService->hasAccess($perm)) {
+            if (! $accessService->hasAccess($perm)) {
                 abort(403, 'Você não tem permissão para acessar este recurso.');
             }
         }

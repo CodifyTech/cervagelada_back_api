@@ -34,16 +34,16 @@ class ListGenerator
         );
 
         // Criar diretório se não existir
-        if (!File::exists($fullPath)) {
+        if (! File::exists($fullPath)) {
             File::makeDirectory($fullPath, 0755, true);
         }
 
         // Nome do arquivo seguindo padrão antigo
         $fileName = 'index.vue';
-        $filePath = $fullPath . '/' . $fileName;
+        $filePath = $fullPath.'/'.$fileName;
 
         // Verificar se o arquivo já existe
-        if (File::exists($filePath) && !($config['force'] ?? false)) {
+        if (File::exists($filePath) && ! ($config['force'] ?? false)) {
             return false;
         }
 
@@ -69,7 +69,7 @@ class ListGenerator
         $schema = $config['schema'];
 
         // Construir store name
-        $storeName = 'use' . $modelName . 'Store';
+        $storeName = 'use'.$modelName.'Store';
 
         // Construir interface name
         $interfaceName = "I$modelName";
@@ -101,7 +101,7 @@ class ListGenerator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column);
 
-            if (!$field) {
+            if (! $field) {
                 continue;
             }
 
@@ -113,7 +113,7 @@ class ListGenerator
             $headers[] = $this->createStubHeaderItem($field);
         }
 
-        return '[' . implode(',', $headers) . "\n]";
+        return '['.implode(',', $headers)."\n]";
     }
 
     /**
@@ -127,7 +127,7 @@ class ListGenerator
         foreach ($columns as $column) {
             @[$field, $params] = explode('=', $column);
 
-            if (!$field) {
+            if (! $field) {
                 continue;
             }
 
@@ -139,7 +139,7 @@ class ListGenerator
             $terms[] = $this->createStubTermsItem($modelName, $field);
         }
 
-        return '[' . implode(',', $terms) . "\n]";
+        return '['.implode(',', $terms)."\n]";
     }
 
     /**
@@ -147,7 +147,7 @@ class ListGenerator
      */
     private function createStubHeaderItem(string $field): string
     {
-        return "\n\t{\n\t\ttitle: '" . StringHumanizer::humanize($field) . "',\n\t\tkey: '$field',\n\t\tsortable: true\n\t}";
+        return "\n\t{\n\t\ttitle: '".StringHumanizer::humanize($field)."',\n\t\tkey: '$field',\n\t\tsortable: true\n\t}";
     }
 
     /**
@@ -155,6 +155,6 @@ class ListGenerator
      */
     private function createStubTermsItem(string $crudName, string $field): string
     {
-        return "\n\t{\n\t\ttitle: '" . StringHumanizer::humanize($field) . "',\n\t\tvalue: '" . strtolower($field) . "'\n\t}";
+        return "\n\t{\n\t\ttitle: '".StringHumanizer::humanize($field)."',\n\t\tvalue: '".strtolower($field)."'\n\t}";
     }
 }

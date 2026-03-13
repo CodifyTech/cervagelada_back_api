@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'middleware' => ['auth:api'],
-    'as' => 'produto'
+    'as' => 'produto',
 ], function () {
 
     // Approval routes (must come before apiResource to avoid wildcard capture)

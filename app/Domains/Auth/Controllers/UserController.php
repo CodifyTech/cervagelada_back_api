@@ -2,11 +2,11 @@
 
 namespace App\Domains\Auth\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Domains\Auth\Requests\UserRequest;
 use App\Domains\Auth\Services\UserService;
 use App\Domains\Shared\Controller\BaseController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {

@@ -2,12 +2,12 @@
 
 namespace App\Domains\Auth\Services;
 
-use App\Domains\Shared\Utils\IntHelper;
 use App\Domains\ACL\Models\Role;
 use App\Domains\Auth\Models\User;
 use App\Domains\Shared\Services\BaseService;
-use Illuminate\Database\Eloquent\Builder;
+use App\Domains\Shared\Utils\IntHelper;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserService extends BaseService
 {

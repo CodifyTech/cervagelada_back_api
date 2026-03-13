@@ -24,7 +24,7 @@ trait S3FileOperations
 
     public function putS3File($file, string $path): ?string
     {
-        $fileName = Str::uuid()->toString() . '.' . $file->getClientOriginalExtension();
+        $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
         try {
             Storage::disk('s3')->put("$path/$fileName", file_get_contents($file), 'public');
 
@@ -67,7 +67,7 @@ trait S3FileOperations
                 }
 
                 // Nome do arquivo
-                $fileHash = $fileName . '.webp';
+                $fileHash = $fileName.'.webp';
                 $name = "$path/$fileHash";
 
                 // Comprimir e upload
@@ -78,7 +78,7 @@ trait S3FileOperations
             } else {
                 // Processar arquivos que não são imagens
                 $extension = is_string($file) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
-                $fileHash = $fileName . '.' . $extension;
+                $fileHash = $fileName.'.'.$extension;
                 $name = "$path/$fileHash";
 
                 // Usar streaming para upload direto
@@ -92,7 +92,7 @@ trait S3FileOperations
             }
         } catch (Exception $e) {
             // Melhorar o log de erros
-            \Log::error('Erro no upload S3: ' . $e->getMessage());
+            \Log::error('Erro no upload S3: '.$e->getMessage());
 
             return null;
         }

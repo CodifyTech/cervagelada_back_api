@@ -4,7 +4,7 @@ namespace App\Domains\ACL\Enums;
 
 use Exception;
 
-enum PermissionActionsEnum : string
+enum PermissionActionsEnum: string
 {
     case READ = 'read';
     case CREATE = 'create';
@@ -27,7 +27,7 @@ enum PermissionActionsEnum : string
             PermissionActionsEnum::EDIT => 'Editar',
             PermissionActionsEnum::BLOCK => 'Bloquear',
             PermissionActionsEnum::MANAGE => 'Gerenciar',
-            default => throw new Exception("Unexpected match value: ".json_encode($this)),
+            default => throw new Exception('Unexpected match value: '.json_encode($this)),
         };
     }
 }

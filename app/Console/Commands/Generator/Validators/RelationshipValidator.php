@@ -13,29 +13,29 @@ class RelationshipValidator
         'belongsTo',
         'hasMany',
         'hasOne',
-        'belongsToMany'
+        'belongsToMany',
     ];
 
     /**
      * Valida uma relação específica
      *
-     * @param array $relation Dados da relação a ser validada
+     * @param  array  $relation  Dados da relação a ser validada
      * @return bool|string Retorna true se válido, ou string com mensagem de erro
      */
     public function validate(array $relation): bool|string
     {
         // Verifica se o tipo de relação é suportado
-        if (!isset($relation['relation']) || !in_array($relation['relation'], self::SUPPORTED_RELATIONS)) {
-            return "Tipo de relação '" . ($relation['relation'] ?? 'não informado') . "' inválido. Use: " . implode(', ', self::SUPPORTED_RELATIONS);
+        if (! isset($relation['relation']) || ! in_array($relation['relation'], self::SUPPORTED_RELATIONS)) {
+            return "Tipo de relação '".($relation['relation'] ?? 'não informado')."' inválido. Use: ".implode(', ', self::SUPPORTED_RELATIONS);
         }
 
         // Verifica se o domínio existe
-        if (!isset($relation['domain']) || !$this->domainExists($relation['domain'])) {
+        if (! isset($relation['domain']) || ! $this->domainExists($relation['domain'])) {
             return "Domínio '".($relation['domain'] ?? 'não informado')."' não existe";
         }
 
         // Verifica se o modelo existe no domínio
-        if (!isset($relation['model']) || !$this->modelExistsInDomain($relation['domain'], $relation['model'])) {
+        if (! isset($relation['model']) || ! $this->modelExistsInDomain($relation['domain'], $relation['model'])) {
             return "Model '".($relation['model'] ?? 'não informado')."' não existe no domínio '{$relation['domain']}'";
         }
 
@@ -49,7 +49,7 @@ class RelationshipValidator
     /**
      * Valida um array de relações
      *
-     * @param array $relations Array de relações a serem validadas
+     * @param  array  $relations  Array de relações a serem validadas
      * @return bool|string Retorna true se todas as relações forem válidas, ou string com mensagem de erro
      */
     public function validateAll(array $relations): bool|string
@@ -67,8 +67,7 @@ class RelationshipValidator
     /**
      * Verifica se um domínio existe
      *
-     * @param string $domain Nome do domínio
-     * @return bool
+     * @param  string  $domain  Nome do domínio
      */
     private function domainExists(string $domain): bool
     {
@@ -78,9 +77,8 @@ class RelationshipValidator
     /**
      * Verifica se um modelo existe no domínio especificado
      *
-     * @param string $domain Nome do domínio
-     * @param string $model Nome do modelo
-     * @return bool
+     * @param  string  $domain  Nome do domínio
+     * @param  string  $model  Nome do modelo
      */
     private function modelExistsInDomain(string $domain, string $model): bool
     {
@@ -99,8 +97,7 @@ class RelationshipValidator
     /**
      * Validações adicionais específicas para relacionamentos belongsToMany
      *
-     * @param array $relation Dados da relação
-     * @return bool|string
+     * @param  array  $relation  Dados da relação
      */
     private function validateBelongsToMany(array $relation): bool|string
     {

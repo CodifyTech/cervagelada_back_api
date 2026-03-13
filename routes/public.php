@@ -1,15 +1,15 @@
 <?php
 
-use App\Domains\Shared\Controller\PublicCepController;
-use App\Domains\Loja\Controllers\PublicLojaController;
-use App\Domains\Endereco\Controllers\PublicEnderecoController;
-use App\Domains\Pedido\Controllers\PublicPedidoController;
-use App\Domains\Pagamento\Controllers\AsaasWebhookController;
-use App\Domains\Promocao\Controllers\PublicPromocaoController;
-use App\Domains\Destaque\Controllers\PublicDestaqueController;
-use App\Domains\Produto\Controllers\PublicProdutoController;
-use App\Domains\Noticias\Controllers\PublicNoticiasController;
 use App\Domains\Configuracao\Controllers\PublicConfiguracaoController;
+use App\Domains\Destaque\Controllers\PublicDestaqueController;
+use App\Domains\Endereco\Controllers\PublicEnderecoController;
+use App\Domains\Loja\Controllers\PublicLojaController;
+use App\Domains\Noticias\Controllers\PublicNoticiasController;
+use App\Domains\Pagamento\Controllers\AsaasWebhookController;
+use App\Domains\Pedido\Controllers\PublicPedidoController;
+use App\Domains\Produto\Controllers\PublicProdutoController;
+use App\Domains\Promocao\Controllers\PublicPromocaoController;
+use App\Domains\Shared\Controller\PublicCepController;
 use Illuminate\Support\Facades\Route;
 
 /*

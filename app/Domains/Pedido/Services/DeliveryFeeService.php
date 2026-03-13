@@ -11,7 +11,9 @@ class DeliveryFeeService
      * Flat base fee (R$) + per-km rate after the first free kilometer.
      */
     private const BASE_FEE = 5.00;
+
     private const PER_KM_RATE = 1.50;
+
     private const FREE_KM = 1.0;
 
     /**
@@ -21,7 +23,7 @@ class DeliveryFeeService
     {
         $loja = Loja::findOrFail($lojaId);
 
-        if (!$endereco->latitude || !$endereco->longitude || !$loja->latitude || !$loja->longitude) {
+        if (! $endereco->latitude || ! $endereco->longitude || ! $loja->latitude || ! $loja->longitude) {
             return self::BASE_FEE;
         }
 

@@ -19,10 +19,11 @@ class MigrationServiceProvider extends ServiceProvider
     private function getMigrationFiles(): array
     {
         $dirName = app_path()
-            . DIRECTORY_SEPARATOR . "Domains"
-            . DIRECTORY_SEPARATOR . "*"
-            . DIRECTORY_SEPARATOR . "Migrations"
-            . DIRECTORY_SEPARATOR . "*.php";
+            .DIRECTORY_SEPARATOR.'Domains'
+            .DIRECTORY_SEPARATOR.'*'
+            .DIRECTORY_SEPARATOR.'Migrations'
+            .DIRECTORY_SEPARATOR.'*.php';
+
         return glob($dirName, GLOB_BRACE);
     }
 

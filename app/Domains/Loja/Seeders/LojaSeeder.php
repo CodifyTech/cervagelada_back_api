@@ -2,10 +2,10 @@
 
 namespace App\Domains\Loja\Seeders;
 
+use App\Domains\Auth\Models\User;
+use App\Domains\Loja\Models\Loja;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Domains\Loja\Models\Loja;
-
 
 class LojaSeeder extends Seeder
 {
@@ -13,8 +13,6 @@ class LojaSeeder extends Seeder
 
     /**
      * Run the database seeds for Loja.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -31,7 +29,7 @@ class LojaSeeder extends Seeder
             ['nome_fantasia' => 'Puro Malte Shop', 'tipo_loja' => 'cervejaria'],
         ];
 
-        $users = \App\Domains\Auth\Models\User::orderBy('created_at')->limit(12)->get();
+        $users = User::orderBy('created_at')->limit(12)->get();
 
         foreach ($lojas as $index => $lojaData) {
             $loja = Loja::create(array_merge($lojaData, [
