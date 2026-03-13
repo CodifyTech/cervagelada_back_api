@@ -58,12 +58,24 @@ class ProdutoController extends BaseController
 
     public function pendentes(Request $request): JsonResponse
     {
-        $query = Produto::pendentes()
-            ->with('aprovador')
+        $query = Produto::query()
+            ->with(['aprovador'])
             ->orderBy('created_at', 'desc');
 
-        if ($request->filled('busca')) {
-            $query->where('nome', 'like', '%'.$request->input('busca').'%');
+        // Filtro de Status
+        $status = $request->input('status', 'pendente');
+        if ($status !== 'todos') {
+            $query->where('status_aprovacao', $status);
+        }
+
+        // Filtro de Busca
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nome', 'like', "%{$search}%")
+                    ->orWhere('marca', 'like', "%{$search}%")
+                    ->orWhere('ean', 'like', "%{$search}%");
+            });
         }
 
         return response()->json($query->paginate($request->input('per_page', 20)));
