@@ -17,7 +17,7 @@ class DashboardService extends BaseService
      */
     public function getMetricas(): array
     {
-        return $this->dashboardModel->getMetricas($this->resolveLojaId());
+        return $this->dashboardModel->getMetricas();
     }
 
     /**
@@ -25,7 +25,7 @@ class DashboardService extends BaseService
      */
     public function getVendasMensais(int $ano): array
     {
-        return $this->dashboardModel->getVendasMensais($this->resolveLojaId(), $ano);
+        return $this->dashboardModel->getVendasMensais($ano);
     }
 
     /**
@@ -33,7 +33,7 @@ class DashboardService extends BaseService
      */
     public function getPedidosPorMes(int $ano): array
     {
-        return $this->dashboardModel->getPedidosPorMes($this->resolveLojaId(), $ano);
+        return $this->dashboardModel->getPedidosPorMes($ano);
     }
 
     /**
@@ -41,7 +41,7 @@ class DashboardService extends BaseService
      */
     public function getCategoriasMaisVendidas(): array
     {
-        return $this->dashboardModel->getCategoriasMaisVendidas($this->resolveLojaId());
+        return $this->dashboardModel->getCategoriasMaisVendidas();
     }
 
     /**
@@ -49,7 +49,7 @@ class DashboardService extends BaseService
      */
     public function getTopProdutos(int $limit = 5): array
     {
-        return $this->dashboardModel->getTopProdutos($this->resolveLojaId(), $limit);
+        return $this->dashboardModel->getTopProdutos($limit);
     }
 
     /**
@@ -57,7 +57,7 @@ class DashboardService extends BaseService
      */
     public function getPedidosRecentes(int $limit = 5): array
     {
-        return $this->dashboardModel->getPedidosRecentes($this->resolveLojaId(), $limit);
+        return $this->dashboardModel->getPedidosRecentes($limit);
     }
 
     /**
@@ -82,22 +82,5 @@ class DashboardService extends BaseService
             'top_produtos' => $this->getTopProdutos($limit),
             'pedidos_recentes' => $this->getPedidosRecentes($limit),
         ];
-    }
-
-    /**
-     * Resolves the loja_id for the currently authenticated user.
-     *
-     * @throws \Exception
-     */
-    protected function resolveLojaId(): string
-    {
-        $user = auth()->user();
-        $lojaId = $user->loja_id ?? null;
-
-        if (! $lojaId) {
-            throw new \Exception('Loja não encontrada para o usuário autenticado.', 403);
-        }
-
-        return $lojaId;
     }
 }

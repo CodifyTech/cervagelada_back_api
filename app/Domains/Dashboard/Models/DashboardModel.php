@@ -26,8 +26,8 @@ class DashboardModel extends BaseModel
         $fimMesPassado = $hoje->copy()->subMonth()->endOfMonth();
 
         $totalPorRole = DB::table('users')
-            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->join('roles', 'role_user.role_id', '=', 'roles.id')
             ->selectRaw('roles.name as role, COUNT(DISTINCT users.id) as total')
             ->groupBy('roles.name')
             ->pluck('total', 'role')
@@ -87,7 +87,7 @@ class DashboardModel extends BaseModel
      * Get main metrics (receita_total, total_pedidos, ticket_medio).
      * Compares current month with previous month.
      */
-    public function getMetricas(string $lojaId): array
+    public function getMetricas(): array
     {
         $hoje = Carbon::now();
         $mesAtual = $hoje->month;
@@ -96,8 +96,8 @@ class DashboardModel extends BaseModel
         $mesPassado = $hoje->copy()->subMonth()->month;
         $anoPassado = $hoje->copy()->subMonth()->year;
 
-        $statsAtual = $this->getStatsByPeriod($lojaId, $mesAtual, $anoAtual);
-        $statsPassado = $this->getStatsByPeriod($lojaId, $mesPassado, $anoPassado);
+        $statsAtual = $this->getStatsByPeriod($mesAtual, $anoAtual);
+        $statsPassado = $this->getStatsByPeriod($mesPassado, $anoPassado);
 
         return [
             'receita_total' => [
@@ -121,11 +121,11 @@ class DashboardModel extends BaseModel
     /**
      * Get monthly sales (revenue) grouped by month for the given year.
      */
-    public function getVendasMensais(string $lojaId, int $ano): array
+    public function getVendasMensais(int $ano): array
     {
         $vendas = DB::table('pedidos')
             ->selectRaw('MONTH(created_at) as mes, SUM(total) as valor')
-            ->where('loja_id', $lojaId)
+            ->where('loja_id', config('cdf.active_loja_id'))
             ->whereYear('created_at', $ano)
             ->where('status', '!=', 'cancelado')
             ->groupBy('mes')
@@ -151,11 +151,11 @@ class DashboardModel extends BaseModel
     /**
      * Get order count per month for the given year.
      */
-    public function getPedidosPorMes(string $lojaId, int $ano): array
+    public function getPedidosPorMes(int $ano): array
     {
         $pedidos = DB::table('pedidos')
             ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
-            ->where('loja_id', $lojaId)
+            ->where('loja_id', config('cdf.active_loja_id'))
             ->whereYear('created_at', $ano)
             ->groupBy('mes')
             ->orderBy('mes')
@@ -173,14 +173,14 @@ class DashboardModel extends BaseModel
     /**
      * Top selling categories based on product brand (marca).
      */
-    public function getCategoriasMaisVendidas(string $lojaId): array
+    public function getCategoriasMaisVendidas(): array
     {
         // Using 'marca' as a proxy for category as per implementation plan
         return DB::table('item_pedidos')
             ->join('pedidos', 'item_pedidos.pedido_id', '=', 'pedidos.id')
             ->join('produtos', 'item_pedidos.produto_id', '=', 'produtos.id')
             ->selectRaw('produtos.marca as categoria, SUM(item_pedidos.quantidade_final) as vendas')
-            ->where('pedidos.loja_id', $lojaId)
+            ->where('pedidos.loja_id', config('cdf.active_loja_id'))
             ->where('pedidos.status', '!=', 'cancelado')
             ->groupBy('produtos.marca')
             ->orderByDesc('vendas')
@@ -198,7 +198,7 @@ class DashboardModel extends BaseModel
     /**
      * Top 5 selling products with details.
      */
-    public function getTopProdutos(string $lojaId, int $limit = 5): array
+    public function getTopProdutos(int $limit = 5): array
     {
         $hoje = Carbon::now();
         $mesAtual = $hoje->month;
@@ -217,7 +217,7 @@ class DashboardModel extends BaseModel
                 SUM(item_pedidos.quantidade_final) as vendas,
                 SUM(item_pedidos.preco_total) as receita
             ')
-            ->where('pedidos.loja_id', $lojaId)
+            ->where('pedidos.loja_id', config('cdf.active_loja_id'))
             ->where('pedidos.status', '!=', 'cancelado')
             ->whereMonth('pedidos.created_at', $mesAtual)
             ->whereYear('pedidos.created_at', $anoAtual)
@@ -226,11 +226,11 @@ class DashboardModel extends BaseModel
             ->limit($limit)
             ->get();
 
-        return $top->map(function ($item) use ($lojaId, $mesPassado, $anoPassado) {
+        return $top->map(function ($item) use ($mesPassado, $anoPassado) {
             // Calculate growth vs last month for this specific product
             $vendasPassado = DB::table('item_pedidos')
                 ->join('pedidos', 'item_pedidos.pedido_id', '=', 'pedidos.id')
-                ->where('pedidos.loja_id', $lojaId)
+                ->where('pedidos.loja_id', config('cdf.active_loja_id'))
                 ->where('item_pedidos.produto_id', $item->id)
                 ->where('pedidos.status', '!=', 'cancelado')
                 ->whereMonth('pedidos.created_at', $mesPassado)
@@ -251,12 +251,12 @@ class DashboardModel extends BaseModel
     /**
      * Most recent orders.
      */
-    public function getPedidosRecentes(string $lojaId, int $limit = 5): array
+    public function getPedidosRecentes(int $limit = 5): array
     {
         return DB::table('pedidos')
             ->join('users', 'pedidos.user_id', '=', 'users.id')
             ->select('pedidos.id', 'users.name as cliente', 'pedidos.total as valor', 'pedidos.status', 'pedidos.created_at as data')
-            ->where('pedidos.loja_id', $lojaId)
+            ->where('pedidos.loja_id', config('cdf.active_loja_id'))
             ->orderByDesc('pedidos.created_at')
             ->limit($limit)
             ->get()
@@ -276,11 +276,11 @@ class DashboardModel extends BaseModel
     /**
      * Helper to get stats for a specific period.
      */
-    private function getStatsByPeriod(string $lojaId, int $mes, int $ano): array
+    private function getStatsByPeriod(int $mes, int $ano): array
     {
         $data = DB::table('pedidos')
             ->selectRaw('SUM(total) as vendas, COUNT(*) as pedidos')
-            ->where('loja_id', $lojaId)
+            ->where('loja_id', config('cdf.active_loja_id'))
             ->where('status', '!=', 'cancelado')
             ->whereMonth('created_at', $mes)
             ->whereYear('created_at', $ano)

@@ -12,6 +12,11 @@ class LojaService extends BaseService
         $this->setModel($this->loja);
     }
 
+    public function show(string $id)
+    {
+        return parent::show($id)->load(['horarios']);
+    }
+
     /**
      * Create a store with horarios.
      */
