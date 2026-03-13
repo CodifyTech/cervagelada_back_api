@@ -261,19 +261,13 @@ class UsersSeeder extends Seeder
                 ],
                 'roleName' => 'logista',
             ],
-            [
-                'data' => [
-                    'name' => 'Consumidor Teste',
-                    'email' => 'consumidor@cervagelada.com',
-                    'password' => Hash::make('123456'),
-                    'email_verified_at' => now(),
-                ],
-                'roleName' => 'consumidor',
-            ],
         ];
 
         foreach ($users as $user) {
-            $adminUser = User::create($user['data']);
+            $adminUser = User::updateOrCreate(
+                ['email' => $user['data']['email']],
+                $user['data']
+            );
             $adminUser->assignRole($user['roleName']);
         }
     }
