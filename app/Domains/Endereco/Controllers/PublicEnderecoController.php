@@ -44,7 +44,9 @@ class PublicEnderecoController extends Controller
             $data['longitude'] = $coords['longitude'];
         }
 
-        $hasEnderecos = Endereco::where('user_id', auth()->id())->withoutGlobalScopes()->exists();
+        $hasEnderecos = Endereco::where('user_id', auth()->id())
+            ->withoutGlobalScopes()
+            ->exists();
         $data['principal'] = ! $hasEnderecos;
 
         $endereco = Endereco::create($data);

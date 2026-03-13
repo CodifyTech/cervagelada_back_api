@@ -8,6 +8,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 trait TenantScope
 {
+    private static array $tableHasTenantColumnCache = [];
+
     public static function bootTenantScope(): void
     {
         static::addGlobalScope('tenant', function (Builder $builder) {
@@ -55,6 +57,10 @@ trait TenantScope
                     $tenantTable = config('cdf.tenantTable');
                     $tenantColumn = config('cdf.tenantColumn');
 
+                    if ($table !== $tenantTable && ! self::modelTableHasTenantColumn($table, $tenantColumn)) {
+                        return;
+                    }
+
                     // Se for a própria tabela de tenants, usa 'id', senão usa a coluna configurada
                     $colunaId = $table === $tenantTable ? "$table.id" : "$table.$tenantColumn";
                     $builder->where($colunaId, $tenantId);
@@ -81,6 +87,10 @@ trait TenantScope
                     return;
                 }
 
+                if (! self::modelTableHasTenantColumn($model->getTable(), $tenantColumn)) {
+                    return;
+                }
+
                 $userId = self::getCurrentUserIdSafely();
 
                 if ($userId) {
@@ -99,6 +109,21 @@ trait TenantScope
                 self::exitTenantScopeRecursion();
             }
         });
+    }
+
+    private static function modelTableHasTenantColumn(string $table, string $tenantColumn): bool
+    {
+        $cacheKey = "{$table}:{$tenantColumn}";
+
+        if (! array_key_exists($cacheKey, self::$tableHasTenantColumnCache)) {
+            try {
+                self::$tableHasTenantColumnCache[$cacheKey] = DB::getSchemaBuilder()->hasColumn($table, $tenantColumn);
+            } catch (\Throwable) {
+                self::$tableHasTenantColumnCache[$cacheKey] = false;
+            }
+        }
+
+        return self::$tableHasTenantColumnCache[$cacheKey];
     }
 
     /**
@@ -212,7 +237,7 @@ trait TenantScope
                 ->where('id', $userId)
                 ->first();
 
-            $userTenantId = $user ? ($user->{$tenantColumn} ?? $user->id) : null;
+            $userTenantId = $user?->{$tenantColumn};
 
             if ($userTenantId == $storeId) {
                 return $storeId;
@@ -229,7 +254,7 @@ trait TenantScope
                     ->where('id', $userId)
                     ->first();
 
-                $tenantCache[$userId] = $user ? ($user->{$tenantColumn} ?? $user->id) : null;
+                $tenantCache[$userId] = $user?->{$tenantColumn};
             } catch (\Exception $e) {
                 $tenantCache[$userId] = null;
             }

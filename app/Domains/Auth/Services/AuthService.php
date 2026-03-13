@@ -178,7 +178,7 @@ class AuthService extends BaseService
 
     public function profile(): JsonResponse
     {
-        return response()->json(auth()->user()->withoutGlobalScopes()->get());
+        return response()->json(auth()->user());
     }
 
     public function updateProfile(): JsonResponse

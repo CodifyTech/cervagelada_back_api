@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\Auth\Controllers\AuthController;
 use App\Domains\Configuracao\Controllers\PublicConfiguracaoController;
 use App\Domains\Destaque\Controllers\PublicDestaqueController;
 use App\Domains\Endereco\Controllers\PublicEnderecoController;
@@ -56,6 +57,9 @@ Route::group(['prefix' => 'public'], function () {
 
     // Consumer address management (requires JWT auth)
     Route::group(['middleware' => 'auth:api'], function () {
+        Route::get('profile', [AuthController::class, 'profile']);
+        Route::put('profile', [AuthController::class, 'updateProfile']);
+
         Route::get('enderecos/meus', [PublicEnderecoController::class, 'index']);
         Route::post('enderecos', [PublicEnderecoController::class, 'store']);
         Route::put('enderecos/{id}', [PublicEnderecoController::class, 'update']);
