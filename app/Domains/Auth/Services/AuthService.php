@@ -115,11 +115,11 @@ class AuthService extends BaseService
                 'loja_id' => $loja->id,
             ]);
 
+            $user->markEmailAsVerified();
+
             if (! empty($request->roles)) {
                 $user->assignRole($request->roles);
             }
-
-            $user->sendEmailVerificationNotification();
 
             $loggedIn = $this->login(new LoginRequest([
                 'email' => $request->email,
