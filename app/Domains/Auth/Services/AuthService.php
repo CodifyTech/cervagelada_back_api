@@ -11,6 +11,7 @@ use App\Domains\Auth\Requests\RegisterStoreRequest;
 use App\Domains\Auth\Requests\ResetPasswordRequest;
 use App\Domains\Loja\Models\Loja;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Shared\Services\CepService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -92,12 +93,20 @@ class AuthService extends BaseService
     public function registerWithStore(RegisterStoreRequest $request): JsonResponse
     {
         return DB::transaction(function () use ($request) {
-            $loja = Loja::create($request->only([
+            $lojaData = $request->only([
                 'nome_fantasia', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km',
                 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo',
                 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento',
                 'bairro', 'cidade', 'estado',
-            ]));
+            ]);
+
+            $coords = app(CepService::class)->geocode($lojaData);
+            if ($coords['latitude'] && $coords['longitude']) {
+                $lojaData['latitude'] = $coords['latitude'];
+                $lojaData['longitude'] = $coords['longitude'];
+            }
+
+            $loja = Loja::create($lojaData);
 
             if ($request->has('horarios')) {
                 foreach ($request->horarios as $horario) {

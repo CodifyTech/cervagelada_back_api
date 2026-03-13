@@ -21,8 +21,8 @@ class RegisterStoreRequest extends FormRequest
             // Loja validations
             'nome_fantasia' => ['required', 'string', 'max:150'],
             'tipo_loja' => ['required', 'in:distribuidor,cervejaria'],
-            'latitude' => ['required', 'numeric'],
-            'longitude' => ['required', 'numeric'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
             'raio_entrega_km' => ['required', 'integer'],
             'tempo_entrega_min' => ['required', 'integer'],
             'tempo_entrega_max' => ['required', 'integer'],
