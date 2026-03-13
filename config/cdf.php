@@ -1,5 +1,7 @@
 <?php
 
+use App\Domains\Auth\Models\User;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -35,9 +37,78 @@ return [
         'es',
     ],
 
-    'tenantTable' => 'tenants',
-    'tenantColumn' => 'tenant_id',
+    'tenantTable' => 'lojas',
+    'tenantColumn' => 'loja_id',
     'tenantModels' => [
-        Domains\Auth\Models\User::class,
+        App\Domains\Loja\Models\Loja::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Auth\Models\User::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Pedido\Models\Pedido::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Avaliacao\Models\Avaliacao::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Endereco\Models\Endereco::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Loja\Models\HorarioLoja::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Pagamento\Models\Pagamento::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        App\Domains\Configuracao\Models\Configuracao::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        \App\Domains\Produto\Models\LojaProduto::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
     ],
 ];

@@ -46,6 +46,7 @@ class PagamentoService
 
             $pagamento = Pagamento::create([
                 'pedido_id' => $pedido->id,
+                'loja_id' => $pedido->loja_id,
                 'asaas_charge_id' => $charge['id'],
                 'asaas_customer_id' => $customerId,
                 'metodo' => $metodo,

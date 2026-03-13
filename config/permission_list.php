@@ -59,6 +59,13 @@ return [
         'produto block',
         'produto manage',
     ],
+    'loja-produto' => [
+        'loja-produto read',
+        'loja-produto list',
+        'loja-produto create',
+        'loja-produto edit',
+        'loja-produto delete',
+    ],
     'noticias' => [
         'noticias read',
         'noticias create',

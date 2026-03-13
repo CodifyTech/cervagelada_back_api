@@ -42,7 +42,7 @@ class CepService
         return $endereco;
     }
 
-    private function geocode(array $endereco): array
+    public function geocode(array $endereco): array
     {
         $token = config('services.mapbox.token');
 

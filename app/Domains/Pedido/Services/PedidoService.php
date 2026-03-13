@@ -29,8 +29,6 @@ class PedidoService extends BaseService
             $itens = $data['itens'] ?? [];
             unset($data['itens']);
 
-            $lojaId = $data['loja_id'];
-
             // Set user_id if not provided
             if (!isset($data['user_id']) && auth()->check()) {
                 $data['user_id'] = auth()->id();
@@ -51,7 +49,6 @@ class PedidoService extends BaseService
 
                 // Check stock in the store
                 $lojaProduto = \DB::table('loja_produtos')
-                    ->where('loja_id', $lojaId)
                     ->where('produto_id', $produtoId)
                     ->first();
 
@@ -94,8 +91,7 @@ class PedidoService extends BaseService
             // Generate unique delivery PIN
             $data['pin_entrega'] = $this->generateUniquePin();
 
-            /** @var Pedido $pedido */
-            $pedido = $this->model->create($data);
+            $pedido = $this->pedido->create($data);
 
             foreach ($itemsToCreate as $itemData) {
                 $pedido->itemPedidos()->create($itemData);
@@ -173,10 +169,7 @@ class PedidoService extends BaseService
      */
     public function listarLoja(array $options = []): array
     {
-        $lojaId = $this->resolveLojaId();
-
-        $query = Pedido::with(['user', 'itemPedidos', 'pagamento'])
-            ->where('loja_id', $lojaId);
+        $query = Pedido::with(['user', 'itemPedidos', 'pagamento']);
 
         // Filter by status
         if (!empty($options['status'])) {
@@ -221,10 +214,7 @@ class PedidoService extends BaseService
      */
     public function resumoLoja(): array
     {
-        $lojaId = $this->resolveLojaId();
-
-        $counts = Pedido::where('loja_id', $lojaId)
-            ->selectRaw('status, count(*) as total')
+        $counts = Pedido::selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
@@ -295,23 +285,5 @@ class PedidoService extends BaseService
         return $pin;
     }
 
-    /**
-     * Resolves the loja_id for the currently authenticated user.
-     * Uses the loja_id stored directly on the users table.
-     *
-     * @return string
-     * @throws \Exception
-     */
-    protected function resolveLojaId(): string
-    {
-        $user = auth()->user();
 
-        $lojaId = $user->loja_id ?? null;
-
-        if (!$lojaId) {
-            throw new \Exception('Loja não encontrada para o usuário autenticado.', 403);
-        }
-
-        return $lojaId;
-    }
 }

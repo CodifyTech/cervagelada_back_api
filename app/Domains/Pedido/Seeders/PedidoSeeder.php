@@ -67,6 +67,7 @@ class PedidoSeeder extends Seeder
                     $isPago = $status !== 'cancelado';
                     Pagamento::create([
                         'pedido_id'  => $pedido->id,
+                        'loja_id'    => $loja->id,
                         'metodo'     => $metodos[array_rand($metodos)],
                         'status'     => $isPago ? 'pago' : 'cancelado',
                         'valor'      => 0, // Updated by ItemPedidoSeeder

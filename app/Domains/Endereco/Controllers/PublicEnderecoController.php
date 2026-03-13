@@ -3,6 +3,7 @@
 namespace App\Domains\Endereco\Controllers;
 
 use App\Domains\Endereco\Models\Endereco;
+use App\Domains\Shared\Services\CepService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,12 @@ class PublicEnderecoController extends Controller
 
         $data['user_id'] = auth()->id();
 
+        $coords = app(CepService::class)->geocode($data);
+        if ($coords['latitude'] && $coords['longitude']) {
+            $data['latitude'] = $coords['latitude'];
+            $data['longitude'] = $coords['longitude'];
+        }
+
         $hasEnderecos = Endereco::where('user_id', auth()->id())->exists();
         $data['principal'] = !$hasEnderecos;
 
@@ -66,6 +73,12 @@ class PublicEnderecoController extends Controller
             Endereco::where('user_id', auth()->id())
                 ->where('id', '!=', $id)
                 ->update(['principal' => false]);
+        }
+
+        $coords = app(CepService::class)->geocode($data);
+        if ($coords['latitude'] && $coords['longitude']) {
+            $data['latitude'] = $coords['latitude'];
+            $data['longitude'] = $coords['longitude'];
         }
 
         $endereco->update($data);

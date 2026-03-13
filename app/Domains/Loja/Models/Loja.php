@@ -46,8 +46,13 @@ class Loja extends BaseModel
     {
         $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))";
 
+        if (is_null($query->getQuery()->columns)) {
+            $query->select($this->getTable() . '.*');
+        }
+
         return $query
-            ->selectRaw("*, {$haversine} AS distancia", [$lat, $lng, $lat])
+            ->addSelect(\DB::raw("{$haversine} AS distancia"))
+            ->addBinding([$lat, $lng, $lat], 'select')
             ->whereRaw("{$haversine} <= raio_entrega_km", [$lat, $lng, $lat])
             ->orderByRaw("{$haversine} ASC", [$lat, $lng, $lat]);
     }
@@ -58,6 +63,7 @@ class Loja extends BaseModel
     public function produtos(): BelongsToMany
     {
         return $this->belongsToMany(\App\Domains\Produto\Models\Produto::class, 'loja_produtos', 'loja_id', 'produto_id')
+            ->using(\App\Domains\Produto\Models\LojaProduto::class)
             ->withPivot(['id', 'preco', 'preco_promocional', 'estoque', 'destaque', 'ativo'])
             ->withTimestamps();
     }

@@ -34,6 +34,7 @@ class Produto extends BaseModel
     public function lojas(): BelongsToMany
     {
         return $this->belongsToMany(\App\Domains\Loja\Models\Loja::class, 'loja_produtos', 'produto_id', 'loja_id')
+                    ->using(LojaProduto::class)
                     ->withPivot(['id', 'preco', 'preco_promocional', 'estoque', 'destaque', 'ativo'])
                     ->withTimestamps();
     }

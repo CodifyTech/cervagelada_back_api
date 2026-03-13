@@ -34,25 +34,30 @@ trait TenantScope
                     return;
                 }
 
-                // Get user ID directly from session/JWT without triggering Auth facade
-                $userId = self::getCurrentUserIdSafely();
+                // Tenta obter o tenant já resolvido pelo middleware
+                $tenantId = config('cdf.active_loja_id');
 
-                if (!$userId) {
-                    return;
+                if (!$tenantId) {
+                    // Fallback: Tenta resolver manualmente se o middleware não rodou (console/testes)
+                    $userId = self::getCurrentUserIdSafely();
+                    if ($userId) {
+                        // Check if user is admin using direct database query
+                        $isAdmin = self::isUserAdminDirectQuery($userId);
+
+                        if (!$isAdmin) {
+                            $tenantId = self::getUserTenantIdDirectly($userId);
+                        }
+                    }
                 }
 
-                // Check if user is admin using direct database query
-                $isAdmin = self::isUserAdminDirectQuery($userId);
+                if ($tenantId) {
+                    $table = $builder->getModel()->getTable();
+                    $tenantTable = config('cdf.tenantTable');
+                    $tenantColumn = config('cdf.tenantColumn');
 
-                if (!$isAdmin) {
-                    // Get tenant_id directly from database
-                    $tenantId = self::getUserTenantIdDirectly($userId);
-
-                    if ($tenantId) {
-                        $table = $builder->getModel()->getTable();
-                        $colunaId = $table === config('cdf.tenantTable') ? "$table.id" : "$table." . config('cdf.tenantColumn');
-                        $builder->where($colunaId, $tenantId);
-                    }
+                    // Se for a própria tabela de tenants, usa 'id', senão usa a coluna configurada
+                    $colunaId = $table === $tenantTable ? "$table.id" : "$table.$tenantColumn";
+                    $builder->where($colunaId, $tenantId);
                 }
             } finally {
                 self::exitTenantScopeRecursion();
@@ -69,17 +74,25 @@ trait TenantScope
             try {
                 $modelClass = $model::class;
                 $tenantModels = config('cdf.tenantModels', []);
+                $tenantTable = config('cdf.tenantTable');
+                $tenantColumn = config('cdf.tenantColumn');
 
-                if (!isset($tenantModels[$modelClass]) || $model->getTable() === config('cdf.tenantTable')) {
+                if (!isset($tenantModels[$modelClass]) || $model->getTable() === $tenantTable) {
                     return;
                 }
 
                 $userId = self::getCurrentUserIdSafely();
 
                 if ($userId) {
-                    $tenantId = self::getUserTenantIdDirectly($userId);
+                    // Tenta obter o tenant já resolvido pelo middleware
+                    $tenantId = config('cdf.active_loja_id');
+
+                    if (!$tenantId) {
+                        $tenantId = self::getUserTenantIdDirectly($userId);
+                    }
+
                     if ($tenantId) {
-                        $model[config('cdf.tenantColumn')] = $tenantId;
+                        $model->{$tenantColumn} = $tenantId;
                     }
                 }
             } finally {
@@ -169,20 +182,53 @@ trait TenantScope
     }
 
     /**
-     * Get user tenant_id directly from database
+     * Get user tenant_id directly from database.
+     * Supports X-Store-Id header for switching.
      */
     private static function getUserTenantIdDirectly(string $userId): ?string
     {
         static $tenantCache = [];
+        $tenantColumn = config('cdf.tenantColumn');
+
+        // Try to get X-Store-Id from header (for switching stores)
+        $request = request();
+        if ($request && $request->hasHeader('X-Store-Id')) {
+            $storeId = $request->header('X-Store-Id');
+
+            // Check if user is admin
+            $isAdmin = self::isUserAdminDirectQuery($userId);
+
+            if ($isAdmin) {
+                // Admin can access any store provided in header
+                return $storeId;
+            }
+
+            // For regular users, they should only be able to switch to their primary tenant_id
+            // Or if we implement a pivot table later, we check it here.
+            // Currently, checking if it matches their assigned tenant_id.
+            $user = DB::table('users')
+                ->select($tenantColumn, 'id')
+                ->where('id', $userId)
+                ->first();
+
+            $userTenantId = $user ? ($user->{$tenantColumn} ?? $user->id) : null;
+
+            if ($userTenantId == $storeId) {
+                return $storeId;
+            }
+
+            // If it doesn't match and not admin, fallback to default or block
+            return $userTenantId;
+        }
 
         if (!isset($tenantCache[$userId])) {
             try {
                 $user = DB::table('users')
-                    ->select('tenant_id', 'id')
+                    ->select($tenantColumn, 'id')
                     ->where('id', $userId)
                     ->first();
 
-                $tenantCache[$userId] = $user ? ($user->tenant_id ?? $user->id) : null;
+                $tenantCache[$userId] = $user ? ($user->{$tenantColumn} ?? $user->id) : null;
             } catch (\Exception $e) {
                 $tenantCache[$userId] = null;
             }

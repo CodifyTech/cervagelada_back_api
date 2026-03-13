@@ -112,7 +112,6 @@ class AuthService extends BaseService
                 'cpf' => $request->cpf,
                 'password' => Hash::make($request->password),
                 'termos' => $request->termos,
-                'tenant_id' => $loja->id,
                 'loja_id' => $loja->id,
             ]);
 

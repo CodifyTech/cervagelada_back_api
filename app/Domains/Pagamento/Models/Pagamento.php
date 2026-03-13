@@ -15,6 +15,7 @@ class Pagamento extends BaseModel
 
     protected $fillable = [
         'pedido_id',
+        'loja_id',
         'asaas_charge_id',
         'asaas_customer_id',
         'metodo',
