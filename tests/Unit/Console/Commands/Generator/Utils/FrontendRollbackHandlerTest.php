@@ -224,8 +224,8 @@ class FrontendRollbackHandlerTest extends TestCase
     public function handles_nonexistent_files_gracefully()
     {
         $nonExistentFiles = [
-            '/path/to/nonexistent/file1.vue',
-            '/path/to/nonexistent/file2.ts',
+            $this->testFrontendPath.'/src/components/NonExistent1.vue',
+            $this->testFrontendPath.'/src/stores/NonExistent2.ts',
         ];
 
         $results = $this->handler->rollbackFrontendFiles($nonExistentFiles);

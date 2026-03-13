@@ -17,7 +17,6 @@ enum RoleEnum: string
             self::Admin => [
                 ...config('permission_list.auth'),
                 ...config('permission_list.manage'),
-                ...config('permission_list.dashboard'),
             ],
             self::AdminSystem => [
                 ...config('permission_list.auth'),
@@ -29,6 +28,16 @@ enum RoleEnum: string
                 ...config('permission_list.audit'),
                 ...config('permission_list.relatorios'),
                 ...config('permission_list.dashboard'),
+                ...config('permission_list.produto-aprovacao'),
+                ...config('permission_list.loja'),
+                ...config('permission_list.produto'),
+                ...config('permission_list.pedido'),
+                ...config('permission_list.item-pedido'),
+                ...config('permission_list.avaliacao'),
+                ...config('permission_list.transacoes-financeiras'),
+                ...config('permission_list.destaque'),
+                ...config('permission_list.endereco'),
+                ...config('permission_list.entrega'),
             ],
             self::Logista => [
                 ...config('permission_list.auth'),
@@ -44,6 +53,8 @@ enum RoleEnum: string
                 'item-pedido read',
                 'item-pedido list',
                 ...config('permission_list.promocao'),
+                'produto-aprovacao read',
+                'produto-aprovacao list',
                 'avaliacao read',
                 'avaliacao list',
                 'transacoes-financeiras read',

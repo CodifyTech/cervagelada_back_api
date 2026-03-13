@@ -14,7 +14,7 @@ class RollbackLogger
 
     public function __construct()
     {
-        $this->rollbackLogPath = storage_path('framework/rollback/rollback_log.json');
+        $this->rollbackLogPath = config('cdf.rollback_log_path', storage_path('framework/rollback/rollback_log.json'));
         $this->initializeLog();
     }
 
@@ -41,7 +41,6 @@ class RollbackLogger
             'user' => $this->getCurrentUser(),
             'sessions' => [],
         ];
-        $this->saveLog();
     }
 
     /**
@@ -64,11 +63,15 @@ class RollbackLogger
     private function migrateOldLog(): void
     {
         $oldLog = $this->rollbackLog;
+        $hasData = ! empty($oldLog['created'] ?? []) || 
+                   ! empty($oldLog['modified'] ?? []) || 
+                   ! empty($oldLog['directories'] ?? []);
+
         $this->rollbackLog = [
             'version' => '2.0',
             'created_at' => Carbon::now()->toISOString(),
-            'user' => 'migrated',
-            'sessions' => [
+            'user' => $this->getCurrentUser(),
+            'sessions' => $hasData ? [
                 [
                     'id' => uniqid(),
                     'timestamp' => Carbon::now()->toISOString(),
@@ -81,9 +84,8 @@ class RollbackLogger
                         'migrated' => true,
                     ],
                 ],
-            ],
+            ] : [],
         ];
-        $this->saveLog();
     }
 
     /**
@@ -147,7 +149,7 @@ class RollbackLogger
      */
     public function logModifiedFile(string $file, ?string $sessionId): void
     {
-        $backupDir = storage_path('framework/rollback/backups');
+        $backupDir = dirname($this->rollbackLogPath).'/backups';
         if (! File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
@@ -306,7 +308,7 @@ class RollbackLogger
     public function clearLog(): void
     {
         // Remover backups
-        $backupDir = storage_path('framework/rollback/backups');
+        $backupDir = dirname($this->rollbackLogPath).'/backups';
         if (is_dir($backupDir)) {
             File::deleteDirectory($backupDir);
         }

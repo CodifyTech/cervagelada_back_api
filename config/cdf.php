@@ -39,6 +39,12 @@ return [
 
     'api_version' => env('CDF_API_VERSION', 'v1'),
 
+    'rollback_log_path' => storage_path('framework/rollback/rollback_log.json'),
+
+    'dir_front_end' => env('CDF_DIR_FRONT_END', '..'.DIRECTORY_SEPARATOR.'frontend'.DIRECTORY_SEPARATOR.'src'),
+
+    'front_end_url' => env('CDF_FRONT_END_URL', 'localhost:5173'),
+
     'locales' => [
         'pt_BR',
         'en',

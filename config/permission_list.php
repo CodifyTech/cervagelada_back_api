@@ -59,6 +59,11 @@ return [
         'produto block',
         'produto manage',
     ],
+    'produto-aprovacao' => [
+        'produto-aprovacao read',
+        'produto-aprovacao list',
+        'produto-aprovacao edit',
+    ],
     'loja-produto' => [
         'loja-produto read',
         'loja-produto list',

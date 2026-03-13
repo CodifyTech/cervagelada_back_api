@@ -7,10 +7,10 @@ trait FrontendPathTrait
     /**
      * Obter o caminho absoluto do diretório frontend
      */
-    private function getFrontendPath(): string
+    protected function getFrontendPath(): string
     {
         $basePath = base_path();
-        $projectDir = env('CDF_DIR_FRONT_END');
+        $projectDir = config('cdf.dir_front_end');
 
         // Construir o caminho correto
         if (str_starts_with($projectDir, '..')) {
