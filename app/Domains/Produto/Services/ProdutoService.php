@@ -128,6 +128,10 @@ class ProdutoService extends BaseService
             }
 
             if (! $produto) {
+                if ($loja->tipo_loja !== 'cervejaria') {
+                    throw new \Exception('Apenas lojas do tipo Cervejaria podem cadastrar novos produtos.');
+                }
+
                 $productData = [
                     'nome' => $data['nome'] ?? null,
                     'descricao' => $data['descricao'] ?? null,
@@ -139,6 +143,7 @@ class ProdutoService extends BaseService
                     'ean' => $data['ean'] ?? null,
                     'sku' => $data['sku'] ?? null,
                     'atributos' => $data['atributos'] ?? null,
+                    'status_aprovacao' => 'pendente',
                 ];
 
                 $produto = $this->produto::create($productData);
