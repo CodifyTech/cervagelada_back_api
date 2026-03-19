@@ -39,9 +39,38 @@ class ProdutoController extends BaseController
         return parent::update($request, $id);
     }
 
-    public function searchByEan(string $ean)
+    public function searchByField(string $tipo, string $valor)
     {
-        $produto = Produto::where('ean', $ean)->first();
+        $query = Produto::query();
+
+        switch ($tipo) {
+            case 'ean':
+                $query->where('ean', $valor);
+                break;
+            case 'sku':
+                $query->where('sku', $valor);
+                break;
+            case 'nome':
+                $query->where('nome', 'like', "%{$valor}%");
+                break;
+            default:
+                return response()->json([
+                    'exists' => false,
+                    'message' => 'Tipo de busca inválido. Use ean, sku ou nome.',
+                    'data' => (object) [],
+                ], 400);
+        }
+
+        if ($tipo === 'nome') {
+            $produtos = $query->get();
+
+            return response()->json([
+                'exists' => $produtos->isNotEmpty(),
+                'data' => $produtos,
+            ]);
+        }
+
+        $produto = $query->first();
 
         if ($produto) {
             return response()->json([

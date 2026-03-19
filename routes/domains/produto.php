@@ -23,7 +23,8 @@ Route::group([
     Route::post('produtos/{id}/reprovar', [ProdutoController::class, 'reprovar']);
 
     // EAN search (must come before apiResource)
-    Route::get('produtos/ean/{ean}', [ProdutoController::class, 'searchByEan']);
+    // Product search by field (ean, sku, nome)
+    Route::get('produtos/{tipo}/{valor}', [ProdutoController::class, 'searchByField']);
 
     // Produto Routes
     Route::apiResource('produtos', ProdutoController::class);
