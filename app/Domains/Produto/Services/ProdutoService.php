@@ -59,6 +59,15 @@ class ProdutoService extends BaseService
         }
 
         // Default or Admin behavior
+        // return parent::index($options, function ($query) {
+        //     $query->when(!auth()->user()->hasRole('admin'), function ($q) {
+        //         $q->where('status_aprovacao', 'aprovado')
+        //             ->whereHas('lojas', function ($q) {
+        //                 $q->where('loja_id', auth()->user()->loja_id);
+        //             })
+        //             ->orderBy('loja_produtos.created_at', 'desc');
+        //     });
+        // });
         return parent::index($options, $builderCallback);
     }
 

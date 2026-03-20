@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nome', 150);
             $table->text('descricao')->nullable();
             $table->string('marca', 100)->nullable();
-            $table->decimal('teor_alcoolico', 4, 2);
+            $table->decimal('teor_alcoolico', 4, 2)->nullable();
             $table->integer('volume_ml')->nullable();
             $table->string('url_imagem', 255)->nullable();
             $table->integer('pedido_minimo')->nullable();
