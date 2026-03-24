@@ -3,12 +3,36 @@
 namespace App\Domains\Produto\Controllers;
 
 use App\Domains\Loja\Models\Loja;
+use App\Domains\Produto\Models\Produto;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PublicProdutoController extends Controller
 {
+    /**
+     * Search products by name (without tenant scope).
+     * GET /api/public/produtos/search?nome=Cerveja
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $request->validate([
+            'nome' => 'required|string|min:2',
+        ]);
+
+        $nome = $request->input('nome');
+
+        $produtos = Produto::withoutGlobalScopes()
+            ->where('nome', 'like', '%'.$nome.'%')
+            ->aprovados()
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'data' => $produtos,
+        ]);
+    }
+
     /**
      * Find the nearest store that carries a given product.
      * GET /api/public/produtos/{id}/loja-proxima?lat=X&lng=Y

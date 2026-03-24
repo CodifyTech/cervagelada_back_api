@@ -44,7 +44,8 @@ Route::group(['prefix' => 'public'], function () {
     Route::get('destaques', [PublicDestaqueController::class, 'index']);
     Route::get('destaques/{id}', [PublicDestaqueController::class, 'show']);
 
-    // Nearest store for a product
+    // Products
+    Route::get('produtos/search', [PublicProdutoController::class, 'search']);
     Route::get('produtos/{id}/loja-proxima', [PublicProdutoController::class, 'lojaProxima']);
 
     // Public news feed

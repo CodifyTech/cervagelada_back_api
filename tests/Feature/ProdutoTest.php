@@ -247,4 +247,3 @@ it('distribuidor pode vincular produto existente', function () {
         'produto_id' => $produto->id,
     ]);
 });
-;
