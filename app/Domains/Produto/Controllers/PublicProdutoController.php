@@ -93,13 +93,13 @@ class PublicProdutoController extends Controller
             ->where('ativo', true)
             ->whereHas('produtos', fn ($q) => $q
                 ->where('produtos.id', $id)
-                ->wherePivot('ativo', true)
-                ->wherePivot('estoque', '>', 0)
+                ->where('loja_produtos.ativo', true)
+                ->where('loja_produtos.estoque', '>', 0)
             )
             ->porRaio($lat, $lng)
             ->with(['produtos' => fn ($q) => $q
                 ->where('produtos.id', $id)
-                ->wherePivot('ativo', true),
+                ->where('loja_produtos.ativo', true),
             ])
             ->first();
 

@@ -33,8 +33,8 @@ class PublicLojaController extends Controller
         $loja = Loja::withoutGlobalScopes()
             ->where('ativo', true)
             ->with('horarios')
-            ->withCount(['produtos' => fn ($q) => $q->wherePivot('ativo', true)])
-            ->withAvg('avaliacoes', 'nota')
+            ->withCount(['produtos' => fn ($q) => $q->where('loja_produtos.ativo', true)])
+            ->withAvg('avaliacoes', 'avaliacao')
             ->findOrFail($id);
 
         return response()->json($loja);
