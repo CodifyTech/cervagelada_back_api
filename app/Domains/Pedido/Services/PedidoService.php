@@ -50,6 +50,7 @@ class PedidoService extends BaseService
 
                 // Check stock in the store
                 $lojaProduto = \DB::table('loja_produtos')
+                    ->where('loja_id', $data['loja_id'])
                     ->where('produto_id', $produtoId)
                     ->first();
 
