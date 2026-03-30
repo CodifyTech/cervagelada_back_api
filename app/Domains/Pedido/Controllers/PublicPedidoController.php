@@ -27,6 +27,7 @@ class PublicPedidoController extends Controller
             'loja_id' => 'required|ulid|exists:lojas,id',
             'endereco_id' => 'required|ulid|exists:enderecos,id',
             'metodo_pagamento' => 'required|string|in:pix,cartao,dinheiro',
+            'cpf' => 'nullable|string|max:14',
             'itens' => 'required|array|min:1',
             'itens.*.produto_id' => 'required|ulid|exists:produtos,id',
             'itens.*.quantidade_solicitada' => 'required|integer|min:1',
@@ -47,6 +48,15 @@ class PublicPedidoController extends Controller
             'taxa_entrega' => $taxaEntrega,
             'itens' => $data['itens'],
         ];
+
+        $user = auth()->user();
+        if (isset($data['cpf']) && ! $user->cpf) {
+            $user->update(['cpf' => $data['cpf']]);
+        }
+
+        if (! $user->cpf) {
+            return response()->json(['message' => 'O CPF é obrigatório para processar o pagamento.'], 422);
+        }
 
         try {
             $pedido = $this->pedidoService->store($orderData);
