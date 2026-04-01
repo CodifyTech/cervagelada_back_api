@@ -23,8 +23,8 @@ class ProdutoRequest extends BaseFormRequest
             'preco' => ['required_if:loja_id,!=,null', 'numeric', 'min:0'],
             'preco_promocional' => ['nullable', 'numeric', 'min:0'],
             'estoque' => ['required_if:loja_id,!=,null', 'numeric', 'min:0'],
-            'destaque' => ['nullable', 'boolean'],
-            'ativo' => ['nullable', 'boolean'],
+            'destaque' => ['nullable'],
+            'ativo' => ['nullable'],
         ];
     }
 

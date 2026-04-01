@@ -18,9 +18,9 @@ Route::group([
 ], function () {
 
     // Approval routes (must come before apiResource to avoid wildcard capture)
-    Route::get('produtos/pendentes', [ProdutoController::class, 'pendentes']);
-    Route::post('produtos/{id}/aprovar', [ProdutoController::class, 'aprovar']);
-    Route::post('produtos/{id}/reprovar', [ProdutoController::class, 'reprovar']);
+    Route::get('produtos/pendentes', [ProdutoController::class, 'pendentes'])->name('.pendentes');
+    Route::post('produtos/{id}/aprovar', [ProdutoController::class, 'aprovar'])->name('.aprovar');
+    Route::post('produtos/{id}/reprovar', [ProdutoController::class, 'reprovar'])->name('.reprovar');
 
     // EAN search (must come before apiResource)
     // Product search by field (ean, sku, nome)

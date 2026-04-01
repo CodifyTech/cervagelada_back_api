@@ -34,11 +34,12 @@ class RolesPermissionSeeder extends Seeder
                 return;
             }
 
-            collect($roleEnum->getPermissions())
-                ->each(function ($p) use (&$role) {
-                    $permission = Permission::whereSlug($p)->firstOrFail();
-                    $role->givePermissionTo($permission);
+            $permissions = collect($roleEnum->getPermissions())
+                ->map(function ($p) {
+                    return Permission::whereSlug($p)->firstOrFail()->id;
                 });
+
+            $role->permissions()->sync($permissions);
         });
     }
 }

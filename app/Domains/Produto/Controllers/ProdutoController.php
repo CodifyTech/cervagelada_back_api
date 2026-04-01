@@ -18,6 +18,9 @@ class ProdutoController extends BaseController
             'create' => ['produto.store'],
             'edit' => ['produto.update'],
             'delete' => ['produto.destroy'],
+            'pendentes' => ['produto-aprovacao.list'],
+            'aprovar' => ['produto-aprovacao.edit'],
+            'reprovar' => ['produto-aprovacao.edit'],
         ]);
         parent::__construct();
         $this->setService($this->service);
