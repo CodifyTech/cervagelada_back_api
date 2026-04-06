@@ -153,7 +153,7 @@ class PedidoService extends BaseService
     {
         return Pedido::with([
             'itemPedidos.produto',
-            'user',
+            'user' => fn ($q) => $q->withoutGlobalScope('tenant'),
             'loja',
             'pagamento',
         ])->findOrFail($id);
@@ -165,7 +165,11 @@ class PedidoService extends BaseService
      */
     public function listarLoja(array $options = []): array
     {
-        $query = Pedido::with(['user', 'itemPedidos', 'pagamento']);
+        $query = Pedido::with([
+            'user' => fn ($q) => $q->withoutGlobalScope('tenant'),
+            'itemPedidos.produto',
+            'pagamento',
+        ]);
 
         // Filter by status
         if (! empty($options['status'])) {
@@ -184,7 +188,7 @@ class PedidoService extends BaseService
         if (! empty($options['search'])) {
             $search = $options['search'];
             $query->whereHas('user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+                $q->withoutGlobalScope('tenant')->where('name', 'like', "%{$search}%");
             });
         }
 
