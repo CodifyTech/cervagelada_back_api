@@ -103,7 +103,7 @@ class UploadCast implements CastsAttributes
         Log::info("[UploadCast] Marcando processamento no cache: $cacheKey");
 
         // Processamento para upload de arquivos
-        if (is_object($value) || is_file($value)) {
+        if (is_object($value) || @is_file($value) || (is_string($value) && preg_match('/^data:image\/(\w+);base64,/', $value))) {
             // Incluir o nome do campo no nome do arquivo
             $fileName = "{$modelId}_{$key}";
             $fileType = is_object($value) ? 'objeto_upload' : 'arquivo_local';

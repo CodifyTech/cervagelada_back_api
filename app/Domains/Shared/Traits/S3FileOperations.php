@@ -58,7 +58,7 @@ trait S3FileOperations
 
             return null;
         } catch (Exception $e) {
-            \Log::error('Erro no upload S3: '.$e->getMessage());
+            \Log::error('Erro no upload S3 (putS3File): '.$e->getMessage());
 
             return null;
         }
@@ -70,22 +70,27 @@ trait S3FileOperations
             return null;
         }
 
+        // Se for uma string base64, usamos o putS3File direto
+        if (is_string($file) && preg_match('/^data:image\/(\w+);base64,/', $file)) {
+            return $this->putS3File($file, $path);
+        }
+
         if (is_string($file)) {
-            // Se já for um nome de arquivo, retorna apenas ele
-            if (! is_file($file)) {
+            // Se já for um nome de arquivo (não um caminho local), retorna apenas ele
+            if (! @is_file($file)) {
                 return basename($file);
             }
-            // Se for um caminho para um arquivo local, continuamos com o upload
         }
 
         try {
             // Verificar se o arquivo é uma imagem
-            $mimeType = is_string($file) ? mime_content_type($file) : $file->getMimeType();
+            $mimeType = ($file instanceof UploadedFile) ? $file->getMimeType() : @mime_content_type($file);
 
-            if (str_starts_with($mimeType, 'image/')) {
+            if ($mimeType && str_starts_with($mimeType, 'image/')) {
                 // Otimização: Redimensionar imagens grandes antes do upload
                 $manager = new ImageManager(new Driver);
-                $image = $manager->read(is_string($file) ? $file : $file->getRealPath());
+                $imagePath = ($file instanceof UploadedFile) ? $file->getRealPath() : $file;
+                $image = $manager->read($imagePath);
 
                 // Redimensionar imagens maiores que 2000px
                 $width = $image->width();
@@ -101,25 +106,24 @@ trait S3FileOperations
                 $name = "$path/$fileHash";
 
                 // Comprimir e upload
-                $imageData = $image->toWebp(85); // Equilíbrio entre qualidade e tamanho
+                $imageData = $image->toWebp(85);
                 Storage::disk('s3')->put($name, $imageData, [
                     'visibility' => 'public',
                 ]);
 
                 return $fileHash;
             } else {
-                // Processar arquivos que não são imagens
-                $extension = is_string($file) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
+                // Processar arquivos que não são imagens ou se mimeType falhou
+                $extension = ($file instanceof UploadedFile) ? $file->getClientOriginalExtension() : pathinfo($file, PATHINFO_EXTENSION);
                 $fileHash = $fileName.'.'.$extension;
                 $name = "$path/$fileHash";
 
-                // Usar streaming para upload direto
-                if (is_string($file)) {
-                    Storage::disk('s3')->put($name, file_get_contents($file), [
+                if ($file instanceof UploadedFile) {
+                    Storage::disk('s3')->putFileAs($path, $file, basename($name), [
                         'visibility' => 'public',
                     ]);
                 } else {
-                    Storage::disk('s3')->putFileAs($path, $file, basename($name), [
+                    Storage::disk('s3')->put($name, @file_get_contents($file), [
                         'visibility' => 'public',
                     ]);
                 }
@@ -127,8 +131,7 @@ trait S3FileOperations
                 return $fileHash;
             }
         } catch (Exception $e) {
-            // Melhorar o log de erros
-            \Log::error('Erro no upload S3: '.$e->getMessage());
+            \Log::error('Erro no upload S3 (putS3FileIfNotExists): '.$e->getMessage());
 
             return null;
         }

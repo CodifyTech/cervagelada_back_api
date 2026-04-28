@@ -70,23 +70,8 @@ class ProdutoService extends BaseService
         return parent::index($options, $builderCallback);
     }
 
-    private function processImageUpload(array $data): array
-    {
-        if (! empty($data['url_imagem']) && (! is_string($data['url_imagem']) || preg_match('/^data:image\/(\w+);base64,/', $data['url_imagem']))) {
-            $fileName = $this->putS3File($data['url_imagem'], 'produtos');
-            if ($fileName) {
-                $data['url_imagem'] = $fileName;
-            } else {
-                unset($data['url_imagem']);
-            }
-        }
-
-        return $data;
-    }
-
     public function store(array $data)
     {
-        $data = $this->processImageUpload($data);
 
         $user = auth()->user();
         if ($user && $user->loja_id) {
@@ -101,7 +86,6 @@ class ProdutoService extends BaseService
 
     public function update(array $data, string $id)
     {
-        $data = $this->processImageUpload($data);
 
         $user = auth()->user();
         if ($user && $user->loja_id) {
@@ -190,11 +174,6 @@ class ProdutoService extends BaseService
                     'atributos' => $data['atributos'] ?? $produto->atributos,
                     'status_aprovacao' => 'pendente',
                 ]);
-            }
-
-            if (isset($data['url_imagem'])) {
-                $produto->url_imagem = $data['url_imagem'];
-                $produto->save();
             }
 
             $pivotData = [
