@@ -2,7 +2,7 @@
 
 namespace App\Domains\Loja\Models;
 
-use App\Casts\UploadCast;
+use App\Casts\S3FileUrlCast;
 use App\Domains\Auth\Models\User;
 use App\Domains\Avaliacao\Models\Avaliacao;
 use App\Domains\Pedido\Models\Pedido;
@@ -35,7 +35,7 @@ class Loja extends BaseModel
     protected $fillable = ['nome_fantasia', 'url_logo', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km', 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo', 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado'];
 
     protected $casts = [
-        'url_logo' => UploadCast::class,
+        'url_logo' => S3FileUrlCast::class,
     ];
 
     public string $fileDir = 'lojas';

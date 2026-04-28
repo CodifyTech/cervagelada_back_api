@@ -14,7 +14,7 @@ class ProdutoRequest extends BaseFormRequest
             'marca' => ['nullable', 'string', 'max:100'],
             'teor_alcoolico' => ['nullable', 'numeric', 'min:0'],
             'volume_ml' => ['nullable', 'integer', 'min:0'],
-            'url_imagem' => ['nullable'],
+            'url_imagem' => ['nullable', 'sometimes', 'max:2048'],
             'pedido_minimo' => ['nullable', 'integer'],
             'fabricante' => ['nullable', 'string', 'max:150'],
             'ean' => ['nullable', 'string', 'max:20'],

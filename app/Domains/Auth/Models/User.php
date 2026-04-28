@@ -2,7 +2,7 @@
 
 namespace App\Domains\Auth\Models;
 
-use App\Casts\UploadCast;
+use App\Casts\S3FileUrlCast;
 use App\Domains\ACL\Models\Role;
 use App\Domains\ACL\Traits\HasRoles;
 use App\Domains\Auth\Notifications\ResetPasswordNotification;
@@ -108,7 +108,7 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'foto' => UploadCast::class,
+        'foto' => S3FileUrlCast::class,
     ];
 
     protected $appends = [

@@ -20,17 +20,20 @@ class S3FileUrlCast implements CastsAttributes
         }
 
         // Se já for uma URL completa, retorná-lo diretamente
-        if (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
             return $value;
         }
 
-        // Determinar o path baseado na tabela ou propriedade do modelo
-        $path = $model->getTable();
-        if (property_exists($model, 'fileDir')) {
-            $path = $model->fileDir;
+        // Limpeza de segurança: Se o valor contiver caminhos locais (C:\ ou /tmp/), pega só o final
+        if (str_contains($value, '\\') || str_contains($value, '/')) {
+            $parts = preg_split('/[\/\\\]/', $value);
+            $value = end($parts);
         }
 
-        return Storage::disk('s3')->url("$path/$value");
+        // Determinar o path baseado na tabela
+        $path = $model->getTable().'/';
+
+        return Storage::disk('s3')->url($path.$value);
     }
 
     /**
@@ -40,6 +43,22 @@ class S3FileUrlCast implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes)
     {
+        if (empty($value)) {
+            return null;
+        }
+
+        // Se for uma URL completa vindo do frontend, extraímos apenas o filename
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return basename(parse_url($value, PHP_URL_PATH));
+        }
+
+        // Se for um caminho local que escapou do Service, limpamos aqui também
+        if (str_contains($value, '\\') || str_contains($value, '/')) {
+            $parts = preg_split('/[\/\\\]/', $value);
+
+            return end($parts);
+        }
+
         return $value;
     }
 }

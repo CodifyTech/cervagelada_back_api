@@ -2,6 +2,7 @@
 
 namespace App\Domains\Noticias\Models;
 
+use App\Casts\S3FileUrlCast;
 use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -30,5 +31,6 @@ class Noticias extends BaseModel
         'ativo' => 'boolean',
         'patrocinado' => 'boolean',
         'publicado_em' => 'datetime',
+        'url_imagem' => S3FileUrlCast::class,
     ];
 }

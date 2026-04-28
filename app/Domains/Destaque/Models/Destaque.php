@@ -2,7 +2,7 @@
 
 namespace App\Domains\Destaque\Models;
 
-use App\Casts\UploadCast;
+use App\Casts\S3FileUrlCast;
 use App\Domains\Produto\Models\Produto;
 use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +26,7 @@ class Destaque extends BaseModel
         // 'data_inicio' => 'date',
         // 'data_fim' => 'date',
         'valor_contrato' => 'float',
-        'imagem' => UploadCast::class,
+        'imagem' => S3FileUrlCast::class,
     ];
 
     public function scopeAtivo(Builder $query): Builder

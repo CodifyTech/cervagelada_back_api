@@ -5,15 +5,18 @@ namespace App\Domains\Auth\Services;
 use App\Domains\ACL\Models\Role;
 use App\Domains\Auth\Models\User;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Shared\Services\UploadService;
 use App\Domains\Shared\Utils\IntHelper;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 
 class UserService extends BaseService
 {
     public function __construct(
         private readonly User $user,
         private readonly Role $role,
+        private readonly UploadService $uploadService
     ) {
         $this->setModel($this->user);
     }
@@ -33,9 +36,17 @@ class UserService extends BaseService
     public function store(array $data)
     {
         return DB::transaction(function () use ($data) {
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
+                $data['foto'] = $this->uploadService->armazenarFoto(
+                    $data['foto'],
+                    null,
+                    'users/'
+                );
+            }
+
             $user = $this->user->create($data);
 
-            if (env('CDF_EMAIL_VERIFICATION', false)) {
+            if (config('app.email_verification', false)) {
                 $user->sendEmailVerificationNotification();
             } else {
                 $user->markEmailAsVerified();
@@ -51,6 +62,16 @@ class UserService extends BaseService
     {
         return DB::transaction(function () use ($data, $id) {
             $user = $this->findById($id);
+
+            if (isset($data['foto']) && $data['foto'] instanceof UploadedFile) {
+                $arquivoAtual = basename(parse_url($user->getRawOriginal('foto'), PHP_URL_PATH));
+                $data['foto'] = $this->uploadService->armazenarFoto(
+                    $data['foto'],
+                    $arquivoAtual,
+                    'users/'
+                );
+            }
+
             $user->update($data);
             $user->syncRoles($data['role']);
 
