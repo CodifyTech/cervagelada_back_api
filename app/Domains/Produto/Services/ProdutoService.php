@@ -6,10 +6,13 @@ use App\Domains\Loja\Models\Loja;
 use App\Domains\Produto\Models\Produto;
 use App\Domains\Shared\Services\BaseService;
 use App\Domains\Shared\Traits\S3FileOperations;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class ProdutoService extends BaseService
 {
+    use S3FileOperations;
+
     public function __construct(private readonly Produto $produto)
     {
         $this->setModel($this->produto);
@@ -57,21 +60,12 @@ class ProdutoService extends BaseService
             }
         }
 
-        // Default or Admin behavior
-        // return parent::index($options, function ($query) {
-        //     $query->when(!auth()->user()->hasRole('admin'), function ($q) {
-        //         $q->where('status_aprovacao', 'aprovado')
-        //             ->whereHas('lojas', function ($q) {
-        //                 $q->where('loja_id', auth()->user()->loja_id);
-        //             })
-        //             ->orderBy('loja_produtos.created_at', 'desc');
-        //     });
-        // });
         return parent::index($options, $builderCallback);
     }
 
     public function store(array $data)
     {
+        $data = $this->handleImageUpload($data);
 
         $user = auth()->user();
         if ($user && $user->loja_id) {
@@ -86,6 +80,7 @@ class ProdutoService extends BaseService
 
     public function update(array $data, string $id)
     {
+        $data = $this->handleImageUpload($data);
 
         $user = auth()->user();
         if ($user && $user->loja_id) {
@@ -122,8 +117,6 @@ class ProdutoService extends BaseService
         return $produto;
     }
 
-    use S3FileOperations;
-
     public function createOrUpdateForStore(array $data, Loja $loja)
     {
         \DB::beginTransaction();
@@ -153,27 +146,34 @@ class ProdutoService extends BaseService
                     'ean' => $data['ean'] ?? null,
                     'sku' => $data['sku'] ?? null,
                     'atributos' => $data['atributos'] ?? null,
+                    'url_imagem' => $data['url_imagem'] ?? null,
                     'status_aprovacao' => 'pendente',
                 ];
 
                 $produto = $this->produto::create($productData);
-            }
+            } else {
+                // atualiza o produto se for cervejaria
+                if ($loja->tipo_loja === 'cervejaria') {
+                    $updateData = [
+                        'nome' => $data['nome'] ?? $produto->nome,
+                        'descricao' => $data['descricao'] ?? $produto->descricao,
+                        'marca' => $data['marca'] ?? $produto->marca,
+                        'teor_alcoolico' => $data['teor_alcoolico'] ?? $produto->teor_alcoolico,
+                        'volume_ml' => $data['volume_ml'] ?? $produto->volume_ml,
+                        'pedido_minimo' => $data['pedido_minimo'] ?? $produto->pedido_minimo,
+                        'fabricante' => $data['fabricante'] ?? $produto->fabricante,
+                        'ean' => $data['ean'] ?? $produto->ean,
+                        'sku' => $data['sku'] ?? $produto->sku,
+                        'atributos' => $data['atributos'] ?? $produto->atributos,
+                        'status_aprovacao' => 'pendente',
+                    ];
 
-            // atualiza o produto
-            if ($produto && $loja->tipo_loja === 'cervejaria') {
-                $produto->update([
-                    'nome' => $data['nome'] ?? $produto->nome,
-                    'descricao' => $data['descricao'] ?? $produto->descricao,
-                    'marca' => $data['marca'] ?? $produto->marca,
-                    'teor_alcoolico' => $data['teor_alcoolico'] ?? $produto->teor_alcoolico,
-                    'volume_ml' => $data['volume_ml'] ?? $produto->volume_ml,
-                    'pedido_minimo' => $data['pedido_minimo'] ?? $produto->pedido_minimo,
-                    'fabricante' => $data['fabricante'] ?? $produto->fabricante,
-                    'ean' => $data['ean'] ?? $produto->ean,
-                    'sku' => $data['sku'] ?? $produto->sku,
-                    'atributos' => $data['atributos'] ?? $produto->atributos,
-                    'status_aprovacao' => 'pendente',
-                ]);
+                    if (isset($data['url_imagem'])) {
+                        $updateData['url_imagem'] = $data['url_imagem'];
+                    }
+
+                    $produto->update($updateData);
+                }
             }
 
             $pivotData = [
@@ -199,6 +199,74 @@ class ProdutoService extends BaseService
         } catch (\Exception $e) {
             \DB::rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Handle image upload (both UploadedFile and Base64)
+     */
+    private function handleImageUpload(array $data): array
+    {
+        if (empty($data['url_imagem'])) {
+            return $data;
+        }
+
+        $image = $data['url_imagem'];
+
+        // If it's an UploadedFile
+        if ($image instanceof UploadedFile) {
+            $fileName = $this->putS3File($image, 'produtos');
+            if ($fileName) {
+                $data['url_imagem'] = $fileName;
+            }
+        }
+        // If it's a Base64 string
+        elseif (is_string($image) && str_starts_with($image, 'data:image')) {
+            $fileName = $this->processBase64Image($image, 'produtos');
+            if ($fileName) {
+                $data['url_imagem'] = $fileName;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Process base64 image like desk_iva_backend
+     */
+    private function processBase64Image(string $base64Data, string $path): ?string
+    {
+        try {
+            if (! preg_match('/^data:image\/(\w+);base64,/', $base64Data, $matches)) {
+                return null;
+            }
+
+            $imageType = $matches[1];
+            $base64Data = substr($base64Data, strpos($base64Data, ',') + 1);
+            $imageData = base64_decode($base64Data);
+
+            if ($imageData === false) {
+                return null;
+            }
+
+            // Criar arquivo temporário
+            $tempFile = tempnam(sys_get_temp_dir(), 'img_').'.'.$imageType;
+            file_put_contents($tempFile, $imageData);
+
+            // Gerar nome único para o arquivo
+            $fileName = Str::uuid()->toString();
+
+            // Usar o método do trait S3FileOperations
+            $uploadedFileName = $this->putS3FileIfNotExists($tempFile, $path, $fileName);
+
+            // Deletar arquivo temporário
+            @unlink($tempFile);
+
+            return $uploadedFileName;
+        } catch (\Exception $e) {
+            \Log::error('Erro ao processar imagem base64: '.$e->getMessage());
+
+            return null;
         }
     }
 }

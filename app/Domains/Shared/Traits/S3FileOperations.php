@@ -20,43 +20,21 @@ trait S3FileOperations
         $file = "$path/$fileName";
 
         return Storage::disk('s3')->url($file);
-        // .'?t='.now()->addMinutes(5)->timestamp;
     }
 
     public function putS3File($file, string $path): ?string
     {
-        try {
-            if ($file instanceof UploadedFile) {
-                $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
-                Storage::disk('s3')->putFileAs($path, $file, $fileName, [
-                    'visibility' => 'public',
-                ]);
-
-                return $fileName;
-            }
-
-            if (is_string($file) && preg_match('/^data:image\/(\w+);base64,/', $file, $type)) {
-                $data = substr($file, strpos($file, ',') + 1);
-                $data = base64_decode($data);
-
-                if ($data === false) {
-                    return null;
-                }
-
-                $extension = strtolower($type[1]);
-                if ($extension === 'jpeg') {
-                    $extension = 'jpg';
-                }
-
-                $fileName = Str::uuid()->toString().'.'.$extension;
-                Storage::disk('s3')->put("$path/$fileName", $data, [
-                    'visibility' => 'public',
-                ]);
-
-                return $fileName;
-            }
-
+        if (! ($file instanceof UploadedFile)) {
             return null;
+        }
+
+        $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
+        try {
+            Storage::disk('s3')->putFileAs($path, $file, $fileName, [
+                'visibility' => 'public',
+            ]);
+
+            return $fileName;
         } catch (Exception $e) {
             \Log::error('Erro no upload S3 (putS3File): '.$e->getMessage());
 
@@ -66,30 +44,21 @@ trait S3FileOperations
 
     public function putS3FileIfNotExists($file, string $path, $fileName = null): ?string
     {
-        if (empty($fileName) || empty($file)) {
+        if (is_null($fileName) || is_null($file)) {
             return null;
         }
 
-        // Se for uma string base64, usamos o putS3File direto
-        if (is_string($file) && preg_match('/^data:image\/(\w+);base64,/', $file)) {
-            return $this->putS3File($file, $path);
-        }
-
         if (is_string($file)) {
-            // Se já for um nome de arquivo (não um caminho local), retorna apenas ele
+            // Se já for um nome de arquivo, retorna apenas ele
             if (! @is_file($file)) {
                 return basename($file);
             }
+            // Se for um caminho para um arquivo local, continuamos com o upload
         }
 
         try {
             // Verificar se o arquivo é uma imagem
-            $mimeType = null;
-            if ($file instanceof UploadedFile) {
-                $mimeType = $file->getMimeType();
-            } elseif (is_string($file) && ! empty($file) && @is_file($file)) {
-                $mimeType = @mime_content_type($file);
-            }
+            $mimeType = ($file instanceof UploadedFile) ? $file->getMimeType() : @mime_content_type($file);
 
             if ($mimeType && str_starts_with($mimeType, 'image/')) {
                 // Otimização: Redimensionar imagens grandes antes do upload
@@ -111,18 +80,19 @@ trait S3FileOperations
                 $name = "$path/$fileHash";
 
                 // Comprimir e upload
-                $imageData = $image->toWebp(85);
+                $imageData = $image->toWebp(85); // Equilíbrio entre qualidade e tamanho
                 Storage::disk('s3')->put($name, $imageData, [
                     'visibility' => 'public',
                 ]);
 
                 return $fileHash;
             } else {
-                // Processar arquivos que não são imagens ou se mimeType falhou
+                // Processar arquivos que não são imagens
                 $extension = ($file instanceof UploadedFile) ? $file->getClientOriginalExtension() : pathinfo($file, PATHINFO_EXTENSION);
                 $fileHash = $fileName.'.'.$extension;
                 $name = "$path/$fileHash";
 
+                // Usar streaming para upload direto
                 if ($file instanceof UploadedFile) {
                     Storage::disk('s3')->putFileAs($path, $file, basename($name), [
                         'visibility' => 'public',
@@ -136,7 +106,7 @@ trait S3FileOperations
                 return $fileHash;
             }
         } catch (Exception $e) {
-            \Log::error('Erro no upload S3 (putS3FileIfNotExists): '.$e->getMessage());
+            \Log::error('Erro no upload S3: '.$e->getMessage());
 
             return null;
         }
