@@ -20,4 +20,12 @@ class DestaqueController extends BaseController
         $this->setService($this->service);
         $this->setRequest('request', DestaqueRequest::class);
     }
+
+    // ? temp
+    // public function index(\Illuminate\Http\Request $request)
+    // {
+    //     return parent::index($request, function ($query) {
+    //         $query->with('produto');
+    //     });
+    // }
 }

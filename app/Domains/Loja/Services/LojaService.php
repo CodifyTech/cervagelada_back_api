@@ -57,6 +57,13 @@ class LojaService extends BaseService
         try {
             $loja = $this->loja::findOrFail($id);
 
+            $user = auth()->user();
+            if ($user && isset($user->role['slug']) && $user->role['slug'] === 'logista') {
+                if ($user->loja_id !== $loja->id) {
+                    throw new \Exception('Você não tem permissão para editar esta loja.', 403);
+                }
+            }
+
             // Extract horarios from data
             $horarios = $data['horarios'] ?? null;
             unset($data['horarios']);

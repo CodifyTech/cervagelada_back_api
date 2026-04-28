@@ -23,8 +23,8 @@ class Destaque extends BaseModel
 
     protected $casts = [
         'ativo' => 'boolean',
-        'data_inicio' => 'date',
-        'data_fim' => 'date',
+        // 'data_inicio' => 'date',
+        // 'data_fim' => 'date',
         'valor_contrato' => 'float',
         'imagem' => UploadCast::class,
     ];

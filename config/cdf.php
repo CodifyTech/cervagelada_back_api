@@ -9,6 +9,7 @@ use App\Domains\Pagamento\Models\Pagamento;
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Produto\Models\LojaProduto;
 use App\Domains\TransacoesFinanceiras\Models\TransacoesFinanceiras;
+use App\Domains\Destaque\Models\Destaque;
 
 return [
     /*
@@ -111,6 +112,13 @@ return [
             'delete' => true,
         ],
         LojaProduto::class => [
+            'list' => true,
+            'read' => true,
+            'create' => true,
+            'update' => true,
+            'delete' => true,
+        ],
+        Destaque::class => [
             'list' => true,
             'read' => true,
             'create' => true,

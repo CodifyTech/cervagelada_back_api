@@ -158,6 +158,23 @@ class ProdutoService extends BaseService
                 $produto = $this->produto::create($productData);
             }
 
+            // atualiza o produto
+            if ($produto && $loja->tipo_loja === 'cervejaria') {
+                $produto->update([
+                    'nome' => $data['nome'] ?? $produto->nome,
+                    'descricao' => $data['descricao'] ?? $produto->descricao,
+                    'marca' => $data['marca'] ?? $produto->marca,
+                    'teor_alcoolico' => $data['teor_alcoolico'] ?? $produto->teor_alcoolico,
+                    'volume_ml' => $data['volume_ml'] ?? $produto->volume_ml,
+                    'pedido_minimo' => $data['pedido_minimo'] ?? $produto->pedido_minimo,
+                    'fabricante' => $data['fabricante'] ?? $produto->fabricante,
+                    'ean' => $data['ean'] ?? $produto->ean,
+                    'sku' => $data['sku'] ?? $produto->sku,
+                    'atributos' => $data['atributos'] ?? $produto->atributos,
+                    'status_aprovacao' => 'pendente',
+                ]);
+            }
+
             if (isset($data['url_imagem']) && $data['url_imagem'] instanceof UploadedFile) {
                 $fileName = $this->putS3File($data['url_imagem'], 'produtos');
                 if ($fileName) {
