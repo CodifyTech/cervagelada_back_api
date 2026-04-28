@@ -24,12 +24,15 @@ trait S3FileOperations
 
     public function putS3File($file, string $path): ?string
     {
-        $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
         try {
-            Storage::disk('s3')->put("$path/$fileName", file_get_contents($file), 'public');
+            $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
+            $content = file_get_contents($file->getRealPath());
+            Storage::disk('s3')->put("$path/$fileName", $content, 'public');
 
             return $fileName;
         } catch (Exception $e) {
+            \Log::error('Erro no upload S3 (putS3File): '.$e->getMessage());
+
             return null;
         }
     }
@@ -85,7 +88,7 @@ trait S3FileOperations
                 if (is_string($file)) {
                     Storage::disk('s3')->put($name, file_get_contents($file), 'public');
                 } else {
-                    Storage::disk('s3')->putFileAs($path, $file, basename($name), 'public');
+                    Storage::disk('s3')->put($name, file_get_contents($file->getRealPath()), 'public');
                 }
 
                 return $fileHash;
