@@ -3,6 +3,7 @@
 namespace App\Domains\Shared\Traits;
 
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -24,12 +25,37 @@ trait S3FileOperations
 
     public function putS3File($file, string $path): ?string
     {
-        $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
         try {
-            Storage::disk('s3')->put("$path/$fileName", file_get_contents($file), 'public');
+            if ($file instanceof UploadedFile) {
+                $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
+                Storage::disk('s3')->putFileAs($path, $file, $fileName, 'public');
 
-            return $fileName;
+                return $fileName;
+            }
+
+            if (is_string($file) && preg_match('/^data:image\/(\w+);base64,/', $file, $type)) {
+                $data = substr($file, strpos($file, ',') + 1);
+                $data = base64_decode($data);
+
+                if ($data === false) {
+                    return null;
+                }
+
+                $extension = strtolower($type[1]);
+                if ($extension === 'jpeg') {
+                    $extension = 'jpg';
+                }
+
+                $fileName = Str::uuid()->toString().'.'.$extension;
+                Storage::disk('s3')->put("$path/$fileName", $data, 'public');
+
+                return $fileName;
+            }
+
+            return null;
         } catch (Exception $e) {
+            \Log::error('Erro no upload S3: '.$e->getMessage());
+
             return null;
         }
     }
