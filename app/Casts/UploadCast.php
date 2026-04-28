@@ -6,6 +6,7 @@ use App\Domains\Shared\Traits\S3FileOperations;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -30,8 +31,8 @@ class UploadCast implements CastsAttributes
             return $value;
         }
 
-        // Se for um objeto ou array, provável erro de serialização, retornar null
-        if (is_array($value) || is_object($value)) {
+        // Se for um objeto ou array de metadados (como {name: "...", size: "..."}), retornar null
+        if (is_array($value) || (is_object($value) && ! ($value instanceof UploadedFile))) {
             return null;
         }
 
@@ -103,15 +104,15 @@ class UploadCast implements CastsAttributes
         Log::info("[UploadCast] Marcando processamento no cache: $cacheKey");
 
         // Processamento para upload de arquivos
-        if (is_object($value) || @is_file($value) || (is_string($value) && preg_match('/^data:image\/(\w+);base64,/', $value))) {
+        if ($value instanceof UploadedFile || @is_file($value) || (is_string($value) && preg_match('/^data:image\/(\w+);base64,/', $value))) {
             // Incluir o nome do campo no nome do arquivo
             $fileName = "{$modelId}_{$key}";
-            $fileType = is_object($value) ? 'objeto_upload' : 'arquivo_local';
+            $fileType = ($value instanceof UploadedFile) ? 'objeto_upload' : 'arquivo_local';
 
             Log::info("[UploadCast] Iniciando upload de $fileType para $modelTable/$modelId campo $key");
 
             // Gerar o nome do arquivo
-            $extension = is_object($value) ? $value->getClientOriginalExtension() : pathinfo($value, PATHINFO_EXTENSION);
+            $extension = ($value instanceof UploadedFile) ? $value->getClientOriginalExtension() : pathinfo($value, PATHINFO_EXTENSION);
             $tempFileName = $fileName.'.'.$extension;
 
             Log::info("[UploadCast] Nome temporário do arquivo: {$tempFileName}");

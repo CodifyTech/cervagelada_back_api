@@ -66,7 +66,7 @@ trait S3FileOperations
 
     public function putS3FileIfNotExists($file, string $path, $fileName = null): ?string
     {
-        if (is_null($fileName) || is_null($file)) {
+        if (empty($fileName) || empty($file)) {
             return null;
         }
 
@@ -84,7 +84,12 @@ trait S3FileOperations
 
         try {
             // Verificar se o arquivo é uma imagem
-            $mimeType = ($file instanceof UploadedFile) ? $file->getMimeType() : @mime_content_type($file);
+            $mimeType = null;
+            if ($file instanceof UploadedFile) {
+                $mimeType = $file->getMimeType();
+            } elseif (is_string($file) && ! empty($file) && @is_file($file)) {
+                $mimeType = @mime_content_type($file);
+            }
 
             if ($mimeType && str_starts_with($mimeType, 'image/')) {
                 // Otimização: Redimensionar imagens grandes antes do upload
