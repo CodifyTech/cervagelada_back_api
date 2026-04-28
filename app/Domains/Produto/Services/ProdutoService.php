@@ -7,6 +7,7 @@ use App\Domains\Produto\Models\Produto;
 use App\Domains\Shared\Services\BaseService;
 use App\Domains\Shared\Services\UploadService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class ProdutoService extends BaseService
 {
@@ -62,11 +63,13 @@ class ProdutoService extends BaseService
     public function store(array $data)
     {
         if (isset($data['url_imagem']) && $data['url_imagem'] instanceof UploadedFile) {
-            $data['url_imagem'] = $this->uploadService->armazenarFoto(
+            $result = $this->uploadService->armazenarFoto(
                 $data['url_imagem'],
                 null,
                 'produtos/'
             );
+
+            $data['url_imagem'] = $this->sanitizeFileName($result, $data['url_imagem']);
         }
 
         $user = auth()->user();
@@ -92,11 +95,13 @@ class ProdutoService extends BaseService
                     $produto = Produto::find($id);
                     $arquivoAtual = $produto ? basename(parse_url($produto->getRawOriginal('url_imagem'), PHP_URL_PATH)) : null;
 
-                    $data['url_imagem'] = $this->uploadService->armazenarFoto(
+                    $result = $this->uploadService->armazenarFoto(
                         $data['url_imagem'],
                         $arquivoAtual,
                         'produtos/'
                     );
+
+                    $data['url_imagem'] = $this->sanitizeFileName($result, $data['url_imagem']);
                 }
 
                 return $this->createOrUpdateForStore($data, $loja);
@@ -104,6 +109,30 @@ class ProdutoService extends BaseService
         }
 
         return parent::update($data, $id);
+    }
+
+    /**
+     * Saneamento extra para o Heroku
+     */
+    private function sanitizeFileName(?string $fileName, UploadedFile $file): string
+    {
+        if (!$fileName) {
+            return (string) Str::uuid() . '.' . $file->getClientOriginalExtension();
+        }
+
+        // Se o nome do arquivo retornado pelo serviço contiver caminhos ou o prefixo "php" típico de temp do Linux
+        if (str_contains($fileName, '/') || str_contains($fileName, '\\') || (str_starts_with($fileName, 'php') && !str_contains($fileName, '.'))) {
+            $cleanName = basename($fileName);
+
+            // Se ainda assim parecer um arquivo temporário (sem extensão), forçamos uma extensão baseada no arquivo original
+            if (!str_contains($cleanName, '.')) {
+                $cleanName .= '.' . ($file->getClientOriginalExtension() ?: 'png');
+            }
+
+            return $cleanName;
+        }
+
+        return $fileName;
     }
 
     public function show(string $id)
@@ -138,11 +167,11 @@ class ProdutoService extends BaseService
                 $produto = $this->produto::find($produtoId);
             }
 
-            if (! $produto && ! empty($data['ean'])) {
+            if (!$produto && !empty($data['ean'])) {
                 $produto = $this->produto::where('ean', $data['ean'])->first();
             }
 
-            if (! $produto) {
+            if (!$produto) {
                 if ($loja->tipo_loja !== 'cervejaria') {
                     throw new \Exception('Apenas lojas do tipo Cervejaria podem cadastrar novos produtos.');
                 }
@@ -187,7 +216,7 @@ class ProdutoService extends BaseService
                 }
             }
 
-            // Tratamento de tipos para o MySQL (booleanos vindos como string 'true'/'false')
+            // Tratamento de tipos para o MySQL
             $destaque = $data['destaque'] ?? false;
             if (is_string($destaque)) {
                 $destaque = filter_var($destaque, FILTER_VALIDATE_BOOLEAN);
