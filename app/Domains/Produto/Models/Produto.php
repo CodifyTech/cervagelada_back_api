@@ -8,6 +8,7 @@ use App\Domains\Shared\Models\BaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Casts\UploadCast;
 
 class Produto extends BaseModel
 {
@@ -23,6 +24,7 @@ class Produto extends BaseModel
 
     protected $casts = [
         'aprovado_em' => 'datetime',
+        'url_imagem'=> UploadCast::class,
     ];
 
     public function aprovador(): BelongsTo
