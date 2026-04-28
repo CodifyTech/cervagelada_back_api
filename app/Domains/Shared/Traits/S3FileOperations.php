@@ -28,7 +28,9 @@ trait S3FileOperations
         try {
             if ($file instanceof UploadedFile) {
                 $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
-                Storage::disk('s3')->putFileAs($path, $file, $fileName, 'public');
+                Storage::disk('s3')->putFileAs($path, $file, $fileName, [
+                    'visibility' => 'public',
+                ]);
 
                 return $fileName;
             }
@@ -47,7 +49,9 @@ trait S3FileOperations
                 }
 
                 $fileName = Str::uuid()->toString().'.'.$extension;
-                Storage::disk('s3')->put("$path/$fileName", $data, 'public');
+                Storage::disk('s3')->put("$path/$fileName", $data, [
+                    'visibility' => 'public',
+                ]);
 
                 return $fileName;
             }
@@ -98,7 +102,9 @@ trait S3FileOperations
 
                 // Comprimir e upload
                 $imageData = $image->toWebp(85); // Equilíbrio entre qualidade e tamanho
-                Storage::disk('s3')->put($name, $imageData, 'public');
+                Storage::disk('s3')->put($name, $imageData, [
+                    'visibility' => 'public',
+                ]);
 
                 return $fileHash;
             } else {
@@ -109,9 +115,13 @@ trait S3FileOperations
 
                 // Usar streaming para upload direto
                 if (is_string($file)) {
-                    Storage::disk('s3')->put($name, file_get_contents($file), 'public');
+                    Storage::disk('s3')->put($name, file_get_contents($file), [
+                        'visibility' => 'public',
+                    ]);
                 } else {
-                    Storage::disk('s3')->putFileAs($path, $file, basename($name), 'public');
+                    Storage::disk('s3')->putFileAs($path, $file, basename($name), [
+                        'visibility' => 'public',
+                    ]);
                 }
 
                 return $fileHash;
