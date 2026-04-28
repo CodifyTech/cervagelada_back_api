@@ -3,7 +3,6 @@
 namespace App\Domains\Shared\Traits;
 
 use Exception;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -20,24 +19,17 @@ trait S3FileOperations
         $file = "$path/$fileName";
 
         return Storage::disk('s3')->url($file);
+        // .'?t='.now()->addMinutes(5)->timestamp;
     }
 
     public function putS3File($file, string $path): ?string
     {
-        if (! ($file instanceof UploadedFile)) {
-            return null;
-        }
-
         $fileName = Str::uuid()->toString().'.'.$file->getClientOriginalExtension();
         try {
-            Storage::disk('s3')->putFileAs($path, $file, $fileName, [
-                'visibility' => 'public',
-            ]);
+            Storage::disk('s3')->put("$path/$fileName", file_get_contents($file), 'public');
 
             return $fileName;
         } catch (Exception $e) {
-            \Log::error('Erro no upload S3 (putS3File): '.$e->getMessage());
-
             return null;
         }
     }
@@ -50,7 +42,7 @@ trait S3FileOperations
 
         if (is_string($file)) {
             // Se já for um nome de arquivo, retorna apenas ele
-            if (! @is_file($file)) {
+            if (! is_file($file)) {
                 return basename($file);
             }
             // Se for um caminho para um arquivo local, continuamos com o upload
@@ -58,13 +50,12 @@ trait S3FileOperations
 
         try {
             // Verificar se o arquivo é uma imagem
-            $mimeType = ($file instanceof UploadedFile) ? $file->getMimeType() : @mime_content_type($file);
+            $mimeType = is_string($file) ? mime_content_type($file) : $file->getMimeType();
 
-            if ($mimeType && str_starts_with($mimeType, 'image/')) {
+            if (str_starts_with($mimeType, 'image/')) {
                 // Otimização: Redimensionar imagens grandes antes do upload
                 $manager = new ImageManager(new Driver);
-                $imagePath = ($file instanceof UploadedFile) ? $file->getRealPath() : $file;
-                $image = $manager->read($imagePath);
+                $image = $manager->read(is_string($file) ? $file : $file->getRealPath());
 
                 // Redimensionar imagens maiores que 2000px
                 $width = $image->width();
@@ -81,31 +72,26 @@ trait S3FileOperations
 
                 // Comprimir e upload
                 $imageData = $image->toWebp(85); // Equilíbrio entre qualidade e tamanho
-                Storage::disk('s3')->put($name, $imageData, [
-                    'visibility' => 'public',
-                ]);
+                Storage::disk('s3')->put($name, $imageData, 'public');
 
                 return $fileHash;
             } else {
                 // Processar arquivos que não são imagens
-                $extension = ($file instanceof UploadedFile) ? $file->getClientOriginalExtension() : pathinfo($file, PATHINFO_EXTENSION);
+                $extension = is_string($file) ? pathinfo($file, PATHINFO_EXTENSION) : $file->getClientOriginalExtension();
                 $fileHash = $fileName.'.'.$extension;
                 $name = "$path/$fileHash";
 
                 // Usar streaming para upload direto
-                if ($file instanceof UploadedFile) {
-                    Storage::disk('s3')->putFileAs($path, $file, basename($name), [
-                        'visibility' => 'public',
-                    ]);
+                if (is_string($file)) {
+                    Storage::disk('s3')->put($name, file_get_contents($file), 'public');
                 } else {
-                    Storage::disk('s3')->put($name, @file_get_contents($file), [
-                        'visibility' => 'public',
-                    ]);
+                    Storage::disk('s3')->putFileAs($path, $file, basename($name), 'public');
                 }
 
                 return $fileHash;
             }
         } catch (Exception $e) {
+            // Melhorar o log de erros
             \Log::error('Erro no upload S3: '.$e->getMessage());
 
             return null;
