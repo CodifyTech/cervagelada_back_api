@@ -26,11 +26,17 @@ class PublicPedidoController extends Controller
         $data = $request->validate([
             'loja_id' => 'required|ulid|exists:lojas,id',
             'endereco_id' => 'required|ulid|exists:enderecos,id',
-            'metodo_pagamento' => 'required|string|in:pix,cartao,dinheiro',
+            'metodo_pagamento' => 'required|string|in:pix,cartao,dinheiro,cartao_online',
             'cpf' => 'nullable|string|max:14',
             'itens' => 'required|array|min:1',
             'itens.*.produto_id' => 'required|ulid|exists:produtos,id',
             'itens.*.quantidade_solicitada' => 'required|integer|min:1',
+            'cartao' => 'required_if:metodo_pagamento,cartao_online|array',
+            'cartao.holderName' => 'required_if:metodo_pagamento,cartao_online|string|max:100',
+            'cartao.number' => 'required_if:metodo_pagamento,cartao_online|string|min:13|max:16',
+            'cartao.expiryMonth' => 'required_if:metodo_pagamento,cartao_online|string|size:2',
+            'cartao.expiryYear' => 'required_if:metodo_pagamento,cartao_online|string|size:4',
+            'cartao.ccv' => 'required_if:metodo_pagamento,cartao_online|string|min:3|max:4',
         ]);
 
         // Verify the address belongs to the authenticated user
@@ -63,7 +69,12 @@ class PublicPedidoController extends Controller
 
             // Create charge on Asaas
             $metodo = $data['metodo_pagamento'];
-            $result = $this->pagamentoService->criarCobranca($pedido, $metodo);
+            $paymentData = $data['cartao'] ?? [];
+            if ($metodo === 'cartao_online') {
+                $paymentData['remoteIp'] = $request->ip();
+            }
+
+            $result = $this->pagamentoService->criarCobranca($pedido, $metodo, $paymentData);
 
             $response = [
                 'id' => $pedido->id,

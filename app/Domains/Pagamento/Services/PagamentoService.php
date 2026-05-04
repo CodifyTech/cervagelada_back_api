@@ -18,10 +18,11 @@ class PagamentoService
      *
      * @return array{pagamento: Pagamento, charge: array}
      */
-    public function criarCobranca(Pedido $pedido, string $metodo): array
+    public function criarCobranca(Pedido $pedido, string $metodo, array $paymentData = []): array
     {
-        return DB::transaction(function () use ($pedido, $metodo) {
+        return DB::transaction(function () use ($pedido, $metodo, $paymentData) {
             $user = $pedido->user;
+            $pedido->loadMissing('endereco');
 
             // Resolve or create customer in Asaas
             $customerId = $this->resolveAsaasCustomer($user);
@@ -29,6 +30,7 @@ class PagamentoService
             $billingType = match ($metodo) {
                 'pix' => 'PIX',
                 'cartao' => 'CREDIT_CARD',
+                'cartao_online' => 'CREDIT_CARD',
                 'boleto' => 'BOLETO',
                 default => 'PIX',
             };
@@ -41,6 +43,31 @@ class PagamentoService
                 'description' => "Pedido #{$pedido->id} - Cerva Gelada",
                 'externalReference' => $pedido->id,
             ];
+
+            if ($metodo === 'cartao_online') {
+                $chargeData['creditCard'] = [
+                    'holderName' => $paymentData['holderName'],
+                    'number' => $paymentData['number'],
+                    'expiryMonth' => $paymentData['expiryMonth'],
+                    'expiryYear' => $paymentData['expiryYear'],
+                    'ccv' => $paymentData['ccv'],
+                ];
+                
+                $chargeData['creditCardHolderInfo'] = [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'cpfCnpj' => $user->cpf,
+                    'postalCode' => preg_replace('/\D/', '', $pedido->endereco->cep),
+                    'addressNumber' => $pedido->endereco->numero ?? 'S/N',
+                    'addressComplement' => $pedido->endereco->complemento ?? '',
+                    'phone' => preg_replace('/\D/', '', $user->phone ?? ''),
+                    'mobilePhone' => preg_replace('/\D/', '', $user->phone ?? ''),
+                ];
+
+                if (!empty($paymentData['remoteIp'])) {
+                    $chargeData['remoteIp'] = $paymentData['remoteIp'];
+                }
+            }
 
             $charge = $this->asaasService->createCharge($chargeData);
 
