@@ -71,15 +71,26 @@ class PagamentoService
 
             $charge = $this->asaasService->createCharge($chargeData);
 
+            $localStatus = $this->mapAsaasStatus($charge['status']);
+
             $pagamento = Pagamento::create([
                 'pedido_id' => $pedido->id,
                 'loja_id' => $pedido->loja_id,
                 'asaas_charge_id' => $charge['id'],
                 'asaas_customer_id' => $customerId,
-                'metodo' => $metodo,
-                'status' => 'pendente',
+                'metodo' => $metodo === 'cartao_online' ? 'cartao' : $metodo,
+                'status' => $localStatus,
                 'valor' => $pedido->total,
             ]);
+
+            if ($localStatus === 'pago') {
+                $pagamento->update(['pago_em' => now()]);
+                
+                if ($pedido->status->value === \App\Domains\Pedido\Enums\OrderStatus::AGUARDANDO_PAGAMENTO->value) {
+                    $pedido->update(['status' => \App\Domains\Pedido\Enums\OrderStatus::RECEBIDO->value]);
+                    \App\Domains\Pedido\Events\NewOrderReceived::dispatch($pedido->load(['itemPedidos', 'loja', 'user']));
+                }
+            }
 
             // If PIX, fetch QR code
             $pixData = null;
