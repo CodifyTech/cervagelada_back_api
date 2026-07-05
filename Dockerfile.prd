@@ -95,4 +95,4 @@ RUN rm -rf \
     CONTRIBUTING.md
 
 # Porta padrão da variação fpm-nginx do serversideup
-EXPOSE 8091
+EXPOSE 8080
