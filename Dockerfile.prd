@@ -1,0 +1,98 @@
+########################################################################################
+# Stage 1 — Composer: dependências PHP de produção (sem dev)
+########################################################################################
+FROM composer:2.8 AS vendor
+
+WORKDIR /app
+
+# Copiar apenas os manifestos primeiro → cache de camada reutilizado
+# até que composer.json/lock mudem
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader \
+    --ignore-platform-reqs
+# --ignore-platform-reqs: o Stage 1 não tem ext-gd, ext-intl, etc.
+# Isso é esperado num multi-stage build — as extensões existem no Stage 2 (serversideup).
+
+
+########################################################################################
+# Stage 2 — Produção
+#
+# serversideup/php já inclui:
+#   ✓ PHP-FPM 8.4 + Nginx                ✓ S6 Overlay (init system em C)
+#   ✓ pdo_mysql, redis, zip, pcntl       ✓ Composer, install-php-extensions
+#   ✓ opcache (ativamos via ini)          ✓ www-data não-root (UID/GID 82:82)
+#   ✓ AUTORUN Laravel (cache + migrate)  ✓ Health check nativo
+#   ✓ ctype, curl, dom, fileinfo,        ✓ mbstring, openssl, xml, tokenizer
+#
+# Para produção, pinar em tag imutável:
+#   serversideup/php:8.4.X-fpm-nginx-alpine-vX.X.X
+########################################################################################
+FROM serversideup/php:8.4-fpm-nginx-alpine AS production
+
+LABEL org.opencontainers.image.title="Laravel 12 API" \
+      org.opencontainers.image.description="Laravel 12 API | PHP 8.4 | S6 + Nginx + PHP-FPM" \
+      org.opencontainers.image.authors="CodifyTech" \
+      org.opencontainers.image.vendor="CodifyTech"
+
+HEALTHCHECK NONE
+
+# ── root: instalar extensões e aplicar configurações ──────────────────────────────────
+# A imagem sobe como www-data por segurança; precisamos de root para instalar extensões
+USER root
+
+# Extensões adicionais não incluídas na imagem base:
+#   gd    → intervention/image (JPEG, WebP, Freetype — deps Alpine tratadas pelo script)
+#   intl  → coduo/php-humanizer (+~40MB, necessário)
+#   bcmath → cálculos de precisão decimal
+#
+# install-php-extensions cuida de todas as libs de sistema e ordem de dependências
+RUN install-php-extensions \
+    gd \
+    intl \
+    bcmath
+
+# Override das configurações PHP:
+#   - OPcache com JIT (a imagem NÃO configura JIT por padrão)
+#   - Segurança, timezone, realpath cache
+#   - Prefixo 99- garante carregamento APÓS o serversideup-docker-php.ini
+COPY docker/php/99-production.ini /usr/local/etc/php/conf.d/99-production.ini
+
+# ── www-data: código da aplicação ─────────────────────────────────────────────────────
+USER www-data
+
+# WORKDIR já é /var/www/html na imagem base
+WORKDIR /var/www/html
+
+# Vendor do Stage 1 (camada estável — cache reutilizado quando só o código muda)
+# www-data no Alpine = UID/GID 82:82
+COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
+
+# Código da aplicação (camada volátil — última posição para maximizar cache de build)
+# "vendor" está em .dockerignore, então este COPY não o sobrescreve
+COPY --chown=www-data:www-data . .
+
+# Remover arquivos que não pertencem ao webroot de produção
+# (docker/ foi copiado pelo COPY . . acima mas seu conteúdo útil já foi
+#  movido para /usr/local/etc/php/conf.d/ pelo COPY como root acima)
+RUN rm -rf \
+    docker \
+    tests \
+    phpunit.xml \
+    phpunit.xml.dist \
+    pest.xml \
+    pest.xml.dist \
+    .env.example \
+    .editorconfig \
+    README.md \
+    CHANGELOG.md \
+    CONTRIBUTING.md
+
+# Porta padrão da variação fpm-nginx do serversideup
+EXPOSE 8081
