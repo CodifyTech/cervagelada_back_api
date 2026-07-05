@@ -27,7 +27,7 @@ class SeedersServiceProvider extends ServiceProvider
             .DIRECTORY_SEPARATOR.'Seeders'
             .DIRECTORY_SEPARATOR.'*.php';
 
-        return glob($dirName, GLOB_BRACE);
+        return glob($dirName);
     }
 
     protected function loadAllSeeders(): void

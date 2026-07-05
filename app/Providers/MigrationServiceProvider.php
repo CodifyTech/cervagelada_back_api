@@ -24,7 +24,7 @@ class MigrationServiceProvider extends ServiceProvider
             .DIRECTORY_SEPARATOR.'Migrations'
             .DIRECTORY_SEPARATOR.'*.php';
 
-        return glob($dirName, GLOB_BRACE);
+        return glob($dirName);
     }
 
     private function loadAllMigrations(): void
