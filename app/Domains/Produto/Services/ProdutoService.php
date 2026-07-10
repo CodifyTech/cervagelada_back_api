@@ -173,7 +173,7 @@ class ProdutoService extends BaseService
 
             if (!$produto) {
                 if ($loja->tipo_loja !== 'cervejaria') {
-                    throw new \Exception('Apenas lojas do tipo Cervejaria podem cadastrar novos produtos.');
+                    abort(403, 'Apenas lojas do tipo Cervejaria podem cadastrar novos produtos.');
                 }
 
                 $productData = [
