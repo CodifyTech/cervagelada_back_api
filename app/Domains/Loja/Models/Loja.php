@@ -32,7 +32,7 @@ class Loja extends BaseModel
      *
      * @var array<int, string>
      */
-    protected $fillable = ['nome_fantasia', 'url_logo', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km', 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo', 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado'];
+    protected $fillable = ['nome_fantasia', 'cnpj', 'url_logo', 'tipo_loja', 'latitude', 'longitude', 'raio_entrega_km', 'tempo_entrega_min', 'tempo_entrega_max', 'aceite_automatico', 'pedido_minimo', 'taxa_comissao', 'ativo', 'cep', 'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado'];
 
     protected $casts = [
         'url_logo' => S3FileUrlCast::class,

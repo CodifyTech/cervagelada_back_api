@@ -33,6 +33,7 @@ class LojaSeeder extends Seeder
 
         foreach ($lojas as $index => $lojaData) {
             $loja = Loja::create(array_merge($lojaData, [
+                'cnpj' => fake('pt_BR')->unique()->cnpj(),
                 'latitude' => '-23.5505',
                 'longitude' => '-46.6333',
                 'raio_entrega_km' => 10,

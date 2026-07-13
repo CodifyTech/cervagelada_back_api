@@ -52,7 +52,7 @@ class RelatoriosController extends BaseController
      */
     public function sellers(Request $request): JsonResponse
     {
-        $filtros = $request->only(['de', 'ate', 'regiao', 'per_page', 'page']);
+        $filtros = $request->only(['de', 'ate', 'regiao', 'cidade', 'per_page', 'page']);
 
         return response()->json($this->service->getSellers($filtros));
     }

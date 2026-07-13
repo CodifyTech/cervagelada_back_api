@@ -21,16 +21,17 @@ class RelatoriosModel extends BaseModel
             ->leftJoin('lojas', 'pedidos.loja_id', '=', 'lojas.id')
             ->leftJoin('pagamentos', 'pagamentos.pedido_id', '=', 'pedidos.id')
             ->leftJoin('enderecos', 'enderecos.id', '=', 'pedidos.endereco_id')
-            ->select(
-                'pedidos.id',
-                'users.name as cliente',
-                'lojas.nome_fantasia as loja',
-                'pedidos.status',
-                'pedidos.total',
-                'pagamentos.metodo as forma_pagamento',
-                'enderecos.cidade',
-                'pedidos.created_at'
-            );
+            ->selectRaw('
+                pedidos.id,
+                UPPER(RIGHT(pedidos.id, 8)) as numero,
+                users.name as cliente,
+                lojas.nome_fantasia as loja,
+                pedidos.status,
+                pedidos.total,
+                pagamentos.metodo as forma_pagamento,
+                enderecos.cidade,
+                pedidos.created_at as criado_em
+            ');
 
         $this->aplicarFiltrosPedidos($query, $filtros);
 
@@ -50,6 +51,11 @@ class RelatoriosModel extends BaseModel
 
     /**
      * Produtos mais vendidos com filtros opcionais.
+     *
+     * Nota: `produtos` não possui `loja_id` (relação N:N com `lojas` via
+     * `loja_produtos`) e este relatório agrega vendas de um produto entre
+     * todas as lojas. Como não há uma loja única por linha, usamos
+     * `produtos.marca` como valor de exibição da coluna `loja`.
      */
     public function getProdutosMaisVendidos(array $filtros): array
     {
@@ -58,15 +64,19 @@ class RelatoriosModel extends BaseModel
             ->join('produtos', 'item_pedidos.produto_id', '=', 'produtos.id')
             ->selectRaw('
                 produtos.id,
-                produtos.nome,
-                produtos.marca as cervejaria,
-                SUM(item_pedidos.quantidade_final) as total_vendido,
-                SUM(item_pedidos.preco_total) as receita_total,
-                COUNT(DISTINCT pedidos.id) as total_pedidos
+                produtos.nome as produto,
+                produtos.marca as loja,
+                COALESCE(SUM(item_pedidos.quantidade_final), 0) as quantidade_vendida,
+                COALESCE(SUM(item_pedidos.preco_total), 0) as receita_total,
+                CASE
+                    WHEN SUM(item_pedidos.quantidade_final) > 0
+                        THEN SUM(item_pedidos.preco_total) / SUM(item_pedidos.quantidade_final)
+                    ELSE 0
+                END as ticket_medio
             ')
             ->where('pedidos.status', '!=', 'cancelado')
             ->groupBy('produtos.id', 'produtos.nome', 'produtos.marca')
-            ->orderByDesc('total_vendido');
+            ->orderByDesc('quantidade_vendida');
 
         if (! empty($filtros['de'])) {
             $query->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
@@ -83,23 +93,21 @@ class RelatoriosModel extends BaseModel
 
     /**
      * Relatório de sellers (lojas).
+     *
+     * O responsável por loja é resolvido via subquery (1 linha por loja),
+     * evitando o produto cartesiano entre `users` e `pedidos` que antes
+     * inflava `receita_total`/`total_pedidos` quando uma loja tinha mais de
+     * um usuário vinculado.
      */
     public function getSellers(array $filtros): array
     {
+        $responsaveisPorLoja = DB::table('users')
+            ->select('loja_id', DB::raw('MIN(users.name) as nome_responsavel'))
+            ->whereNotNull('loja_id')
+            ->groupBy('loja_id');
+
         $query = DB::table('lojas')
-            ->leftJoin('users', 'users.loja_id', '=', 'lojas.id')
-            ->selectRaw('
-                lojas.id,
-                lojas.nome_fantasia,
-                lojas.tipo_loja,
-                lojas.cidade,
-                lojas.estado,
-                lojas.ativo,
-                lojas.created_at,
-                COUNT(DISTINCT pedidos.id) as total_pedidos,
-                COALESCE(SUM(pedidos.total), 0) as receita_total,
-                users.name as responsavel
-            ')
+            ->leftJoinSub($responsaveisPorLoja, 'responsaveis', 'responsaveis.loja_id', '=', 'lojas.id')
             ->leftJoin('pedidos', function ($join) use ($filtros) {
                 $join->on('pedidos.loja_id', '=', 'lojas.id')
                     ->where('pedidos.status', '!=', 'cancelado');
@@ -110,13 +118,30 @@ class RelatoriosModel extends BaseModel
                     $join->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
                 }
             })
-            ->groupBy('lojas.id', 'lojas.nome_fantasia', 'lojas.tipo_loja', 'lojas.cidade', 'lojas.estado', 'lojas.ativo', 'lojas.created_at', 'users.name');
+            ->selectRaw('
+                lojas.id,
+                lojas.nome_fantasia as loja,
+                lojas.cnpj as cnpj,
+                lojas.tipo_loja,
+                lojas.cidade,
+                lojas.estado,
+                CASE WHEN lojas.ativo THEN "ativo" ELSE "inativo" END as status,
+                lojas.created_at as criado_em,
+                COUNT(DISTINCT pedidos.id) as total_pedidos,
+                COALESCE(SUM(pedidos.total), 0) as receita,
+                responsaveis.nome_responsavel as responsavel
+            ')
+            ->groupBy('lojas.id', 'lojas.nome_fantasia', 'lojas.cnpj', 'lojas.tipo_loja', 'lojas.cidade', 'lojas.estado', 'lojas.ativo', 'lojas.created_at', 'responsaveis.nome_responsavel');
 
         if (! empty($filtros['regiao'])) {
             $query->where('lojas.estado', $filtros['regiao']);
         }
 
-        $query->orderByDesc('receita_total');
+        if (! empty($filtros['cidade'])) {
+            $query->where('lojas.cidade', 'like', '%'.$filtros['cidade'].'%');
+        }
+
+        $query->orderByDesc('receita');
 
         $perPage = intval($filtros['per_page'] ?? 15);
         $page = intval($filtros['page'] ?? 1);
@@ -131,49 +156,101 @@ class RelatoriosModel extends BaseModel
     }
 
     /**
-     * Relatório financeiro.
+     * Relatório financeiro: uma linha por loja com receita bruta, taxa da
+     * plataforma e receita líquida no período filtrado.
      */
     public function getFinanceiro(array $filtros): array
     {
-        $query = DB::table('pedidos')
+        $query = DB::table('lojas')
+            ->leftJoin('pedidos', function ($join) use ($filtros) {
+                $join->on('pedidos.loja_id', '=', 'lojas.id')
+                    ->where('pedidos.status', '!=', 'cancelado');
+                if (! empty($filtros['de'])) {
+                    $join->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
+                }
+                if (! empty($filtros['ate'])) {
+                    $join->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
+                }
+            })
             ->selectRaw('
-                DATE(created_at) as data,
-                COUNT(*) as total_pedidos,
-                SUM(CASE WHEN status != "cancelado" THEN total ELSE 0 END) as receita,
-                SUM(CASE WHEN status = "cancelado" THEN 1 ELSE 0 END) as cancelamentos,
-                AVG(CASE WHEN status != "cancelado" THEN total ELSE NULL END) as ticket_medio
+                lojas.id,
+                lojas.nome_fantasia as loja,
+                lojas.taxa_comissao,
+                COALESCE(SUM(pedidos.total), 0) as receita_bruta,
+                COUNT(pedidos.id) as pedidos
             ')
-            ->groupByRaw('DATE(created_at)')
-            ->orderByDesc('data');
+            ->groupBy('lojas.id', 'lojas.nome_fantasia', 'lojas.taxa_comissao')
+            ->orderByDesc('receita_bruta');
 
-        if (! empty($filtros['de'])) {
-            $query->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
-        }
-        if (! empty($filtros['ate'])) {
-            $query->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
+        if (! empty($filtros['loja_id'])) {
+            $query->where('lojas.id', $filtros['loja_id']);
         }
 
         $perPage = intval($filtros['per_page'] ?? 30);
         $page = intval($filtros['page'] ?? 1);
         $paginated = $query->paginate($perPage, ['*'], 'page', $page);
 
-        $totais = DB::table('pedidos')
-            ->selectRaw('
-                SUM(CASE WHEN status != "cancelado" THEN total ELSE 0 END) as receita_total,
-                COUNT(*) as total_pedidos,
-                AVG(CASE WHEN status != "cancelado" THEN total ELSE NULL END) as ticket_medio_geral
-            ')
-            ->when(! empty($filtros['de']), fn ($q) => $q->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay()))
-            ->when(! empty($filtros['ate']), fn ($q) => $q->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay()))
-            ->first();
+        $taxaPlataformaFallback = (float) config('relatorios.taxa_plataforma');
+        $periodo = $this->formatarPeriodoFinanceiro($filtros);
+
+        $data = collect($paginated->items())
+            ->map(fn ($row) => $this->montarLinhaFinanceiro($row, $taxaPlataformaFallback, $periodo))
+            ->all();
 
         return [
-            'data' => $paginated->items(),
+            'data' => $data,
             'total' => $paginated->total(),
             'page' => $paginated->currentPage(),
             'last_page' => $paginated->lastPage(),
-            'totais' => $totais,
         ];
+    }
+
+    /**
+     * Monta uma linha do relatório financeiro garantindo que nenhum campo
+     * monetário ou de contagem retorne null.
+     *
+     * A taxa da plataforma usa o percentual `taxa_comissao` da própria loja
+     * (armazenado como percentual inteiro, ex.: 15.00 = 15%). Se a loja não
+     * tiver uma taxa configurada (null ou <= 0), usa o fallback de
+     * `config('relatorios.taxa_plataforma')` (já em fração).
+     */
+    private function montarLinhaFinanceiro(object $row, float $taxaPlataformaFallback, string $periodo): array
+    {
+        $receitaBruta = (float) ($row->receita_bruta ?? 0);
+        $taxaComissao = (float) ($row->taxa_comissao ?? 0);
+        $taxaFracao = $taxaComissao > 0 ? $taxaComissao / 100 : $taxaPlataformaFallback;
+        $taxaValor = round($receitaBruta * $taxaFracao, 2);
+
+        return [
+            'loja' => $row->loja ?? '',
+            'receita_bruta' => $receitaBruta,
+            'taxa_plataforma' => $taxaValor,
+            'receita_liquida' => round($receitaBruta - $taxaValor, 2),
+            'pedidos' => (int) ($row->pedidos ?? 0),
+            'periodo' => $periodo,
+        ];
+    }
+
+    /**
+     * Formata o intervalo de datas filtrado para exibição, nunca retornando
+     * null/vazio.
+     */
+    private function formatarPeriodoFinanceiro(array $filtros): string
+    {
+        $de = ! empty($filtros['de']) ? Carbon::parse($filtros['de']) : null;
+        $ate = ! empty($filtros['ate']) ? Carbon::parse($filtros['ate']) : null;
+
+        if ($de && $ate) {
+            return $de->format('d/m/Y').' - '.$ate->format('d/m/Y');
+        }
+        if ($de) {
+            return 'A partir de '.$de->format('d/m/Y');
+        }
+        if ($ate) {
+            return 'Até '.$ate->format('d/m/Y');
+        }
+
+        return 'Todos os períodos';
     }
 
     /**
@@ -187,16 +264,17 @@ class RelatoriosModel extends BaseModel
                 ->leftJoin('lojas', 'pedidos.loja_id', '=', 'lojas.id')
                 ->leftJoin('pagamentos', 'pagamentos.pedido_id', '=', 'pedidos.id')
                 ->leftJoin('enderecos', 'enderecos.id', '=', 'pedidos.endereco_id')
-                ->select(
-                    'pedidos.id',
-                    'users.name as cliente',
-                    'lojas.nome_fantasia as loja',
-                    'pedidos.status',
-                    'pedidos.total',
-                    'pagamentos.metodo as forma_pagamento',
-                    'enderecos.cidade',
-                    'pedidos.created_at'
-                );
+                ->selectRaw('
+                    pedidos.id,
+                    UPPER(RIGHT(pedidos.id, 8)) as numero,
+                    users.name as cliente,
+                    lojas.nome_fantasia as loja,
+                    pedidos.status,
+                    pedidos.total,
+                    pagamentos.metodo as forma_pagamento,
+                    enderecos.cidade,
+                    pedidos.created_at as criado_em
+                ');
 
             $this->aplicarFiltrosPedidos($query, $filtros);
             $query->orderByDesc('pedidos.created_at');
@@ -217,14 +295,14 @@ class RelatoriosModel extends BaseModel
                 ->join('pedidos', 'item_pedidos.pedido_id', '=', 'pedidos.id')
                 ->join('produtos', 'item_pedidos.produto_id', '=', 'produtos.id')
                 ->selectRaw('
-                    produtos.nome,
+                    produtos.nome as produto,
                     produtos.marca as cervejaria,
-                    SUM(item_pedidos.quantidade_final) as total_vendido,
-                    SUM(item_pedidos.preco_total) as receita_total
+                    COALESCE(SUM(item_pedidos.quantidade_final), 0) as quantidade_vendida,
+                    COALESCE(SUM(item_pedidos.preco_total), 0) as receita_total
                 ')
                 ->where('pedidos.status', '!=', 'cancelado')
                 ->groupBy('produtos.id', 'produtos.nome', 'produtos.marca')
-                ->orderByDesc('total_vendido');
+                ->orderByDesc('quantidade_vendida');
 
             if (! empty($filtros['de'])) {
                 $query->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
@@ -245,26 +323,31 @@ class RelatoriosModel extends BaseModel
     public function streamFinanceiroCsv(array $filtros): LazyCollection
     {
         return LazyCollection::make(function () use ($filtros) {
-            $query = DB::table('pedidos')
-                ->selectRaw('
-                    DATE(created_at) as data,
-                    COUNT(*) as total_pedidos,
-                    SUM(CASE WHEN status != "cancelado" THEN total ELSE 0 END) as receita,
-                    SUM(CASE WHEN status = "cancelado" THEN 1 ELSE 0 END) as cancelamentos,
-                    AVG(CASE WHEN status != "cancelado" THEN total ELSE NULL END) as ticket_medio
-                ')
-                ->groupByRaw('DATE(created_at)')
-                ->orderByDesc('data');
+            $taxaPlataformaFallback = (float) config('relatorios.taxa_plataforma');
+            $periodo = $this->formatarPeriodoFinanceiro($filtros);
 
-            if (! empty($filtros['de'])) {
-                $query->where('created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
-            }
-            if (! empty($filtros['ate'])) {
-                $query->where('created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
-            }
+            $query = DB::table('lojas')
+                ->leftJoin('pedidos', function ($join) use ($filtros) {
+                    $join->on('pedidos.loja_id', '=', 'lojas.id')
+                        ->where('pedidos.status', '!=', 'cancelado');
+                    if (! empty($filtros['de'])) {
+                        $join->where('pedidos.created_at', '>=', Carbon::parse($filtros['de'])->startOfDay());
+                    }
+                    if (! empty($filtros['ate'])) {
+                        $join->where('pedidos.created_at', '<=', Carbon::parse($filtros['ate'])->endOfDay());
+                    }
+                })
+                ->selectRaw('
+                    lojas.nome_fantasia as loja,
+                    lojas.taxa_comissao,
+                    COALESCE(SUM(pedidos.total), 0) as receita_bruta,
+                    COUNT(pedidos.id) as pedidos
+                ')
+                ->groupBy('lojas.id', 'lojas.nome_fantasia', 'lojas.taxa_comissao')
+                ->orderByDesc('receita_bruta');
 
             foreach ($query->lazy(200) as $row) {
-                yield $row;
+                yield (object) $this->montarLinhaFinanceiro($row, $taxaPlataformaFallback, $periodo);
             }
         });
     }
