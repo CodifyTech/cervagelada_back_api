@@ -68,9 +68,9 @@ class RelatoriosService extends BaseService
     private function getCsvHeaders(string $tipo): array
     {
         return match ($tipo) {
-            'pedidos' => ['ID', 'Cliente', 'Loja', 'Status', 'Total (R$)', 'Pagamento', 'Cidade', 'Data'],
+            'pedidos' => ['ID', 'Número', 'Cliente', 'Loja', 'Status', 'Total (R$)', 'Pagamento', 'Cidade', 'Data'],
             'produtos' => ['Produto', 'Cervejaria', 'Total Vendido', 'Receita Total (R$)'],
-            'financeiro' => ['Data', 'Total Pedidos', 'Receita (R$)', 'Cancelamentos', 'Ticket Médio (R$)'],
+            'financeiro' => ['Loja', 'Receita Bruta (R$)', 'Taxa Plataforma (R$)', 'Receita Líquida (R$)', 'Pedidos', 'Período'],
             default => [],
         };
     }

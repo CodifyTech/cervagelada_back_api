@@ -3,6 +3,7 @@
 namespace App\Domains\Loja\Requests;
 
 use App\Domains\Shared\Requests\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class LojaRequest extends BaseFormRequest
 {
@@ -10,6 +11,13 @@ class LojaRequest extends BaseFormRequest
     {
         return [
             'nome_fantasia' => ['required', 'string', 'max:150'],
+            'cnpj' => [
+                'nullable',
+                'string',
+                'max:18',
+                'regex:/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$|^\d{14}$/',
+                Rule::unique('lojas', 'cnpj')->ignore($this->route('loja')),
+            ],
             'url_logo' => ['nullable', 'image', 'max:2048'],
             'tipo_loja' => ['required', 'in:distribuidor,cervejaria'],
             'latitude' => ['required', 'numeric'],
