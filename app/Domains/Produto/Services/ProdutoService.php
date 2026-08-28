@@ -6,7 +6,9 @@ use App\Domains\Loja\Models\Loja;
 use App\Domains\Produto\Models\Produto;
 use App\Domains\Shared\Services\BaseService;
 use App\Domains\Shared\Services\UploadService;
+use App\Domains\Shared\Utils\FullTextHelper;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProdutoService extends BaseService
@@ -58,6 +60,42 @@ class ProdutoService extends BaseService
         }
 
         return parent::index($options, $builderCallback);
+    }
+
+    public function search(array $options = [], ?\Closure $builderCallback = null)
+    {
+        if (($options['field'] ?? null) === 'nome' && DB::connection()->getDriverName() !== 'sqlite') {
+            return $this->searchByNomeFullText($options, $builderCallback);
+        }
+
+        return parent::search($options, $builderCallback);
+    }
+
+    /**
+     * Busca fulltext (MATCH ... AGAINST ... IN BOOLEAN MODE) no campo nome,
+     * ordenada por relevância.
+     */
+    private function searchByNomeFullText(array $options, ?\Closure $builderCallback = null)
+    {
+        $value = (string) ($options['value'] ?? '');
+        $booleanQuery = FullTextHelper::toBooleanQuery($value);
+
+        $query = $this->getModel()->newQuery()
+            ->whereFullText('nome', $booleanQuery, ['mode' => 'boolean'])
+            ->orderByRaw('MATCH(nome) AGAINST(? IN BOOLEAN MODE) DESC', [$booleanQuery]);
+
+        if ($builderCallback !== null) {
+            $builderCallback($query);
+        }
+
+        $data = $query->paginate($options['per_page'] ?? 15);
+
+        return [
+            'data' => $data->items(),
+            'total' => $data->total(),
+            'page' => $data->currentPage(),
+            'last_page' => $data->lastPage(),
+        ];
     }
 
     public function store(array $data)

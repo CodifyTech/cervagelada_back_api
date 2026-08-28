@@ -25,6 +25,10 @@ return new class extends Migration
             $table->string('sku', 50)->nullable();
             $table->text('atributos')->nullable();
             $table->timestamps();
+
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText('nome');
+            }
         });
     }
 
