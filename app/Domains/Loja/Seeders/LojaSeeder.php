@@ -31,9 +31,11 @@ class LojaSeeder extends Seeder
 
         $users = User::orderBy('created_at')->limit(12)->get();
 
+        $cnpjsGerados = [];
+
         foreach ($lojas as $index => $lojaData) {
             $loja = Loja::create(array_merge($lojaData, [
-                'cnpj' => fake('pt_BR')->unique()->cnpj(),
+                'cnpj' => $this->gerarCnpjUnico($cnpjsGerados),
                 'latitude' => '-23.5505',
                 'longitude' => '-46.6333',
                 'raio_entrega_km' => 10,
@@ -56,5 +58,64 @@ class LojaSeeder extends Seeder
                 $users[$index + 2]->update(['loja_id' => $loja->id]);
             }
         }
+    }
+
+    /**
+     * Gera um CNPJ válido e ainda não utilizado, formatado como XX.XXX.XXX/XXXX-XX.
+     *
+     * @param  array<int, string>  $cnpjsGerados
+     */
+    private function gerarCnpjUnico(array &$cnpjsGerados): string
+    {
+        do {
+            $cnpj = $this->gerarCnpj();
+        } while (in_array($cnpj, $cnpjsGerados, true));
+
+        $cnpjsGerados[] = $cnpj;
+
+        return $cnpj;
+    }
+
+    private function gerarCnpj(): string
+    {
+        $base = [];
+
+        for ($i = 0; $i < 8; $i++) {
+            $base[] = random_int(0, 9);
+        }
+
+        // Filial fixa (0001)
+        array_push($base, 0, 0, 0, 1);
+
+        $base[] = $this->calcularDigitoVerificadorCnpj($base, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        $base[] = $this->calcularDigitoVerificadorCnpj($base, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+
+        $numeros = implode('', $base);
+
+        return sprintf(
+            '%s.%s.%s/%s-%s',
+            substr($numeros, 0, 2),
+            substr($numeros, 2, 3),
+            substr($numeros, 5, 3),
+            substr($numeros, 8, 4),
+            substr($numeros, 12, 2),
+        );
+    }
+
+    /**
+     * @param  array<int, int>  $numeros
+     * @param  array<int, int>  $pesos
+     */
+    private function calcularDigitoVerificadorCnpj(array $numeros, array $pesos): int
+    {
+        $soma = 0;
+
+        foreach ($pesos as $index => $peso) {
+            $soma += $numeros[$index] * $peso;
+        }
+
+        $resto = $soma % 11;
+
+        return $resto < 2 ? 0 : 11 - $resto;
     }
 }
