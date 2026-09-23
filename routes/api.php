@@ -52,3 +52,6 @@ require __DIR__.'/domains/destaque.php';
 
 // Configuracao Domain Routes
 require __DIR__.'/domains/configuracao.php';
+
+// Legal / Institutional Content Routes
+require __DIR__.'/domains/legal.php';
