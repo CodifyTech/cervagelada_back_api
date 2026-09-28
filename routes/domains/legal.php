@@ -256,3 +256,490 @@ Route::get('termos-e-condicoes', function () {
         ],
     ]);
 });
+
+Route::get('como-comprar', function () {
+    return response()->json([
+        'title' => 'Como Comprar no Cervagelada',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'Um Guia Rápido',
+                'content' => 'Comprar suas bebidas favoritas no Cervagelada é fácil e rápido! Siga estes passos simples.',
+            ],
+            [
+                'title' => '1. Cadastre-se',
+                'content' => 'No canto superior direito da tela, clique em "Cadastrar-se".<br><br>'
+                    .'Preencha o formulário com seus dados pessoais: nome completo, e-mail, número de telefone, data de nascimento e endereço de entrega completo.<br><br>'
+                    .'Crie uma senha segura para sua conta.<br><br>'
+                    .'Leia e aceite os Termos e Condições de Uso e a Política de Privacidade.<br><br>'
+                    .'Clique em "Cadastrar" para criar sua conta.',
+            ],
+            [
+                'title' => '2. Escolha sua Loja',
+                'content' => 'Após o cadastro, você poderá navegar pelas diversas lojas (Cervejarias Artesanais e Distribuidoras de Bebidas) disponíveis na sua região.<br><br>'
+                    .'Utilize os filtros por tipo de bebida, marca, localização ou outros critérios para encontrar a loja que mais lhe agrada.<br><br>'
+                    .'Você também pode buscar diretamente pelo nome da loja na barra de pesquisa.',
+            ],
+            [
+                'title' => '3. Selecione seus Produtos',
+                'content' => 'Ao acessar a página de uma loja, você poderá visualizar todos os produtos disponíveis.<br><br>'
+                    .'Clique nos produtos para ver mais detalhes, como descrição, preço e informações adicionais.<br><br>'
+                    .'Selecione a quantidade desejada de cada produto e clique em "Adicionar ao Carrinho".<br><br>'
+                    .'Você pode continuar navegando por outras lojas e adicionando mais produtos ao seu carrinho.',
+            ],
+            [
+                'title' => '4. Finalize sua Compra',
+                'content' => 'Quando terminar de escolher seus produtos, clique no ícone do carrinho no canto superior direito da tela.<br><br>'
+                    .'Revise os itens adicionados, a quantidade e os preços.<br><br>'
+                    .'Informe ou confirme seu endereço de entrega.<br><br>'
+                    .'Escolha a forma de pagamento de sua preferência entre as opções disponíveis.<br><br>'
+                    .'Confira o valor total do seu pedido, incluindo a taxa de entrega (se houver).<br><br>'
+                    .'Clique em "Finalizar Pedido" para concluir sua compra.',
+            ],
+            [
+                'title' => '5. Acompanhe seu Pedido',
+                'content' => 'Após a confirmação do pagamento, você receberá um e-mail com os detalhes do seu pedido.<br><br>'
+                    .'Você poderá acompanhar o status da sua entrega na seção "Meus Pedidos" da sua conta.<br><br>'
+                    .'Pronto! Agora é só aguardar a entrega das suas bebidas geladas no conforto da sua casa. Boas compras no Cervagelada!',
+            ],
+        ],
+    ]);
+});
+
+Route::get('formas-pagamento', function () {
+    return response()->json([
+        'title' => 'Formas de Pagamento',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'Escolha a Sua Forma de Pagamento',
+                'content' => 'Pensando na sua comodidade, o Cervagelada oferece opções de pagamento fáceis e seguras para você garantir suas bebidas favoritas sem complicação! O valor total da sua compra, incluindo a entrega, aparece de forma clara para você conferir antes de finalizar o pedido.',
+            ],
+            [
+                'title' => 'Cartão de Crédito',
+                'content' => 'Use seu cartão de crédito das principais bandeiras e parcele suas compras (verifique as condições de cada loja).',
+            ],
+            [
+                'title' => 'Pix',
+                'content' => 'Pague na hora, com toda a segurança e a rapidez que só o Pix oferece!<br><br>'
+                    .'Selecione a forma de pagamento que mais combina com você e finalize seu pedido. Em breve, suas bebidas estarão a caminho para refrescar seus momentos. Saúde!',
+            ],
+        ],
+    ]);
+});
+
+Route::get('envios-frete', function () {
+    return response()->json([
+        'title' => 'Envios / Frete',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'Pedidos em Distribuidoras de Bebidas',
+                'content' => 'O prazo estimado de entrega será informado antes da conclusão da compra e poderá variar de acordo com a localização, disponibilidade do estabelecimento, condições climáticas, volume de pedidos e operação logística. Quando houver indicação de tempo médio de entrega, ela será apresentada como estimativa, e não como garantia de prazo.',
+            ],
+            [
+                'title' => 'Pedidos em Cervejarias Artesanais',
+                'content' => 'Para pedidos de Cervejarias Artesanais, o prazo estimado de entrega será informado antes da conclusão da compra e poderá variar conforme disponibilidade de produção e estoque, localização, condições climáticas, volume de pedidos e operação logística.',
+            ],
+            [
+                'title' => 'Demais lojas, livros, acessórios, ingressos, cursos e demais',
+                'content' => 'As lojas parceiras são 100% responsáveis pelo devido despacho conforme o pedido recebido. Para as demais lojas do Cervagelada, produtos físicos (ex.: churrasqueira ou livros) são despachados por transportadoras para envio de longa distância, com acompanhamento via comunicados por e-mail. Para cursos e eventos, a entrega será realizada conforme a política das lojas, utilizando meios logísticos como e-mail e WhatsApp.',
+            ],
+        ],
+    ]);
+});
+
+Route::get('perguntas-frequentes', function () {
+    return response()->json([
+        'title' => 'Perguntas Frequentes',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => '1. Sobre o Cervagelada',
+                'content' => '<strong>O que é o Cervagelada?</strong><br>'
+                    .'O Cervagelada é um marketplace online que conecta você às melhores Cervejarias Artesanais e Distribuidoras de Bebidas da sua região. Através da nossa plataforma, você pode explorar uma seleção diversificada de cervejas artesanais exclusivas e outras bebidas, realizar seus pedidos de forma rápida e prática, e recebê-los no conforto do seu lar.<br><br>'
+                    .'<strong>Em quais cidades o Cervagelada opera?</strong><br>'
+                    .'Estamos trabalhando continuamente para expandir nossa área de atuação. Consulte a disponibilidade para a sua região informando seu CEP na Plataforma.<br><br>'
+                    .'<strong>Como posso entrar em contato com o Cervagelada?</strong><br>'
+                    .'E-mail: faleconosco@cervagelada.com.br — Telefone/WhatsApp: (41) 9 8855-1173.',
+            ],
+            [
+                'title' => '2. Realização de Pedidos',
+                'content' => '<strong>Como efetuo um pedido no Cervagelada?</strong><br>'
+                    .'Navegue em nossa plataforma (website ou aplicativo) e explore as opções de cervejas artesanais e outras bebidas disponíveis. Utilize os filtros e categorias para encontrar seus produtos desejados. Adicione os produtos ao carrinho, revise-o e selecione "Finalizar Pedido". Informe seu endereço de entrega, escolha a forma de pagamento, confirme o pedido e aguarde a notificação de confirmação.<br><br>'
+                    .'<strong>É necessário possuir uma conta para realizar um pedido?</strong><br>'
+                    .'Sim, para realizar pedidos no Cervagelada é necessário criar uma conta. Isso nos permite armazenar seu histórico de pedidos, informações de entrega e preferências, otimizando suas futuras compras.<br><br>'
+                    .'<strong>Posso modificar ou cancelar meu pedido após a finalização?</strong><br>'
+                    .'A possibilidade de alteração ou cancelamento depende do status do seu pedido. Caso o pedido ainda não tenha sido processado para entrega, entre em contato com nossa equipe de suporte o mais breve possível para verificar a viabilidade da sua solicitação.<br><br>'
+                    .'<strong>Existe um valor mínimo para realizar um pedido?</strong><br>'
+                    .'O valor mínimo, quando aplicável, é sempre exibido em seu carrinho de compras antes da conclusão do pedido.<br><br>'
+                    .'<strong>Como serei notificado sobre a confirmação do meu pedido?</strong><br>'
+                    .'Após a conclusão do seu pedido, você receberá uma confirmação por e-mail contendo os detalhes da sua compra e um código de rastreamento (se aplicável). Você também poderá acompanhar o status do seu pedido na seção "Meus Pedidos" da sua conta.<br><br>'
+                    .'<strong>O que ocorre se um produto se tornar indisponível após a realização do meu pedido?</strong><br>'
+                    .'Nossa equipe entrará em contato para oferecer alternativas, como a substituição por um item similar, a remoção do item do pedido ou o cancelamento parcial ou total da compra.',
+            ],
+            [
+                'title' => '3. Entrega dos Pedidos',
+                'content' => '<strong>Qual a área de cobertura para entregas do Cervagelada?</strong><br>'
+                    .'Você poderá confirmar se seu endereço está dentro da nossa área de cobertura ao inserir seu CEP durante o processo de finalização da compra.<br><br>'
+                    .'<strong>Qual o prazo estimado para a entrega do meu pedido?</strong><br>'
+                    .'O prazo de entrega pode variar de acordo com sua localização, o horário da realização do pedido e a disponibilidade do parceiro responsável pela entrega (Cervejaria ou Distribuidora). O prazo estimado será informado durante a finalização do seu pedido.<br><br>'
+                    .'<strong>Qual o valor da taxa de entrega?</strong><br>'
+                    .'A taxa de entrega pode variar dependendo da distância do endereço de entrega e do parceiro responsável. O valor será claramente indicado em seu carrinho de compras antes da confirmação do pedido. Em algumas promoções, a entrega poderá ser gratuita para pedidos acima de um determinado valor.<br><br>'
+                    .'<strong>Posso agendar um horário específico para a entrega do meu pedido?</strong><br>'
+                    .'No momento, não oferecemos a opção de agendamento de horário para a entrega. As entregas são realizadas dentro do prazo estimado informado no momento da compra.<br><br>'
+                    .'<strong>Como posso acompanhar o status da entrega do meu pedido?</strong><br>'
+                    .'Assim que seu pedido for despachado para entrega, você receberá um link de rastreamento por e-mail (caso o parceiro de entrega ofereça este serviço). Você também poderá verificar o status da entrega na seção "Meus Pedidos" de sua conta.<br><br>'
+                    .'<strong>O que devo fazer caso meu pedido não seja entregue dentro do prazo previsto?</strong><br>'
+                    .'Entre em contato com nossa equipe de suporte para que possamos verificar a situação junto ao parceiro de entrega.<br><br>'
+                    .'<strong>Qual o procedimento caso eu receba meu pedido incompleto ou danificado?</strong><br>'
+                    .'Entre em contato com nossa equipe de suporte após o recebimento, enviando fotos dos produtos danificados e detalhes da ocorrência. Faremos o possível para solucionar a questão prontamente.<br><br>'
+                    .'<strong>Quem será o responsável pela entrega do meu pedido?</strong><br>'
+                    .'A entrega do seu pedido poderá ser realizada diretamente pela Cervejaria Artesanal, pela Distribuidora de Bebidas parceira ou por um serviço de entrega terceirizado, a depender da sua localização e dos produtos selecionados.',
+            ],
+            [
+                'title' => '4. Produtos Disponíveis',
+                'content' => '<strong>Quais tipos de bebidas posso encontrar no Cervagelada?</strong><br>'
+                    .'No Cervagelada, você encontrará uma vasta seleção de cervejas em geral, inclusive artesanais de diversas cervejarias, além de outras bebidas como refrigerantes, sucos, vinhos, destilados, cachaças, energéticos, entre outras.<br><br>'
+                    .'<strong>Onde posso obter mais informações sobre uma cerveja artesanal específica?</strong><br>'
+                    .'Na página de cada produto, você encontrará informações detalhadas sobre o estilo da cerveja, a cervejaria produtora, os ingredientes utilizados, o teor alcoólico, as notas de degustação e outras informações relevantes.<br><br>'
+                    .'<strong>Os produtos comercializados no Cervagelada são originais?</strong><br>'
+                    .'Sim, o Cervagelada estabelece parcerias apenas com Cervejarias Artesanais e Distribuidoras de Bebidas que garantem a autenticidade e a alta qualidade de seus produtos.<br><br>'
+                    .'<strong>Posso avaliar os produtos que adquiri?</strong><br>'
+                    .'Sim, após o recebimento do seu pedido, você terá a oportunidade de avaliar os produtos e sua experiência de compra na seção "Meus Pedidos" de sua conta.',
+            ],
+            [
+                'title' => '5. Formas de Pagamento',
+                'content' => '<strong>Quais são as formas de pagamento aceitas no Cervagelada?</strong><br>'
+                    .'Aceitamos cartão de crédito e Pix. As formas de pagamento disponíveis para cada loja são exibidas durante o processo de compra.<br><br>'
+                    .'<strong>O processo de pagamento online é seguro?</strong><br>'
+                    .'Sim, implementamos tecnologias de segurança avançadas para assegurar a proteção de seus dados financeiros durante o processo de pagamento online. As transações são criptografadas e processadas por plataformas de pagamento seguras.<br><br>'
+                    .'<strong>Posso utilizar dois cartões diferentes para pagar um único pedido?</strong><br>'
+                    .'No momento, nossa plataforma não oferece a funcionalidade de pagamento com dois cartões distintos para o mesmo pedido.<br><br>'
+                    .'<strong>O que devo fazer se meu pagamento for recusado?</strong><br>'
+                    .'Verifique se os dados do cartão inseridos estão corretos e se há saldo disponível. Você também pode tentar utilizar outra forma de pagamento ou entrar em contato com a administradora do seu cartão.<br><br>'
+                    .'<strong>Como funciona o processo de reembolso em caso de cancelamento ou problema com o pedido?</strong><br>'
+                    .'O reembolso será processado utilizando a mesma forma de pagamento utilizada na compra original. O prazo para o crédito ser efetuado em sua conta pode variar de acordo com a sua operadora de cartão ou instituição bancária.',
+            ],
+            [
+                'title' => '6. Gerenciamento da Sua Conta',
+                'content' => '<strong>Como posso criar uma conta no Cervagelada?</strong><br>'
+                    .'Você pode criar sua conta clicando em "Cadastrar-se" na página inicial da nossa plataforma e seguindo as instruções apresentadas.<br><br>'
+                    .'<strong>Como posso alterar minhas informações cadastrais?</strong><br>'
+                    .'Você pode modificar seus dados cadastrais (endereço, número de telefone, e-mail, etc.) acessando a seção "Minha Conta" e editando as informações desejadas.<br><br>'
+                    .'<strong>Esqueci minha senha. Como posso recuperá-la?</strong><br>'
+                    .'Na página de login, clique na opção "Esqueci minha senha" e siga as instruções para redefinir sua senha. Você receberá um e-mail contendo um link para a criação de uma nova senha.<br><br>'
+                    .'<strong>Como posso solicitar a exclusão da minha conta no Cervagelada?</strong><br>'
+                    .'Entre em contato com nossa equipe de suporte através dos canais de atendimento disponíveis.',
+            ],
+            [
+                'title' => '7. Para Cervejarias Artesanais e Distribuidoras Interessadas em Parceria',
+                'content' => '<strong>Como posso me tornar um parceiro do Cervagelada?</strong><br>'
+                    .'Se você representa uma Cervejaria Artesanal ou Distribuidora de Bebidas e tem interesse em estabelecer uma parceria com o Cervagelada, entre em contato conosco através do e-mail comercial@cervagelada.com.br.<br><br>'
+                    .'<strong>Quais são os critérios para se tornar um parceiro do Cervagelada?</strong><br>'
+                    .'Os critérios para parceria incluem a posse de todas as licenças e registros necessários para operação, a garantia da qualidade dos produtos, a capacidade de atendimento e entrega (para distribuidores), e o alinhamento com os valores e princípios do Cervagelada. Veja mais detalhes na página "Como Vender no Cervagelada".',
+            ],
+        ],
+    ]);
+});
+
+Route::get('regras-do-site', function () {
+    return response()->json([
+        'title' => 'Termos e Condições de Uso — Marketplace Cervagelada',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => '1. Sobre a Plataforma',
+                'content' => 'Bem-vindo(a) ao marketplace online Cervagelada ("Plataforma"), operado por M2T Tecnologia Ltda, com sede na Av. Camilo Di Lellis, 1065, Sala OutBox, Centro - 83323-000 - Pinhais - PR, CNPJ 57.774.206/0001-96 ("Cervagelada").<br><br>'
+                    .'Estes Termos e Condições de Uso ("Termos") regem o acesso e a utilização da Plataforma Cervagelada por você, seja como Usuário Comprador ou como Parceiro Vendedor. Ao acessar ou utilizar a Plataforma, você concorda integralmente com estes Termos.<br><br>'
+                    .'O Cervagelada é uma plataforma que conecta Usuários Compradores a Parceiros Vendedores de bebidas. O Cervagelada não é o proprietário, vendedor ou distribuidor dos produtos anunciados na Plataforma. Os Parceiros Vendedores são responsáveis pelos produtos, pelas informações disponibilizadas, pelo processamento dos pedidos e pelas entregas sob sua responsabilidade, sem prejuízo das responsabilidades atribuídas ao Cervagelada pela legislação aplicável.',
+            ],
+            [
+                'title' => '2. Aceitação e Modificações dos Termos',
+                'content' => 'A utilização da Plataforma implica a sua total aceitação e concordância com estes Termos. O Cervagelada reserva-se o direito de modificar estes Termos a qualquer momento, sem aviso prévio. As alterações entrarão em vigor imediatamente após a sua publicação na Plataforma. É de sua responsabilidade revisar periodicamente estes Termos para estar ciente de quaisquer modificações. O uso continuado da Plataforma após a publicação de alterações constituirá sua aceitação dos novos Termos.',
+            ],
+            [
+                'title' => '3. Regras para Usuários Compradores',
+                'content' => '<strong>3.1. Cadastro e Conta:</strong> Para realizar pedidos, é necessário criar uma conta, fornecendo informações precisas, completas e atualizadas. Você é responsável pela confidencialidade de sua senha e por todas as atividades em sua conta.<br><br>'
+                    .'<strong>3.2. Uso da Plataforma:</strong> Utilize a Plataforma para fins lícitos e de acordo com estes Termos. É proibido qualquer uso que viole leis, direitos de terceiros ou a moral e os bons costumes.<br><br>'
+                    .'<strong>3.3. Pedidos e Compras:</strong> Ao realizar um pedido, você está celebrando uma transação diretamente com o Parceiro Vendedor. O Cervagelada atua apenas como um facilitador da comunicação e do processo de compra.<br><br>'
+                    .'<strong>3.4. Preços e Pagamentos:</strong> Os preços dos produtos são definidos pelos Parceiros Vendedores e podem ser alterados conforme as condições apresentadas na Plataforma.<br><br>'
+                    .'<strong>3.5. Entrega:</strong> A entrega dos produtos poderá ser realizada pelo Parceiro Vendedor ou por serviço de entrega indicado na Plataforma. O Parceiro responsável pela entrega informará a área de cobertura, os prazos e as taxas aplicáveis.<br><br>'
+                    .'<strong>3.6. Idade Mínima:</strong> A venda de bebidas alcoólicas é permitida exclusivamente a pessoas maiores de 18 anos, com confirmação obrigatória da data de nascimento e bloqueio automático de menores no fluxo de registro. O Cervagelada e/ou o Parceiro Vendedor poderão realizar procedimentos de verificação de idade durante a compra e na entrega, inclusive mediante solicitação de documento oficial com foto. A entrega poderá ser recusada caso não seja possível comprovar a maioridade do recebedor, com cancelamento do pedido e reembolso integral. A venda de bebidas alcoólicas a menores de 18 anos é proibida por lei (Art. 63 do ECA e Lei 13.106/2015).<br><br>'
+                    .'<strong>3.7. Avaliações e Comentários:</strong> Você poderá avaliar os produtos e a experiência de compra, fornecendo informações honestas e respeitosas. O Cervagelada reserva-se o direito de remover avaliações que violem estes Termos.',
+            ],
+            [
+                'title' => '4. Regras para Parceiros Vendedores',
+                'content' => '<strong>4.1. Cadastro e Conta:</strong> Para anunciar e vender na Plataforma, é necessário realizar um cadastro específico como Parceiro Vendedor, incluindo todas as licenças e registros necessários para a venda de bebidas.<br><br>'
+                    .'<strong>4.2. Responsabilidade pelos Produtos:</strong> Você é o único responsável pela qualidade, segurança, legalidade e descrição precisa dos produtos que anuncia na Plataforma.<br><br>'
+                    .'<strong>4.3. Preços e Pagamentos:</strong> Você é responsável por definir os preços dos seus produtos. O Cervagelada poderá cobrar uma taxa ou comissão sobre as vendas realizadas, conforme acordo específico entre as partes.<br><br>'
+                    .'<strong>4.4. Processamento de Pedidos e Entrega:</strong> Você é o único responsável por processar os pedidos e por realizar a entrega dos produtos, seguindo todas as leis e regulamentos aplicáveis.<br><br>'
+                    .'<strong>4.5. Conformidade com a Lei:</strong> Você garante que suas atividades na Plataforma estão em conformidade com todas as leis aplicáveis, incluindo a legislação referente à venda de bebidas alcoólicas e a Lei Geral de Proteção de Dados (LGPD).',
+            ],
+            [
+                'title' => '5. Propriedade Intelectual',
+                'content' => 'A Plataforma e todo o seu conteúdo (exceto o conteúdo fornecido pelos Parceiros Vendedores) são de propriedade exclusiva do Cervagelada ou de seus licenciadores, sendo proibida qualquer reprodução, distribuição, modificação ou utilização não autorizada.<br><br>'
+                    .'Ao anunciar produtos na Plataforma, você concede ao Cervagelada uma licença não exclusiva, gratuita, perpétua e mundial para utilizar, reproduzir, exibir e divulgar as informações e imagens dos seus produtos na Plataforma e em materiais promocionais.',
+            ],
+            [
+                'title' => '6. Limitação de Responsabilidade',
+                'content' => 'O Cervagelada atua como plataforma de intermediação, conectando Usuários Compradores e Parceiros Vendedores. Cada participante responderá pelos atos, serviços e obrigações sob sua responsabilidade, sem prejuízo dos direitos e responsabilidades que não possam ser afastados pela legislação de defesa do consumidor.<br><br>'
+                    .'A Plataforma é fornecida "no estado em que se encontra" e "conforme a disponibilidade". O Cervagelada não garante que a Plataforma estará sempre disponível, livre de erros ou interrupções.<br><br>'
+                    .'O Cervagelada adota dever de cuidado na curadoria de seus parceiros, incluindo verificação prévia de CNPJ ativo, CNAE compatível, além de monitoramento contínuo de reclamações de consumidores e bloqueio de parceiros reincidentes. O vendedor é sempre identificado em cada anúncio e na finalização da compra (razão social, CNPJ, endereço e canal de atendimento), em conformidade com o Decreto 7.962/2013.',
+            ],
+            [
+                'title' => '7. Privacidade e Proteção de Dados',
+                'content' => 'O Cervagelada coleta e trata dados pessoais em conformidade com a Lei Geral de Proteção de Dados (LGPD) e com a nossa Política de Privacidade. Ao utilizar a Plataforma, você declara ter lido e concordado com a nossa Política de Privacidade.',
+            ],
+            [
+                'title' => '8. Rescisão',
+                'content' => 'O Cervagelada poderá, a seu exclusivo critério, suspender ou encerrar o acesso de qualquer Usuário ou Parceiro Vendedor à Plataforma, a qualquer momento, em caso de violação destes Termos, uso indevido da plataforma ou motivos comerciais justificáveis, mediante aviso prévio, salvo em hipóteses de grave violação legal ou contratual, quando a medida poderá ser imediata. Em pedidos pagos e não entregues, os valores serão integralmente reembolsados.',
+            ],
+            [
+                'title' => '9. Lei Aplicável e Foro',
+                'content' => 'Estes Termos serão regidos e interpretados de acordo com as leis da República Federativa do Brasil. Fica eleito o foro da Comarca de Pinhais, Paraná, sem prejuízo da competência do Juizado Especial Cível, como o único competente para dirimir quaisquer dúvidas ou litígios oriundos destes Termos.',
+            ],
+            [
+                'title' => '10. Contato',
+                'content' => 'Em caso de dúvidas ou necessidade de informações adicionais sobre estes Termos, entre em contato conosco:<br><br>'
+                    .'E-mail: faleconosco@cervagelada.com.br<br>'
+                    .'Endereço: Av. Camilo Di Lellis, 1065, Sala OutBox, Centro - 83323-000 - Pinhais - PR<br>'
+                    .'WhatsApp: (41) 9 8855-1173',
+            ],
+        ],
+    ]);
+});
+
+Route::get('trocas-e-devolucoes', function () {
+    return response()->json([
+        'title' => 'Política de Trocas e Devoluções',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'Sobre esta Política',
+                'content' => 'Esta política descreve como funcionam as trocas e devoluções de bebidas (alcoólicas e não alcoólicas) compradas no marketplace online Cervagelada. Ela é baseada no Código de Defesa do Consumidor do Brasil.<br><br>'
+                    .'Importante: no Cervagelada, a compra é realizada com Cervejarias Artesanais, Distribuidoras e demais Lojas Parceiras. O vendedor é responsável pelos produtos, informações, preparação do pedido e atendimento das solicitações de troca ou devolução sob sua responsabilidade, sem prejuízo dos direitos do consumidor e das responsabilidades atribuídas ao Cervagelada pela legislação aplicável.',
+            ],
+            [
+                'title' => '1. Condições Gerais para Troca ou Devolução',
+                'content' => '1.1. Para pedir uma troca ou devolução, utilize o canal de comunicação disponível na Plataforma para contatar o vendedor responsável (WhatsApp, telefone, chat ou e-mail). Se houver dificuldade na solução, o suporte do Cervagelada poderá auxiliar na intermediação do atendimento.<br><br>'
+                    .'1.2. Reclamação por vício: para produtos não duráveis, como bebidas, o prazo legal para reclamar de vícios aparentes ou de fácil constatação é de 30 dias, contado da entrega. Para produtos duráveis, o prazo legal é de 90 dias, sem prejuízo das regras aplicáveis aos vícios ocultos.<br><br>'
+                    .'1.3. Direito de arrependimento em compras online: nas hipóteses previstas na legislação aplicável, o consumidor poderá exercer o direito de arrependimento no prazo de 7 dias, contado do recebimento do produto.<br><br>'
+                    .'1.4. Para que a troca ou devolução seja aceita, os produtos precisam estar: na embalagem original, sem sinais de abertura (exceto se o problema for um defeito); sem sinais de uso ou consumo (exceto se o problema for um defeito); com todos os acessórios, manuais e etiquetas (se houver); com a nota fiscal ou comprovante de compra.<br><br>'
+                    .'1.5. Guarde os produtos e as bebidas na temperatura correta desde que você as recebe. Problemas causados por armazenamento incorreto não serão de responsabilidade do vendedor.',
+            ],
+            [
+                'title' => '2. Como Solicitar a Troca ou Devolução',
+                'content' => '2.1. Acesse a seção "Meus Pedidos" na sua conta Cervagelada e encontre o pedido da bebida que você quer trocar ou devolver.<br><br>'
+                    .'2.2. Entre em contato direto com o vendedor responsável pela venda, usando os canais de comunicação na plataforma.<br><br>'
+                    .'2.3. Na sua mensagem, informe: o número do pedido; qual produto você quer trocar ou devolver; o motivo da troca ou devolução; e, se possível, envie fotos ou vídeos mostrando o problema.<br><br>'
+                    .'2.4. O vendedor vai analisar sua solicitação e, se tudo estiver certo, vai te dar as instruções para a troca ou devolução.',
+            ],
+            [
+                'title' => '3. O Que o Vendedor Pode Oferecer',
+                'content' => 'Depois de receber sua solicitação e o produto (se precisar enviar de volta), o vendedor vai verificar se tudo está de acordo com esta política.<br><br>'
+                    .'<strong>Troca por defeito:</strong> o vendedor pode oferecer o mesmo produto (se houver estoque), outro produto de mesmo valor (se houver estoque) ou o seu dinheiro de volta.<br><br>'
+                    .'<strong>Entrega errada:</strong> se você recebeu um produto diferente do que pediu, o vendedor poderá enviar o produto correto ou realizar o reembolso, conforme o caso.',
+            ],
+            [
+                'title' => '4. Condições Específicas para Bebidas de Consumo Imediato',
+                'content' => '4.1. Para pedidos de "entrega para consumo imediato" (bebidas que você pretende consumir logo, como cervejas geladas), qualquer problema visível (embalagem danificada, bebida errada) deve ser comunicado ao vendedor no mesmo dia da entrega, de preferência na hora em que você receber ou em até 2 horas depois do recebimento do produto.<br><br>'
+                    .'4.2. Use os canais de contato da plataforma para informar o problema e, se puder, envie fotos ou vídeos.<br><br>'
+                    .'4.3. A comunicação rápida de problemas visíveis facilita a solução do atendimento. Contudo, os prazos operacionais sugeridos nesta seção não afastam os prazos e direitos assegurados ao consumidor pela legislação aplicável, inclusive nas hipóteses de vício oculto.',
+            ],
+            [
+                'title' => '5. Como Enviar o Produto para Troca ou Devolução',
+                'content' => '5.1. O vendedor vai te dizer como enviar o produto de volta. Geralmente, você terá que levar o produto aos Correios ou outra transportadora indicada, ou esperar que a transportadora retire o produto no seu endereço (se o vendedor oferecer essa opção).<br><br>'
+                    .'5.2. O vendedor vai te informar sobre quem paga o frete da devolução ou troca, seguindo as leis (geralmente, o vendedor paga se for por defeito).',
+            ],
+            [
+                'title' => '6. Reembolso do Seu Dinheiro',
+                'content' => '6.1. O vendedor vai devolver o seu dinheiro depois de receber e analisar o produto devolvido ou depois de confirmar o cancelamento da compra por arrependimento.<br><br>'
+                    .'6.2. O reembolso será feito da mesma forma que você pagou: estorno no cartão de crédito (o tempo para o dinheiro voltar depende da administradora do cartão); depósito ou transferência bancária; ou crédito na sua conta Cervagelada (se o vendedor oferecer essa opção).<br><br>'
+                    .'6.3. O vendedor vai te informar o prazo para o reembolso, seguindo as leis.',
+            ],
+            [
+                'title' => '7. Bebidas que Não Podem Ser Trocadas ou Devolvidas',
+                'content' => '7.1. Alguns produtos podem estar sujeitos a condições específicas de devolução em razão de sua natureza, personalização, perecibilidade ou condições sanitárias. Essas limitações serão avaliadas caso a caso e não afastam direitos assegurados pela legislação aplicável.<br><br>'
+                    .'7.2. O vendedor pode se recusar a trocar ou devolver a bebida se ela não estiver de acordo com esta política.',
+            ],
+            [
+                'title' => '8. O Que o Cervagelada Faz',
+                'content' => '8.1. O Cervagelada atua como plataforma de intermediação. O vendedor é responsável pelo tratamento das solicitações relativas aos produtos comercializados por ele, e o Cervagelada poderá auxiliar na comunicação e no atendimento, sem prejuízo das responsabilidades previstas na legislação aplicável.<br><br>'
+                    .'8.2. Se você tiver problemas para falar com o vendedor ou para resolver a troca ou devolução, você pode entrar em contato com o suporte do Cervagelada para que possamos ajudar a facilitar a comunicação e buscar uma solução.',
+            ],
+            [
+                'title' => '9. Contato',
+                'content' => 'Para pedir uma troca ou devolução, fale direto com o vendedor pela plataforma. Se precisar de ajuda para falar com o vendedor, entre em contato com o suporte do Cervagelada:<br><br>'
+                    .'E-mail: faleconosco@cervagelada.com.br<br>'
+                    .'Telefone/WhatsApp: (41) 9 8855-1173',
+            ],
+        ],
+    ]);
+});
+
+Route::get('quem-somos', function () {
+    return response()->json([
+        'title' => 'Quem Somos',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'A gente está sempre por perto',
+                'content' => 'Olá, a gente está muito feliz de ter você aqui perto e, pra ficar melhor da gente se apresentar, vamos por tópicos. E lembre-se: a gente está sempre por perto. Olha aí quem somos nós...',
+            ],
+            [
+                'title' => 'Visão',
+                'content' => 'Ser o maior "hub virtual" do mercado cervejeiro do mundo.',
+            ],
+            [
+                'title' => 'Missão',
+                'content' => 'Desenvolver todo o macroambiente que envolve o atendimento ao mercado cervejeiro, desde a produção até a reciclagem, gerando dezenas de milhares de empregos diretos e/ou indiretos, satisfação, orgulho e renda para todo o ecossistema.',
+            ],
+            [
+                'title' => 'Nossos Valores',
+                'content' => '<strong>Gente</strong> — Nossa gente é uma união totalmente isenta de qualquer tipo de rótulo, porque somos todos iguais.<br><br>'
+                    .'<strong>Inovação</strong> — Tudo pode e deve ser questionado buscando a melhoria contínua, sempre com o objetivo de beneficiar a todos os envolvidos, em qualquer fase da empresa.<br><br>'
+                    .'<strong>Transparência</strong> — A gente faz sempre tudo de forma transparente, assim todos sabem onde estamos e onde queremos chegar.<br><br>'
+                    .'<strong>Sociedade</strong> — A gente gosta de gente por perto; promovemos integração constante dentro e fora da empresa com nossos funcionários, seus familiares e toda a comunidade na qual estamos inseridos.<br><br>'
+                    .'<strong>Paixão</strong> — A gente é apaixonado pela nossa empresa, nossas soluções e, principalmente, pela nossa gente.<br><br>'
+                    .'<strong>Liderança</strong> — Liderar é a arte de inspirar a todos para terem confiança suficiente de que são capazes de fazer, alcançando os melhores resultados profissionais e pessoais.<br><br>'
+                    .'<strong>Credibilidade</strong> — A gente transpira credibilidade; nossa honestidade em tudo o que fazemos deve ser reconhecida pela comunidade dentro e fora da empresa.<br><br>'
+                    .'<strong>Ética</strong> — A gente atua sempre dentro de todas as regras da sociedade e dos governos onde atuamos, respeitando todas as leis vigentes e culturas locais.<br><br>'
+                    .'<strong>Comunicação</strong> — A comunicação efetiva começa com a escuta ativa.<br><br>'
+                    .'<strong>Qualidade</strong> — Qualidade é o que temos e fazemos. Ajustamos sempre que necessário para melhorar nossos produtos e serviços.<br><br>'
+                    .'<strong>Meio Ambiente</strong> — Nossa vida depende do meio ambiente; a gente contribui e age o tempo todo pela sua preservação.<br><br>'
+                    .'<strong>Fé</strong> — A gente tem fé, acredita na fé e respeita toda e qualquer manifestação de fé.<br><br>'
+                    .'<strong>Gratidão</strong> — A gente é movido pela gratidão. Agradecemos a tudo e a todos, somos gratos pela nossa gente e pelo nosso meio ambiente.<br><br>'
+                    .'<strong>Metas e Objetivos</strong> — A gente é focado no alcance de nossas metas e objetivos, gerando perpetuidade dos nossos negócios e do nosso ecossistema.<br><br>'
+                    .'<strong>Conhecimento</strong> — A gente vai continuar buscando mais conhecimento e sempre compartilhando o que sabemos.',
+            ],
+        ],
+    ]);
+});
+
+Route::get('como-vender', function () {
+    return response()->json([
+        'title' => 'Como Vender no Cervagelada',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => 'Prezados(as) Parceiros(as)',
+                'content' => 'O Cervagelada está comprometido em construir um marketplace de bebidas de alta qualidade, proporcionando a melhor experiência para nossos clientes. Para isso, buscamos estabelecer parcerias sólidas e duradouras com Cervejarias Artesanais e Distribuidoras de Bebidas que compartilhem nosso compromisso com a excelência.<br><br>'
+                    .'Se você tem um CNPJ com CNAE de Cervejaria Artesanal ou Distribuidora de Bebidas, verifique abaixo os requisitos para ser nosso parceiro. Um detalhe importante: só temos parceria com CNPJs com no mínimo 12 meses de atividade. Mande um e-mail para <strong>comercial@cervagelada.com.br</strong>.',
+            ],
+            [
+                'title' => 'Requisitos para Cervejarias Artesanais Parceiras',
+                'content' => '<strong>Compromisso com a Qualidade do Produto</strong><br>'
+                    .'Regularização e conformidade: possuir todas as licenças e registros sanitários (federal, estadual e municipal) para produção e comercialização de cerveja artesanal, sempre atualizados.<br>'
+                    .'Excelência na produção: implementar e manter rigorosos padrões de boas práticas de fabricação (BPF).<br>'
+                    .'Controle de qualidade rigoroso em matérias-primas, no processo produtivo e no produto final.<br>'
+                    .'Embalagem e rotulagem adequadas, em conformidade com a legislação vigente.<br>'
+                    .'Armazenamento responsável, protegendo os produtos de fatores que comprometam sua qualidade.<br><br>'
+                    .'<strong>Compromisso com a Parceria Cervagelada</strong><br>'
+                    .'Capacidade produtiva e de estoque para atender à demanda da plataforma, com potencial de crescimento.<br>'
+                    .'Confiabilidade e cumprimento de prazos de entrega, com fluxo de fornecimento consistente.<br>'
+                    .'Comunicação eficaz e ágil com o Cervagelada e os clientes.<br>'
+                    .'Flexibilidade e proatividade para colaborar com as iniciativas da Cervagelada.<br>'
+                    .'Alinhamento de valores com a satisfação do cliente, a qualidade dos produtos e a ética nos negócios.<br>'
+                    .'Disponibilidade para integrar seus sistemas e processos com a plataforma da Cervagelada.',
+            ],
+            [
+                'title' => 'Requisitos para Distribuidoras de Bebidas Parceiras',
+                'content' => '<strong>Compromisso com a Qualidade na Distribuição</strong><br>'
+                    .'Regularização e conformidade: possuir todas as licenças e registros necessários para a distribuição e comercialização de bebidas, sempre atualizados.<br>'
+                    .'Infraestrutura de armazenamento adequada, incluindo controle de temperatura quando necessário.<br>'
+                    .'Transporte seguro e eficiente, com veículos adequados para proteção contra danos e variações de temperatura.<br>'
+                    .'Rastreabilidade dos produtos, com sistema que permita identificar origem e destino de cada lote.<br>'
+                    .'Manuseio e conservação cuidadosos, com colaboradores capacitados.<br><br>'
+                    .'<strong>Compromisso com a Parceria Cervagelada</strong><br>'
+                    .'Ampla área de cobertura de distribuição, atendendo às necessidades da Cervagelada e de seus clientes.<br>'
+                    .'Logística eficaz e ágil, com entregas rápidas, seguras e dentro dos prazos.<br>'
+                    .'Experiência comprovada na distribuição de bebidas, preferencialmente incluindo cervejas artesanais.<br>'
+                    .'Bom relacionamento com diversas cervejarias, facilitando o acesso a um portfólio variado.<br>'
+                    .'Comunicação transparente e proativa sobre informações relevantes da distribuição.<br>'
+                    .'Flexibilidade e capacidade de solução de eventuais problemas de entrega.<br>'
+                    .'Alinhamento de valores com a satisfação do cliente, a qualidade dos serviços e a ética nos negócios.<br>'
+                    .'Disponibilidade para integrar seus sistemas e processos com a plataforma da Cervagelada.',
+            ],
+            [
+                'title' => 'Próximos Passos',
+                'content' => 'Acreditamos que, ao estabelecermos estes requisitos mínimos, construiremos uma rede de parceiros de excelência, capaz de oferecer aos nossos clientes a melhor experiência no mercado de cervejas artesanais e outras bebidas. Estamos à disposição para quaisquer esclarecimentos e ansiosos para construir uma parceria de sucesso com você!<br><br>'
+                    .'Atenciosamente, Equipe Cervagelada.',
+            ],
+        ],
+    ]);
+});
+
+Route::get('politica-de-privacidade', function () {
+    return response()->json([
+        'title' => 'Política de Privacidade',
+        'last_updated' => '2025-04-01',
+        'sections' => [
+            [
+                'title' => '1. Introdução',
+                'content' => 'Esta Política de Privacidade descreve como a M2T Tecnologia Ltda ("Cervagelada", "nós" ou "nosso"), com sede na Av. Camilo Di Lellis, 1065, Sala OutBox, Centro - 83323-000 - Pinhais - PR, CNPJ 57.774.206/0001-96, coleta, utiliza, compartilha e protege as informações pessoais dos usuários que acessam e utilizam nosso marketplace disponível em www.cervagelada.com.br e seu aplicativo ("Plataforma"). Para fins desta Política e da LGPD, a M2T Tecnologia Ltda atua como controladora dos dados pessoais quando define as finalidades e os meios essenciais do tratamento realizado pela Plataforma.<br><br>'
+                    .'Ao utilizar a Plataforma Cervagelada, você concorda com os termos desta Política de Privacidade. Caso não concorde com algum dos termos aqui apresentados, você não deve utilizar nossa Plataforma.',
+            ],
+            [
+                'title' => '2. Quais Dados Pessoais Coletamos',
+                'content' => '<strong>Dados de cadastro:</strong> nome completo, e-mail, telefone, data de nascimento, endereço de entrega, CPF (em alguns casos), informações de pagamento e senha de acesso.<br><br>'
+                    .'<strong>Dados de utilização da Plataforma:</strong> histórico de pedidos e compras, produtos visualizados e pesquisados, avaliações e comentários, interações com o suporte, preferências de produtos e categorias, e informações de localização (com o seu consentimento).<br><br>'
+                    .'<strong>Dados do dispositivo e de navegação:</strong> endereço IP, tipo de dispositivo, sistema operacional, informações do navegador, dados de acesso (data e hora), páginas visitadas e cookies.<br><br>'
+                    .'<strong>Dados de Parceiros (Cervejarias e Distribuidoras):</strong> razão social, CNPJ, endereço comercial, dados de contato do representante, informações bancárias, informações sobre produtos e estoque, e documentação legal e sanitária.<br><br>'
+                    .'<strong>Dados de redes sociais:</strong> caso você opte por se conectar à nossa Plataforma através de uma rede social, poderemos coletar informações do seu perfil, de acordo com as configurações de privacidade definidas por você.',
+            ],
+            [
+                'title' => '3. Como Utilizamos Seus Dados Pessoais',
+                'content' => '<strong>Fornecer e operar a Plataforma:</strong> criar e gerenciar sua conta, processar pedidos, intermediar sua relação com os parceiros, notificar sobre o status do pedido, processar pagamentos e reembolsos e prestar suporte ao cliente.<br><br>'
+                    .'<strong>Personalizar sua experiência:</strong> recomendar produtos e ofertas com base em suas preferências e histórico de compras.<br><br>'
+                    .'<strong>Comunicação:</strong> enviar e-mails e notificações sobre pedidos, promoções e novidades (com o seu consentimento, quando aplicável) e responder às suas dúvidas.<br><br>'
+                    .'<strong>Melhoria da Plataforma:</strong> realizar análises estatísticas e desenvolver novas funcionalidades e serviços.<br><br>'
+                    .'<strong>Marketing e publicidade:</strong> enviar publicidade direcionada com base em seus interesses (com o seu consentimento, quando aplicável).<br><br>'
+                    .'<strong>Segurança e prevenção de fraudes:</strong> verificar sua identidade e prevenir atividades fraudulentas ou ilegais.<br><br>'
+                    .'<strong>Obrigações legais e regulatórias:</strong> cumprir obrigações legais, como emissão de notas fiscais e atendimento a ordens judiciais.',
+            ],
+            [
+                'title' => '4. Como Compartilhamos Seus Dados Pessoais',
+                'content' => '<strong>Parceiros (Cervejarias e Distribuidoras):</strong> compartilhamos seus dados de contato e informações do pedido com os parceiros responsáveis por fornecer e entregar os produtos que você solicitou.<br><br>'
+                    .'<strong>Prestadores de serviços:</strong> contratamos empresas para processamento de pagamentos, análise de dados, envio de e-mails, marketing, suporte ao cliente e infraestrutura, obrigadas a proteger seus dados.<br><br>'
+                    .'<strong>Autoridades públicas:</strong> em cumprimento de obrigações legais, regulatórias ou ordens judiciais.<br><br>'
+                    .'<strong>Parceiros de marketing:</strong> dados anonimizados ou pseudonimizados, para fins de publicidade direcionada (com o seu consentimento, quando aplicável).<br><br>'
+                    .'<strong>Em caso de transação empresarial:</strong> fusão, aquisição, venda de ativos ou outra transação empresarial pode implicar a transferência de seus dados para a empresa adquirente.',
+            ],
+            [
+                'title' => '5. Cookies e Outras Tecnologias de Rastreamento',
+                'content' => 'Utilizamos cookies e outras tecnologias de rastreamento (como pixels e web beacons) para coletar informações sobre sua atividade de navegação na nossa Plataforma. Esses dados nos ajudam a melhorar a sua experiência, personalizar conteúdo e anúncios, analisar o tráfego do site e entender de onde nossos usuários vêm.<br><br>'
+                    .'Você pode controlar o uso de cookies através das configurações do seu navegador. No entanto, desabilitar alguns cookies pode afetar a funcionalidade da nossa Plataforma.',
+            ],
+            [
+                'title' => '6. Segurança dos Seus Dados Pessoais',
+                'content' => 'Implementamos medidas de segurança técnicas e organizacionais adequadas para proteger seus dados pessoais contra acesso não autorizado, uso indevido, alteração, divulgação ou destruição, incluindo criptografia, firewalls, controles de acesso e treinamento de nossos colaboradores.<br><br>'
+                    .'No entanto, é importante lembrar que nenhuma medida de segurança é completamente infalível. Portanto, não podemos garantir a segurança absoluta dos seus dados pessoais.',
+            ],
+            [
+                'title' => '7. Retenção dos Seus Dados Pessoais',
+                'content' => 'Nós reteremos seus dados pessoais pelo tempo necessário para cumprir as finalidades para as quais foram coletados, incluindo o cumprimento de obrigações legais, regulatórias, contratuais ou para o exercício regular de direitos.',
+            ],
+            [
+                'title' => '8. Seus Direitos em Relação aos Seus Dados Pessoais',
+                'content' => 'Em conformidade com a LGPD, você tem os seguintes direitos: acesso, retificação, eliminação, oposição, portabilidade, revogação do consentimento, informação sobre o compartilhamento e revisão de decisões automatizadas.<br><br>'
+                    .'Para exercer qualquer um desses direitos, entre em contato conosco pelos canais indicados na seção "Contato" abaixo. A solicitação será analisada de acordo com a LGPD e demais normas aplicáveis, podendo ser necessária a confirmação da identidade do titular.',
+            ],
+            [
+                'title' => '9. Privacidade de Crianças e Adolescentes',
+                'content' => 'Nossa Plataforma não se destina à compra de bebidas alcoólicas por menores de 18 anos. A comercialização de bebidas alcoólicas é restrita a maiores de 18 anos. Caso sejam identificados dados ou contas utilizados em desacordo com essa regra, poderão ser adotadas medidas de verificação, bloqueio ou exclusão, observada a legislação aplicável.',
+            ],
+            [
+                'title' => '10. Alterações a Esta Política de Privacidade',
+                'content' => 'Podemos atualizar esta Política de Privacidade periodicamente para refletir mudanças em nossas práticas de privacidade ou em decorrência de alterações na legislação. A versão mais recente estará sempre disponível em nossa Plataforma, com a data da última atualização.',
+            ],
+            [
+                'title' => '11. Contato',
+                'content' => 'Se você tiver alguma dúvida ou preocupação sobre esta Política de Privacidade ou sobre o tratamento dos seus dados pessoais, entre em contato conosco:<br><br>'
+                    .'E-mail: faleconosco@cervagelada.com.br<br>'
+                    .'Endereço: Av. Camilo Di Lellis, 1065, Sala OutBox, Centro - 83323-000 - Pinhais - PR<br>'
+                    .'Telefone: (41) 9 8855-1173',
+            ],
+        ],
+    ]);
+});
