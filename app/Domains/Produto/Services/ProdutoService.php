@@ -154,17 +154,17 @@ class ProdutoService extends BaseService
      */
     private function sanitizeFileName(?string $fileName, UploadedFile $file): string
     {
-        if (!$fileName) {
-            return (string) Str::uuid() . '.' . $file->getClientOriginalExtension();
+        if (! $fileName) {
+            return (string) Str::uuid().'.'.$file->getClientOriginalExtension();
         }
 
         // Se o nome do arquivo retornado pelo serviço contiver caminhos ou o prefixo "php" típico de temp do Linux
-        if (str_contains($fileName, '/') || str_contains($fileName, '\\') || (str_starts_with($fileName, 'php') && !str_contains($fileName, '.'))) {
+        if (str_contains($fileName, '/') || str_contains($fileName, '\\') || (str_starts_with($fileName, 'php') && ! str_contains($fileName, '.'))) {
             $cleanName = basename($fileName);
 
             // Se ainda assim parecer um arquivo temporário (sem extensão), forçamos uma extensão baseada no arquivo original
-            if (!str_contains($cleanName, '.')) {
-                $cleanName .= '.' . ($file->getClientOriginalExtension() ?: 'png');
+            if (! str_contains($cleanName, '.')) {
+                $cleanName .= '.'.($file->getClientOriginalExtension() ?: 'png');
             }
 
             return $cleanName;
@@ -205,11 +205,11 @@ class ProdutoService extends BaseService
                 $produto = $this->produto::find($produtoId);
             }
 
-            if (!$produto && !empty($data['ean'])) {
+            if (! $produto && ! empty($data['ean'])) {
                 $produto = $this->produto::where('ean', $data['ean'])->first();
             }
 
-            if (!$produto) {
+            if (! $produto) {
                 if ($loja->tipo_loja !== 'cervejaria') {
                     abort(403, 'Apenas lojas do tipo Cervejaria podem cadastrar novos produtos.');
                 }
@@ -246,7 +246,7 @@ class ProdutoService extends BaseService
                         'atributos' => $data['atributos'] ?? $produto->atributos,
                     ];
 
-                    if (array_key_exists('url_imagem', $data)) {
+                    if (! empty($data['url_imagem'])) {
                         $updateData['url_imagem'] = $data['url_imagem'];
                     }
 

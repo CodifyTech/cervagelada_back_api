@@ -49,6 +49,13 @@ class S3FileUrlCast implements CastsAttributes
 
         // Se for uma URL completa vindo do frontend, extraímos apenas o filename
         if (filter_var($value, FILTER_VALIDATE_URL)) {
+            $prefixoS3 = Storage::disk('s3')->url($model->getTable().'/');
+
+            // URL externa (ex: catálogo importado) não pertence ao nosso bucket, mantém inteira
+            if (! str_starts_with($value, $prefixoS3)) {
+                return $value;
+            }
+
             return basename(parse_url($value, PHP_URL_PATH));
         }
 
