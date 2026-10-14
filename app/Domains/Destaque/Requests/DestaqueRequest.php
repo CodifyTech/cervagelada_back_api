@@ -11,7 +11,7 @@ class DestaqueRequest extends BaseFormRequest
         return [
             'titulo' => ['required', 'string', 'max:150'],
             'descricao' => ['nullable', 'string'],
-            'imagem' => ['nullable', 'string', 'max:255'],
+            'imagem' => ['nullable'],
             'video_url' => ['nullable', 'url', 'max:255'],
             'cta_texto' => ['nullable', 'string', 'max:100'],
             'cta_url' => ['nullable', 'url', 'max:255'],

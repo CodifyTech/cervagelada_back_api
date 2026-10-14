@@ -4,11 +4,15 @@ namespace App\Domains\Loja\Services;
 
 use App\Domains\Loja\Models\Loja;
 use App\Domains\Shared\Services\BaseService;
+use App\Domains\Shared\Services\UploadService;
+use Illuminate\Http\UploadedFile;
 
 class LojaService extends BaseService
 {
-    public function __construct(private readonly Loja $loja)
-    {
+    public function __construct(
+        private readonly Loja $loja,
+        private readonly UploadService $uploadService
+    ) {
         $this->setModel($this->loja);
     }
 
@@ -27,6 +31,14 @@ class LojaService extends BaseService
             // Extract horarios from data
             $horarios = $data['horarios'] ?? [];
             unset($data['horarios']);
+
+            if (isset($data['url_logo']) && $data['url_logo'] instanceof UploadedFile) {
+                $data['url_logo'] = $this->uploadService->armazenarFoto(
+                    $data['url_logo'],
+                    null,
+                    'lojas/'
+                );
+            }
 
             // Create the store
             $loja = $this->loja::create($data);
@@ -67,6 +79,15 @@ class LojaService extends BaseService
             // Extract horarios from data
             $horarios = $data['horarios'] ?? null;
             unset($data['horarios']);
+
+            if (isset($data['url_logo']) && $data['url_logo'] instanceof UploadedFile) {
+                $arquivoAtual = basename((string) parse_url((string) $loja->getRawOriginal('url_logo'), PHP_URL_PATH));
+                $data['url_logo'] = $this->uploadService->armazenarFoto(
+                    $data['url_logo'],
+                    $arquivoAtual,
+                    'lojas/'
+                );
+            }
 
             // Update the store
             $loja->update($data);

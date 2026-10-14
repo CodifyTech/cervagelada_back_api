@@ -11,7 +11,7 @@ class NoticiasRequest extends BaseFormRequest
         return [
             'titulo' => ['required', 'string', 'max:150'],
             'conteudo' => ['required', 'string'],
-            'url_imagem' => ['nullable', 'string', 'max:255'],
+            'url_imagem' => ['nullable'],
             'publicado_em' => ['required', 'date'],
             'ativo' => ['required', 'boolean'],
             'fonte' => ['nullable', 'string', 'max:150'],
