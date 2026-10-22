@@ -16,7 +16,7 @@ class AsaasService
         $this->apiKey = config('services.asaas.api_key');
         $this->baseUrl = config('services.asaas.sandbox')
             ? 'https://sandbox.asaas.com/api/v3'
-            : 'https://api.asaas.com/api/v3';
+            : 'https://api.asaas.com/v3';
     }
 
     /**
@@ -88,7 +88,7 @@ class AsaasService
         $http = Http::withHeaders([
             'access_token' => $this->apiKey,
             'Content-Type' => 'application/json',
-        ])->retry(3, 500)->timeout(30);
+        ])->retry(3, 500, throw: false)->timeout(30);
 
         $url = $this->baseUrl.$endpoint;
 
