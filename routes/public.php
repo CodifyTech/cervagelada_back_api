@@ -72,5 +72,6 @@ Route::group(['prefix' => 'public'], function () {
         Route::post('pedidos', [PublicPedidoController::class, 'store']);
         Route::get('pedidos/{id}', [PublicPedidoController::class, 'show']);
         Route::get('pedidos/{id}/pagamento/status', [PublicPedidoController::class, 'paymentStatus']);
+        Route::get('pedidos/{id}/pagamento/pix', [PublicPedidoController::class, 'pixPagamento']);
     });
 });

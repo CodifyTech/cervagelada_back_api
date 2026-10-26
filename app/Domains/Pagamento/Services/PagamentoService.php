@@ -3,6 +3,8 @@
 namespace App\Domains\Pagamento\Services;
 
 use App\Domains\Pagamento\Models\Pagamento;
+use App\Domains\Pedido\Enums\OrderStatus;
+use App\Domains\Pedido\Events\NewOrderReceived;
 use App\Domains\Pedido\Models\Pedido;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +54,7 @@ class PagamentoService
                     'expiryYear' => $paymentData['expiryYear'],
                     'ccv' => $paymentData['ccv'],
                 ];
-                
+
                 $chargeData['creditCardHolderInfo'] = [
                     'name' => $user->name,
                     'email' => $user->email,
@@ -64,7 +66,7 @@ class PagamentoService
                     'mobilePhone' => preg_replace('/\D/', '', $user->phone ?? ''),
                 ];
 
-                if (!empty($paymentData['remoteIp'])) {
+                if (! empty($paymentData['remoteIp'])) {
                     $chargeData['remoteIp'] = $paymentData['remoteIp'];
                 }
             }
@@ -85,11 +87,8 @@ class PagamentoService
 
             if ($localStatus === 'pago') {
                 $pagamento->update(['pago_em' => now()]);
-                
-                if ($pedido->status->value === \App\Domains\Pedido\Enums\OrderStatus::AGUARDANDO_PAGAMENTO->value) {
-                    $pedido->update(['status' => \App\Domains\Pedido\Enums\OrderStatus::RECEBIDO->value]);
-                    \App\Domains\Pedido\Events\NewOrderReceived::dispatch($pedido->load(['itemPedidos', 'loja', 'user']));
-                }
+
+                $this->confirmarPedidoPago($pedido);
             }
 
             // If PIX, fetch QR code
@@ -123,9 +122,43 @@ class PagamentoService
                 'status' => $newStatus,
                 'pago_em' => $newStatus === 'pago' ? now() : $pagamento->pago_em,
             ]);
+
+            if ($newStatus === 'pago') {
+                $this->confirmarPedidoPago($pagamento->pedido);
+            }
         }
 
         return $pagamento->refresh();
+    }
+
+    /**
+     * Avança o pedido de "aguardando pagamento" para "recebido" e avisa a loja.
+     * Não faz nada se o pedido já foi confirmado (ex.: pelo webhook do Asaas).
+     */
+    private function confirmarPedidoPago(Pedido $pedido): void
+    {
+        if ($pedido->status !== OrderStatus::AGUARDANDO_PAGAMENTO) {
+            return;
+        }
+
+        $pedido->update(['status' => OrderStatus::RECEBIDO->value]);
+        NewOrderReceived::dispatch($pedido->load(['itemPedidos', 'loja', 'user']));
+    }
+
+    /**
+     * Busca no Asaas o QR Code e o código copia e cola de uma cobrança PIX.
+     *
+     * @return array{qr_code: ?string, copy_paste: ?string, expiration_date: ?string}
+     */
+    public function obterPix(Pagamento $pagamento): array
+    {
+        $pix = $this->asaasService->getPixQrCode($pagamento->asaas_charge_id);
+
+        return [
+            'qr_code' => $pix['encodedImage'] ?? null,
+            'copy_paste' => $pix['payload'] ?? null,
+            'expiration_date' => $pix['expirationDate'] ?? null,
+        ];
     }
 
     /**

@@ -139,12 +139,14 @@ class PublicPedidoController extends Controller
     /**
      * GET /api/public/pedidos/meus — List consumer's own orders.
      */
-    public function meusPedidos(): JsonResponse
+    public function meusPedidos(Request $request): JsonResponse
     {
+        $porPagina = min(max($request->integer('per_page', 15), 1), 50);
+
         $pedidos = Pedido::with(['loja', 'itemPedidos.produto', 'pagamento'])
             ->where('user_id', auth()->id())
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate($porPagina);
 
         return response()->json($pedidos);
     }
@@ -193,5 +195,37 @@ class PublicPedidoController extends Controller
             'metodo' => $pagamento->metodo,
             'pago_em' => $pagamento->pago_em,
         ]);
+    }
+
+    /**
+     * GET /api/public/pedidos/{id}/pagamento/pix — QR Code e código copia e cola de um pedido PIX pendente.
+     * Permite ao cliente concluir o pagamento depois de sair da tela de checkout.
+     */
+    public function pixPagamento(string $id): JsonResponse
+    {
+        $pedido = Pedido::with('pagamento')
+            ->where('user_id', auth()->id())
+            ->findOrFail($id);
+
+        $pagamento = $pedido->pagamento;
+
+        if (! $pagamento || $pagamento->metodo !== 'pix') {
+            return response()->json(['message' => 'Este pedido não possui pagamento via PIX.'], 404);
+        }
+
+        try {
+            $pagamento = $this->pagamentoService->sincronizarStatus($pagamento);
+
+            if ($pagamento->status !== 'pendente') {
+                return response()->json(['status' => $pagamento->status, 'pix' => null]);
+            }
+
+            return response()->json([
+                'status' => $pagamento->status,
+                'pix' => $this->pagamentoService->obterPix($pagamento),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 }
