@@ -9,8 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Change enum to include aguardando_pagamento
-        DB::statement("ALTER TABLE pedidos MODIFY COLUMN status ENUM('aguardando_pagamento','pendente','preparando','pronto','em_rota','entregue','cancelado') DEFAULT 'aguardando_pagamento'");
+        // Change enum to include aguardando_pagamento (sintaxe exclusiva do MySQL)
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE pedidos MODIFY COLUMN status ENUM('aguardando_pagamento','pendente','preparando','pronto','em_rota','entregue','cancelado') DEFAULT 'aguardando_pagamento'");
+        }
 
         // Add endereco_id for delivery address
         Schema::table('pedidos', function (Blueprint $table) {

@@ -7,6 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Sintaxe de ENUM exclusiva do MySQL; outros drivers (ex.: SQLite dos testes) são ignorados
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Step 1: Expand enum to include new values while keeping 'pendente' (allows safe UPDATE)
         DB::statement("ALTER TABLE pedidos MODIFY COLUMN status ENUM(
             'aguardando_pagamento',

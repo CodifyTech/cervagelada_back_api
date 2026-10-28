@@ -29,6 +29,9 @@ require __DIR__.'/domains/promocao.php';
 // Pedido Domain Routes
 require __DIR__.'/domains/pedido.php';
 
+// Entrega Domain Routes
+require __DIR__.'/domains/entrega.php';
+
 // ItemPedido Domain Routes
 require __DIR__.'/domains/item-pedido.php';
 

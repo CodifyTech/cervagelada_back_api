@@ -4,6 +4,7 @@ namespace App\Domains\Pedido\Controllers;
 
 use App\Domains\Endereco\Models\Endereco;
 use App\Domains\Pagamento\Services\PagamentoService;
+use App\Domains\Pedido\Enums\OrderStatus;
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Pedido\Services\DeliveryFeeService;
 use App\Domains\Pedido\Services\PedidoService;
@@ -164,12 +165,9 @@ class PublicPedidoController extends Controller
         $data = $pedido->toArray();
 
         // Only expose PIN when order is in delivery
-        if ($pedido->status === 'em_rota' && ! $pedido->pin_validado_em) {
+        if ($pedido->status === OrderStatus::EM_ROTA && ! $pedido->pin_validado_em) {
             $data['pin_entrega'] = $pedido->pin_entrega;
-        } else {
-            unset($data['pin_entrega']);
         }
-        unset($data['pin_tentativas']);
 
         return response()->json($data);
     }

@@ -50,6 +50,7 @@ class PedidoController extends BaseController
     {
         $request->validate([
             'status' => ['required', 'in:'.OrderStatus::valuesString()],
+            'entregador_id' => ['nullable', 'ulid'],
         ]);
 
         $targetStatus = OrderStatus::from($request->input('status'));
@@ -70,12 +71,28 @@ class PedidoController extends BaseController
         }
 
         try {
-            return response()->json($this->service->update($request->only('status'), $id));
+            $dados = $request->only('status');
+
+            if ($targetStatus === OrderStatus::EM_ROTA) {
+                $dados['entregador_id'] = $request->input('entregador_id');
+            }
+
+            return response()->json($this->service->update($dados, $id));
         } catch (\Exception $e) {
             $code = $e->getCode() ?: 422;
 
             return response()->json(['message' => $e->getMessage()], $code);
         }
+    }
+
+    /**
+     * GET /api/pedidos/{id}/entregadores — entregadores da loja do pedido, para o despacho.
+     */
+    public function entregadores(string $id): JsonResponse
+    {
+        $pedido = $this->service->findById($id);
+
+        return response()->json(['data' => $this->service->entregadoresDisponiveis($pedido->loja_id)]);
     }
 
     /**

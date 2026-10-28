@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\ACL\Middleware\CheckPermission;
 use App\Domains\Pedido\Controllers\PedidoController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,8 @@ Route::group([
     Route::get('pedidos/listar/loja', [PedidoController::class, 'listarLoja']);
     Route::get('pedidos/resumo/loja', [PedidoController::class, 'resumoLoja']);
     Route::patch('pedidos/{id}/status', [PedidoController::class, 'atualizarStatus']);
+    Route::get('pedidos/{id}/entregadores', [PedidoController::class, 'entregadores'])
+        ->middleware(CheckPermission::class.':admin|pedido edit');
     Route::post('pedidos/{id}/validar-pin', [PedidoController::class, 'validarPin']);
 
     // Pedido Resource Routes

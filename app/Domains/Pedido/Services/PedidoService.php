@@ -2,10 +2,13 @@
 
 namespace App\Domains\Pedido\Services;
 
+use App\Domains\ACL\Enums\RoleEnum;
 use App\Domains\Auditoria\Services\AuditService;
+use App\Domains\Auth\Models\User;
 use App\Domains\Pedido\Enums\OrderStatus;
 use App\Domains\Pedido\Models\Pedido;
 use App\Domains\Shared\Services\BaseService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 class PedidoService extends BaseService
@@ -124,6 +127,10 @@ class PedidoService extends BaseService
                 );
             }
 
+            if ($newStatus === OrderStatus::EM_ROTA && $oldStatus !== OrderStatus::EM_ROTA) {
+                $this->validarEntregadorDoDespacho($pedido, $data['entregador_id'] ?? null);
+            }
+
             // If cancelling an order that wasn't cancelled before, return stock
             if ($newStatus === OrderStatus::CANCELADO && $oldStatus !== OrderStatus::CANCELADO) {
                 foreach ($pedido->itemPedidos as $item) {
@@ -145,6 +152,45 @@ class PedidoService extends BaseService
     }
 
     /**
+     * Entregadores que podem ser escalados para a loja: usuários com o cargo
+     * entregador cuja loja principal é a informada ou que possuem vínculo ativo
+     * com ela em `entregador_loja`.
+     *
+     * @return Collection<int, User>
+     */
+    public function entregadoresDisponiveis(string $lojaId): Collection
+    {
+        return User::withoutGlobalScope('tenant')
+            ->select('id', 'name', 'telefone')
+            ->whereHas('belongsToManyRoles', fn ($consulta) => $consulta->where('slug', RoleEnum::Entregador->value))
+            ->where(function ($consulta) use ($lojaId) {
+                $consulta->where('loja_id', $lojaId)
+                    ->orWhereHas('lojasEntregador', fn ($lojas) => $lojas
+                        ->withoutGlobalScope('tenant')
+                        ->where('lojas.id', $lojaId)
+                        ->where('entregador_loja.ativo', true));
+            })
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Garante que o despacho (pronto → em_rota) informe um entregador da loja do pedido.
+     *
+     * @throws \Exception
+     */
+    private function validarEntregadorDoDespacho(Pedido $pedido, ?string $entregadorId): void
+    {
+        if (! $entregadorId) {
+            throw new \Exception('Informe o entregador para despachar o pedido.', 422);
+        }
+
+        if (! $this->entregadoresDisponiveis($pedido->loja_id)->contains('id', $entregadorId)) {
+            throw new \Exception('O entregador informado não pertence a esta loja.', 422);
+        }
+    }
+
+    /**
      * Returns a single Pedido with all relations needed for the detail screen.
      *
      * @return Pedido
@@ -154,6 +200,7 @@ class PedidoService extends BaseService
         return Pedido::with([
             'itemPedidos.produto',
             'user' => fn ($q) => $q->withoutGlobalScope('tenant'),
+            'entregador' => fn ($q) => $q->withoutGlobalScope('tenant')->select('id', 'name', 'telefone'),
             'loja',
             'pagamento',
         ])->findOrFail($id);
@@ -167,6 +214,7 @@ class PedidoService extends BaseService
     {
         $query = Pedido::with([
             'user' => fn ($q) => $q->withoutGlobalScope('tenant'),
+            'entregador' => fn ($q) => $q->withoutGlobalScope('tenant')->select('id', 'name', 'telefone'),
             'itemPedidos.produto',
             'pagamento',
         ]);
@@ -228,13 +276,28 @@ class PedidoService extends BaseService
     }
 
     /**
-     * Validate delivery PIN for a given order.
-     * Returns the updated Pedido on success, throws on failure.
+     * Valida o PIN de entrega de um pedido.
+     * Retorna o Pedido atualizado em caso de sucesso e lança exceção em caso de falha.
+     *
+     * A exceção de PIN incorreto é lançada fora da transação para que o
+     * incremento de `pin_tentativas` (e o log de auditoria) não sofra rollback.
+     *
+     * @param  bool  $ignorarEscopoLoja  Ignora o escopo de loja (usado pelo entregador, que atua em várias lojas).
+     *
+     * @throws \Exception
      */
-    public function validarPin(string $id, string $pin): Pedido
+    public function validarPin(string $id, string $pin, bool $ignorarEscopoLoja = false): Pedido
     {
-        return \DB::transaction(function () use ($id, $pin) {
-            $pedido = Pedido::lockForUpdate()->findOrFail($id);
+        $tentativasRestantes = 0;
+
+        $pedidoEntregue = \DB::transaction(function () use ($id, $pin, $ignorarEscopoLoja, &$tentativasRestantes) {
+            $consulta = Pedido::lockForUpdate();
+
+            if ($ignorarEscopoLoja) {
+                $consulta->withoutGlobalScope('tenant');
+            }
+
+            $pedido = $consulta->findOrFail($id);
 
             if ($pedido->pin_validado_em) {
                 throw new \Exception('PIN já foi validado para este pedido.', 422);
@@ -244,31 +307,33 @@ class PedidoService extends BaseService
                 throw new \Exception('Número máximo de tentativas excedido. Contate o suporte.', 429);
             }
 
-            if ($pedido->pin_entrega !== $pin) {
+            if (! hash_equals((string) $pedido->pin_entrega, $pin)) {
                 $pedido->increment('pin_tentativas');
+                $tentativasRestantes = max(0, 3 - $pedido->pin_tentativas);
                 $this->auditService->log('pin_validation_failed', 'pedido', $id, null, null, [
-                    'tentativa' => $pedido->pin_tentativas + 1,
+                    'tentativa' => $pedido->pin_tentativas,
                 ]);
 
-                $restantes = 3 - ($pedido->pin_tentativas + 1);
-                throw new \Exception(
-                    "PIN incorreto. {$restantes} tentativa(s) restante(s).",
-                    422
-                );
+                return null;
             }
 
-            // PIN correct — mark as validated and transition to entregue
-            $oldStatus = $pedido->status;
+            $statusAnterior = $pedido->status;
             $pedido->update([
                 'pin_validado_em' => now(),
                 'status' => OrderStatus::ENTREGUE->value,
             ]);
 
             $this->auditService->log('pin_validated', 'pedido', $id);
-            $this->auditService->logOrderStatusChanged($id, $oldStatus->value, OrderStatus::ENTREGUE->value);
+            $this->auditService->logOrderStatusChanged($id, $statusAnterior->value, OrderStatus::ENTREGUE->value);
 
             return $pedido->refresh();
         });
+
+        if ($pedidoEntregue === null) {
+            throw new \Exception("PIN incorreto. {$tentativasRestantes} tentativa(s) restante(s).", 422);
+        }
+
+        return $pedidoEntregue;
     }
 
     /**

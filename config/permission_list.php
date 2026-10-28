@@ -158,4 +158,9 @@ return [
         'entrega edit',
         'entrega manage',
     ],
+    'minhas-entregas' => [
+        'minhas-entregas read',
+        'minhas-entregas list',
+        'minhas-entregas edit',
+    ],
 ];

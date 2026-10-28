@@ -26,6 +26,12 @@ class Pedido extends BaseModel
 
     protected $fillable = ['subtotal', 'taxa_entrega', 'total', 'status', 'codigo_rastreamento', 'tempo_estimado_min', 'tempo_estimado_max', 'user_id', 'loja_id', 'entregador_id', 'endereco_id', 'pin_entrega', 'pin_validado_em', 'pin_tentativas'];
 
+    /**
+     * O PIN pertence ao cliente: nunca é serializado nas respostas do painel.
+     * O fluxo público o expõe explicitamente quando o pedido está em rota.
+     */
+    protected $hidden = ['pin_entrega', 'pin_tentativas'];
+
     protected $casts = [
         'status' => OrderStatus::class,
         'pin_validado_em' => 'datetime',
