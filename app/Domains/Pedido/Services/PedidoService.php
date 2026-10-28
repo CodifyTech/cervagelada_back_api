@@ -197,13 +197,19 @@ class PedidoService extends BaseService
      */
     public function show(string $id)
     {
-        return Pedido::with([
+        $pedido = Pedido::with([
             'itemPedidos.produto',
             'user' => fn ($q) => $q->withoutGlobalScope('tenant'),
             'entregador' => fn ($q) => $q->withoutGlobalScope('tenant')->select('id', 'name', 'telefone'),
             'loja',
             'pagamento',
         ])->findOrFail($id);
+
+        if ($this->usuarioPodeVerPinEntrega()) {
+            $pedido->makeVisible('pin_entrega');
+        }
+
+        return $pedido;
     }
 
     /**
@@ -245,13 +251,41 @@ class PedidoService extends BaseService
         $perPage = intval($options['per_page'] ?? 15);
         $data = $query->paginate($perPage);
 
+        $pedidos = collect($data->items());
+
+        if ($this->usuarioPodeVerPinEntrega()) {
+            $pedidos->each(fn (Pedido $pedido) => $pedido->makeVisible('pin_entrega'));
+        }
+
         return [
-            'data' => $data->items(),
+            'data' => $pedidos->all(),
             'total' => $data->total(),
             'page' => $data->currentPage(),
             'current_page' => $data->currentPage(),
             'last_page' => $data->lastPage(),
         ];
+    }
+
+    /**
+     * O PIN de entrega só é exibido para quem administra pedidos (lojista,
+     * funcionário e administradores); consumidores e entregadores nunca o recebem
+     * pela listagem da loja.
+     */
+    private function usuarioPodeVerPinEntrega(): bool
+    {
+        $usuario = auth()->user();
+
+        if (! $usuario) {
+            return false;
+        }
+
+        foreach ([RoleEnum::Admin, RoleEnum::AdminSystem, RoleEnum::Logista, RoleEnum::Funcionario] as $perfil) {
+            if ($usuario->hasRole($perfil->value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

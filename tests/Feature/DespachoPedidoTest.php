@@ -180,3 +180,44 @@ it('o entregador despachado enxerga o pedido nas suas entregas em rota', functio
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.id', $this->pedido->id);
 });
+
+it('mostra o PIN de entrega para o lojista no painel operacional', function () {
+    $this->withToken($this->token)
+        ->getJson('/api/pedidos/listar/loja')
+        ->assertOk()
+        ->assertJsonPath('data.0.pin_entrega', '123456');
+
+    $this->withToken($this->token)
+        ->getJson("/api/pedidos/{$this->pedido->id}")
+        ->assertOk()
+        ->assertJsonPath('pin_entrega', '123456');
+});
+
+it('não expõe o PIN de entrega para o entregador', function () {
+    $entregador = criarUsuarioComPerfil('Ana', 'entregador', $this->loja->id);
+    Role::where('slug', 'entregador')->first()->permissions()->sync(
+        Permission::firstOrCreate(['slug' => 'minhas-entregas list'], ['name' => 'minhas-entregas'])->id
+    );
+    $this->pedido->update(['status' => 'em_rota', 'entregador_id' => $entregador->id]);
+
+    $this->withToken(auth('api')->login($entregador))
+        ->getJson('/api/entregas/em-rota')
+        ->assertOk()
+        ->assertJsonMissingPath('data.0.pin_entrega');
+});
+
+it('exibe o PIN de entrega na listagem do lojista', function () {
+    $this->withToken($this->token)
+        ->getJson('/api/pedidos/listar/loja')
+        ->assertOk()
+        ->assertJsonPath('data.0.id', $this->pedido->id)
+        ->assertJsonPath('data.0.pin_entrega', '123456');
+});
+
+it('não exibe o PIN de entrega na listagem para quem não administra pedidos', function () {
+    $tokenCliente = auth('api')->login($this->cliente);
+
+    $resposta = $this->withToken($tokenCliente)->getJson('/api/pedidos/listar/loja')->assertOk();
+
+    expect($resposta->json('data.0'))->not->toHaveKey('pin_entrega');
+});
